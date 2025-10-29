@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>User Account Dashboard · E-Commerce (Integrated Demo)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#0f162e; --muted:#6b7280; --accent:#2563eb; --danger:#ef4444;
+      --glass: rgba(255,255,255,0.04);
+    }
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#f8fafc,#eef2ff);color:#0f172a}
+    .sidebar{background:#0f1724;color:white;border-radius:.75rem;padding:1rem}
+    .card{background:white;border:1px solid #e6eef8;border-radius:.75rem;padding:1rem}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem .9rem;border-radius:.5rem;font-weight:600}
+    .btn-primary{background:var(--accent);color:white}
+    .btn-ghost{background:transparent;border:1px solid #e6eef8}
+    .btn-danger{background:var(--danger);color:white}
+    .avatar{height:56px;width:56px;border-radius:12px;display:grid;place-items:center;background:#eef2ff;color:#0b1220;font-weight:700}
+    input,textarea,select{border:1px solid #e6eef8;padding:.5rem;border-radius:.5rem;width:100%}
+    .small{font-size:.9rem;color:#475569}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.5);z-index:50}
+    .toast{position:fixed;right:16px;bottom:16px;background:#0f172a;color:white;padding:.6rem .9rem;border-radius:.6rem;z-index:60}
+    .hidden{display:none}
+    .kbd{background:#f1f5f9;border:1px solid #e2e8f0;padding:.1rem .4rem;border-radius:.25rem;font-size:.85rem}
+  </style>
+</head>
+<body class="min-h-screen p-6">
+
+  <!-- Header -->
+  <header class="max-w-7xl mx-auto mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold">My Account — Unified Dashboard</h1>
+      <div class="small">Profile • Security • Addresses • Orders • Payments • Preferences</div>
+    </div>
+    <div id="headerActions" class="flex items-center gap-3"></div>
+  </header>
+
+  <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
+
+    <!-- Sidebar: UI Management & Navigation -->
+    <aside class="sidebar md:col-span-1 space-y-4">
+      <div class="flex items-center gap-3">
+        <div id="miniAvatar" class="avatar">U</div>
+        <div>
+          <div id="miniName" class="font-semibold">Guest</div>
+          <div id="miniEmail" class="small">Not signed in</div>
+        </div>
+      </div>
+
+      <nav class="mt-4 space-y-1">
+        <button class="w-full text-left p-2 rounded-md hover:bg-white/5 nav-btn" data-tab="profile">Profile</button>
+        <button class="w-full text-left p-2 rounded-md hover:bg-white/5 nav-btn" data-tab="orders">Orders</button>
+        <button class="w-full text-left p-2 rounded-md hover:bg-white/5 nav-btn" data-tab="addresses">Addresses</button>
+        <button class="w-full text-left p-2 rounded-md hover:bg-white/5 nav-btn" data-tab="payments">Payments</button>
+        <button class="w-full text-left p-2 rounded-md hover:bg-white/5 nav-btn" data-tab="wishlist">Wishlist</button>
+        <button class="w-full text-left p-2 rounded-md hover:bg-white/5 nav-btn" data-tab="offers">Offers</button>
+        <button class="w-full text-left p-2 rounded-md hover:bg-white/5 nav-btn" data-tab="security">Security</button>
+        <button class="w-full text-left p-2 rounded-md hover:bg-white/5 nav-btn" data-tab="preferences">UI & Preferences</button>
+        <button class="w-full text-left p-2 rounded-md hover:bg-white/5 text-red-300 nav-btn" data-tab="privacy">Privacy</button>
+      </nav>
+
+      <div class="mt-4 text-xs small">
+        <div><strong>Accessibility</strong></div>
+        <div class="mt-2">
+          <label class="flex items-center gap-2"><input id="prefLargeFont" type="checkbox"> Large font</label>
+          <label class="flex items-center gap-2 mt-1"><input id="prefHighContrast" type="checkbox"> High contrast</label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main area: tabs -->
+    <section class="md:col-span-3 space-y-6">
+
+      <!-- Profile (Member Profile Management) -->
+      <div id="tab-profile" class="card">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div id="profileAvatar" class="avatar">U</div>
+            <div>
+              <div id="profileFullName" class="text-xl font-bold">Guest User</div>
+              <div id="profileEmailText" class="small">Not signed in</div>
+            </div>
+          </div>
+          <div id="profileActions"></div>
+        </div>
+
+        <hr class="my-4" />
+
+        <form id="profileForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="small">Full name</label>
+            <input id="inputName" placeholder="Your full name" />
+          </div>
+          <div>
+            <label class="small">Email</label>
+            <input id="inputEmail" type="email" placeholder="you@example.com" />
+          </div>
+          <div>
+            <label class="small">Phone</label>
+            <input id="inputPhone" placeholder="+91 98765 43210" />
+          </div>
+          <div>
+            <label class="small">Avatar / Initials</label>
+            <input id="inputAvatar" placeholder="AS" />
+          </div>
+
+          <div class="md:col-span-2 flex justify-between items-center">
+            <div class="small text-slate-500">Member since: <span id="memberSince">—</span></div>
+            <div class="flex gap-2">
+              <button type="button" id="openAuthBtn" class="btn btn-ghost">Sign In / Register</button>
+              <button type="button" id="saveProfileBtn" class="btn btn-primary">Save Profile</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Orders -->
+      <div id="tab-orders" class="card hidden">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold">Orders</h2>
+          <div class="small">Track and download invoices</div>
+        </div>
+        <div id="ordersList" class="mt-4 space-y-3"></div>
+      </div>
+
+      <!-- Addresses -->
+      <div id="tab-addresses" class="card hidden">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold">Saved Addresses</h2>
+          <button id="addAddrBtn" class="btn btn-primary">+ Add Address</button>
+        </div>
+        <div id="addrList" class="mt-4 space-y-3"></div>
+      </div>
+
+      <!-- Payments -->
+      <div id="tab-payments" class="card hidden">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold">Saved Payment Methods</h2>
+          <button id="addPaymentBtn" class="btn btn-primary">+ Add Method</button>
+        </div>
+        <div id="paymentsList" class="mt-4 space-y-3"></div>
+      </div>
+
+      <!-- Wishlist -->
+      <div id="tab-wishlist" class="card hidden">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold">Wishlist</h2>
+          <div class="small">Save items to buy later</div>
+        </div>
+        <ul id="wishlistList" class="mt-4 space-y-2"></ul>
+      </div>
+
+      <!-- Offers & Coupons -->
+      <div id="tab-offers" class="card hidden">
+        <h2 class="text-lg font-bold">My Offers & Coupons</h2>
+        <div id="offersList" class="mt-3 space-y-2"></div>
+      </div>
+
+      <!-- Security / User Management -->
+      <div id="tab-security" class="card hidden">
+        <h2 class="text-lg font-bold">Security & Sessions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+          <div class="p-3 border rounded">
+            <div class="small mb-2">Change Password</div>
+            <input id="curPw" type="password" placeholder="Current password" class="mb-2" />
+            <input id="newPw" type="password" placeholder="New password" class="mb-2" />
+            <input id="confirmPw" type="password" placeholder="Confirm new password" class="mb-2" />
+            <div class="text-right"><button id="changePwBtn" class="btn btn-primary">Change Password</button></div>
+          </div>
+
+          <div class="p-3 border rounded">
+            <div class="small mb-2">Two-Factor Authentication</div>
+            <div id="twofaStatus" class="mb-2">2FA is <strong>disabled</strong> (demo)</div>
+            <div class="flex gap-2">
+              <button id="toggle2faBtn" class="btn btn-ghost">Enable / Disable 2FA</button>
+            </div>
+            <hr class="my-3" />
+            <div class="small mb-2">Active Sessions</div>
+            <div id="sessionsList" class="space-y-2 small"></div>
+            <div class="mt-2 text-right"><button id="logoutAllBtn" class="btn btn-danger">Logout from all devices</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UI & Preferences (User Interface Management) -->
+      <div id="tab-preferences" class="card hidden">
+        <h2 class="text-lg font-bold">UI & Preferences</h2>
+        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <div class="small mb-2">Theme</div>
+            <label class="flex items-center gap-2"><input id="prefDarkMode" type="checkbox"> Dark mode (demo)</label>
+            <label class="flex items-center gap-2 mt-2"><input id="prefReducedMotion" type="checkbox"> Reduce animations</label>
+          </div>
+          <div>
+            <div class="small mb-2">Notifications</div>
+            <label class="flex items-center gap-2"><input id="prefOrderUpdates" type="checkbox"> Order updates</label>
+            <label class="flex items-center gap-2 mt-2"><input id="prefPromos" type="checkbox"> Promotions & offers</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacy -->
+      <div id="tab-privacy" class="card hidden">
+        <h2 class="text-lg font-bold">Privacy & Data</h2>
+        <div class="mt-3 space-y-3">
+          <div>
+            <div class="small mb-1">Download your data</div>
+            <button id="downloadDataBtn" class="btn btn-primary">Download JSON</button>
+          </div>
+          <div>
+            <div class="small mb-1">Deactivate / Delete</div>
+            <div class="small mb-2">You can deactivate temporarily or permanently delete your account.</div>
+            <div class="flex gap-2">
+              <button id="deactivateBtn" class="btn btn-ghost">Deactivate</button>
+              <button id="deleteBtn" class="btn btn-danger">Delete account</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Auth modal (signup/signin/forgot) -->
+  <div id="authModal" class="modal">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="authTitle" class="text-lg font-bold">Sign In</h3>
+        <button onclick="closeAuth()">✕</button>
+      </div>
+
+      <div id="authForms">
+        <form id="signInForm" class="space-y-3">
+          <input id="siId" placeholder="Email or phone" />
+          <input id="siPw" type="password" placeholder="Password" />
+          <div class="flex items-center justify-between">
+            <label class="small"><input id="remember" type="checkbox"> Remember me</label>
+            <a href="#" id="forgotLink" class="small">Forgot?</a>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-primary">Sign In</button>
+            <button type="button" id="goRegister" class="btn btn-ghost">Register</button>
+          </div>
+        </form>
+
+        <form id="registerForm" class="space-y-3 hidden">
+          <input id="rName" placeholder="Full name" />
+          <input id="rEmail" placeholder="Email or phone" />
+          <input id="rPw" type="password" placeholder="Password" />
+          <div class="flex gap-2">
+            <button class="btn btn-primary">Create account</button>
+            <button type="button" id="goSignIn" class="btn btn-ghost">Sign In</button>
+          </div>
+        </form>
+
+        <form id="forgotForm" class="space-y-3 hidden">
+          <input id="fpEmail" placeholder="Email or phone" />
+          <div class="flex gap-2">
+            <button class="btn btn-primary">Send reset (demo)</button>
+            <button type="button" id="backSignIn" class="btn btn-ghost">Back</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Address modal -->
+  <div id="addrModal" class="modal">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="addrModalTitle" class="text-lg font-bold">Add Address</h3>
+        <button onclick="closeAddrModal()">✕</button>
+      </div>
+      <form id="addrForm" class="space-y-3">
+        <input id="addrLabel" placeholder="Label (Home/Work)" />
+        <textarea id="addrLine" rows="3" placeholder="Full address"></textarea>
+        <div class="flex justify-end gap-2">
+          <button type="button" class="btn btn-ghost" onclick="closeAddrModal()">Cancel</button>
+          <button class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Payment modal (simple) -->
+  <div id="paymentModal" class="modal">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="paymentModalTitle" class="text-lg font-bold">Add Payment Method</h3>
+        <button onclick="closePaymentModal()">✕</button>
+      </div>
+      <form id="paymentForm" class="space-y-3">
+        <input id="pmLabel" placeholder="Label (Card / UPI)" />
+        <input id="pmDetail" placeholder="Card last 4 or UPI id" />
+        <div class="flex justify-end gap-2">
+          <button type="button" class="btn btn-ghost" onclick="closePaymentModal()">Cancel</button>
+          <button class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toastArea" aria-live="polite"></div>
+
+  <script>
+  /**************************************************************************
+   Integrated frontend demo for:
+   - User Interface Management (preferences, accessibility)
+   - User Management (auth, sessions, security)
+   - Member Profile Management (profile, addresses, orders, payments, wishlist)
+   Data stored in localStorage under keys, replace with API calls when ready.
+  ***************************************************************************/
+
+  // Storage keys & demo seeding
+  const KEY_USER = 'app_user_demo';
+  const KEY_ADDR = 'app_addr_demo';
+  const KEY_ORD = 'app_orders_demo';
+  const KEY_PAY = 'app_payments_demo';
+  const KEY_WIS = 'app_wishlist_demo';
+  const KEY_OFF = 'app_offers_demo';
+  const KEY_SESS = 'app_sessions_demo';
+  const KEY_PREFS = 'app_prefs_demo';
+
+  function seedDemo() {
+    if(!localStorage.getItem(KEY_USER)) {
+      localStorage.setItem(KEY_USER, JSON.stringify({
+        id:1, name:'Aarav Sharma', email:'aarav@example.com', phone:'+91 98765 10001', avatar:'AS', memberSince:'2024-11-02', twofa:false
+      }));
+    }
+    if(!localStorage.getItem(KEY_ADDR)) {
+      localStorage.setItem(KEY_ADDR, JSON.stringify([
+        {id:1,label:'Home',line:'12 MG Road, Bengaluru'},
+        {id:2,label:'Work',line:'Tech Park, Whitefield'}
+      ]));
+    }
+    if(!localStorage.getItem(KEY_ORD)) {
+      localStorage.setItem(KEY_ORD, JSON.stringify([
+        {id:'ORD1001',date:'2025-09-01',status:'Delivered',total:1200},
+        {id:'ORD1002',date:'2025-09-05',status:'Shipped',total:450}
+      ]));
+    }
+    if(!localStorage.getItem(KEY_PAY)) {
+      localStorage.setItem(KEY_PAY, JSON.stringify([
+        {id:1,label:'Visa • 1234',detail:'**** **** **** 1234'},
+        {id:2,label:'UPI • aarav@upi',detail:'aarav@upi'}
+      ]));
+    }
+    if(!localStorage.getItem(KEY_WIS)) {
+      localStorage.setItem(KEY_WIS, JSON.stringify([
+        {id:1,name:'Wireless Earbuds'}, {id:2,name:'Casual Sneakers'}
+      ]));
+    }
+    if(!localStorage.getItem(KEY_OFF)) {
+      localStorage.setItem(KEY_OFF, JSON.stringify([
+        {id:1,code:'WELCOME100',desc:'₹100 off for new users',exp:'2025-09-30'},
+        {id:2,code:'FREESHIP',desc:'Free shipping',exp:'2025-10-15'}
+      ]));
+    }
+    if(!localStorage.getItem(KEY_SESS)) {
+      localStorage.setItem(KEY_SESS, JSON.stringify([
+        {id:'s1',device:'Chrome on Windows',lastActive:new Date().toISOString()}
+      ]));
+    }
+    if(!localStorage.getItem(KEY_PREFS)) {
+      localStorage.setItem(KEY_PREFS, JSON.stringify({
+        dark:false,reducedMotion:false,largeFont:false,highContrast:false,notifyOrders:true,notifyPromos:true
+      }));
+    }
+  }
+
+  seedDemo();
+
+  // Helpers
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  function toast(msg, t=2200) {
+    const el = document.createElement('div'); el.className='toast'; el.textContent = msg;
+    document.body.appendChild(el); setTimeout(()=> el.remove(), t);
+  }
+
+  // Data getters/setters
+  const getUser = ()=> JSON.parse(localStorage.getItem(KEY_USER) || 'null');
+  const setUser = (u)=> { localStorage.setItem(KEY_USER, JSON.stringify(u)); renderProfileSection(); };
+  const getAddrs = ()=> JSON.parse(localStorage.getItem(KEY_ADDR) || '[]');
+  const setAddrs = (a)=> { localStorage.setItem(KEY_ADDR, JSON.stringify(a)); renderAddresses(); };
+  const getOrders = ()=> JSON.parse(localStorage.getItem(KEY_ORD) || '[]');
+  const getPays = ()=> JSON.parse(localStorage.getItem(KEY_PAY) || '[]');
+  const setPays = (p)=> { localStorage.setItem(KEY_PAY, JSON.stringify(p)); renderPayments(); };
+  const getWish = ()=> JSON.parse(localStorage.getItem(KEY_WIS) || '[]');
+  const setWish = (w)=> { localStorage.setItem(KEY_WIS, JSON.stringify(w)); renderWishlist(); };
+  const getOffers = ()=> JSON.parse(localStorage.getItem(KEY_OFF) || '[]');
+  const getSess = ()=> JSON.parse(localStorage.getItem(KEY_SESS) || '[]');
+  const setSess = (s)=> { localStorage.setItem(KEY_SESS, JSON.stringify(s)); renderSessions(); };
+  const getPrefs = ()=> JSON.parse(localStorage.getItem(KEY_PREFS) || '{}');
+  const setPrefs = (p)=> { localStorage.setItem(KEY_PREFS, JSON.stringify(p)); applyPrefs(); };
+
+  // Render functions
+  function renderProfileSection(){
+    const u = getUser();
+    if(!u) {
+      $('#profileFullName').textContent = 'Guest User';
+      $('#profileEmailText').textContent = 'Not signed in';
+      $('#miniName').textContent = 'Guest';
+      $('#miniEmail').textContent = 'Not signed in';
+      $('#profileAvatar').textContent = 'U';
+      $('#miniAvatar').textContent = 'U';
+      $('#inputName').value=''; $('#inputEmail').value=''; $('#inputPhone').value=''; $('#inputAvatar').value='';
+      $('#profileActions').innerHTML = '<button id="openAuthTop" class="btn btn-primary">Sign In</button>';
+      $('#headerActions').innerHTML = '<button id="openAuthTop2" class="btn btn-primary">Sign In</button>';
+      $('#openAuthTop')?.addEventListener('click', openAuth);
+      $('#openAuthTop2')?.addEventListener('click', openAuth);
+      return;
+    }
+    const initials = (u.avatar || u.name || 'U').slice(0,2).toUpperCase();
+    $('#profileFullName').textContent = u.name;
+    $('#profileEmailText').textContent = u.email;
+    $('#miniName').textContent = u.name;
+    $('#miniEmail').textContent = u.email;
+    $('#profileAvatar').textContent = initials;
+    $('#miniAvatar').textContent = initials;
+    $('#inputName').value = u.name || '';
+    $('#inputEmail').value = u.email || '';
+    $('#inputPhone').value = u.phone || '';
+    $('#inputAvatar').value = u.avatar || '';
+    $('#memberSince').textContent = u.memberSince || '—';
+    $('#profileActions').innerHTML = '<button id="signOutBtn" class="btn btn-ghost">Sign Out</button>';
+    $('#headerActions').innerHTML = '<div class="flex items-center gap-2"><div class="small mr-2">Signed in</div><button id="signOutBtnTop" class="btn btn-ghost">Sign Out</button></div>';
+    $('#signOutBtn')?.addEventListener('click', signOut);
+    $('#signOutBtnTop')?.addEventListener('click', signOut);
+  }
+
+  function renderOrders() {
+    const list = getOrders();
+    $('#ordersList').innerHTML = list.length ? list.map(o=>`
+      <div class="p-3 border rounded flex justify-between items-center">
+        <div><div class="font-semibold">${o.id}</div><div class="small">${o.date} • ${o.status}</div></div>
+        <div class="text-right"><div class="font-bold">₹ ${o.total}</div><div class="small mt-1"><button class="btn btn-ghost" onclick="downloadInvoice('${o.id}')">Download Invoice</button></div></div>
+      </div>
+    `).join('') : '<div class="small text-gray-500">No orders</div>';
+  }
+
+  function downloadInvoice(id){
+    const orders = getOrders();
+    const o = orders.find(x=>x.id===id);
+    if(!o) return toast('Order not found');
+    const txt = `Invoice for ${o.id}\nTotal: ₹${o.total}\nStatus: ${o.status}`;
+    const blob = new Blob([txt], {type:'text/plain'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${o.id}-invoice.txt`; a.click(); URL.revokeObjectURL(a.href);
+    toast('Invoice downloaded (demo)');
+  }
+
+  function renderAddresses(){
+    const list = getAddrs();
+    $('#addrList').innerHTML = list.length ? list.map(a=>`
+      <div class="p-3 border rounded flex justify-between items-start">
+        <div><div class="font-semibold">${a.label}</div><div class="small">${a.line}</div></div>
+        <div class="flex flex-col gap-2">
+          <button class="btn btn-ghost" onclick="editAddr(${a.id})">Edit</button>
+          <button class="btn btn-danger" onclick="delAddr(${a.id})">Delete</button>
+        </div>
+      </div>
+    `).join('') : '<div class="small text-gray-500">No saved addresses</div>';
+  }
+
+  function renderPayments(){
+    const list = getPays();
+    $('#paymentsList').innerHTML = list.length ? list.map(p=>`
+      <div class="p-3 border rounded flex justify-between items-center">
+        <div><div class="font-semibold">${p.label}</div><div class="small">${p.detail}</div></div>
+        <div class="flex gap-2"><button class="btn btn-ghost" onclick="delPayment(${p.id})">Remove</button></div>
+      </div>
+    `).join('') : '<div class="small text-gray-500">No payment methods</div>';
+  }
+
+  function renderWishlist(){
+    const list = getWish();
+    $('#wishlistList').innerHTML = list.length ? list.map(w=>`
+      <li class="p-2 border rounded flex justify-between items-center">
+        <div>${w.name}</div><div><button class="btn btn-ghost" onclick="removeWish(${w.id})">Remove</button></div>
+      </li>
+    `).join('') : '<div class="small text-gray-500">No wishlist items</div>';
+  }
+
+  function renderOffers(){
+    const list = getOffers();
+    $('#offersList').innerHTML = list.length ? list.map(o=>`
+      <div class="p-2 border rounded flex justify-between items-center">
+        <div><div class="font-semibold">${o.code}</div><div class="small">${o.desc} • Exp: ${o.exp}</div></div>
+        <div><button class="btn btn-ghost" onclick="copyCode('${o.code}')">Copy</button></div>
+      </div>
+    `).join('') : '<div class="small text-gray-500">No offers</div>';
+  }
+
+  function copyCode(code){ navigator.clipboard?.writeText(code); toast('Code copied'); }
+
+  function renderSessions(){
+    const s = getSess();
+    $('#sessionsList').innerHTML = s.length ? s.map(sess=>`<div>${sess.device}<div class="small text-gray-500">${new Date(sess.lastActive).toLocaleString()}</div></div>`).join('') : '<div class="small text-gray-500">No sessions</div>';
+  }
+
+  function applyPrefs(){
+    const p = getPrefs();
+    // theme toggle (demo only - no real theme switching)
+    document.body.style.fontSize = p.largeFont ? '18px' : '16px';
+    document.body.style.background = p.dark ? 'linear-gradient(180deg,#0b1020,#0d1226)' : 'linear-gradient(180deg,#f8fafc,#eef2ff)';
+    // high contrast
+    document.body.style.filter = p.highContrast ? 'contrast(1.15)' : 'none';
+    // reduced motion - could toggle CSS classes; demo just stores pref
+    // set checkbox states
+    $('#prefDarkMode').checked = p.dark;
+    $('#prefReducedMotion').checked = p.reducedMotion;
+    $('#prefLargeFont').checked = p.largeFont;
+    $('#prefHighContrast').checked = p.highContrast;
+    $('#prefOrderUpdates').checked = p.notifyOrders;
+    $('#prefPromos').checked = p.notifyPromos;
+  }
+
+  // initial render
+  renderProfileSection();
+  renderOrders();
+  renderAddresses();
+  renderPayments();
+  renderWishlist();
+  renderOffers();
+  renderSessions();
+  applyPrefs();
+
+  // Navigation wiring
+  $$('.nav-btn').forEach(btn => btn.addEventListener('click', (e)=>{
+    const tab = btn.dataset.tab;
+    $$('[id^="tab-"]').forEach(t=> t.classList.add('hidden'));
+    $(`#tab-${tab}`).classList.remove('hidden');
+    // highlight active
+    $$('.nav-btn').forEach(n=> n.classList.remove('bg-white/5'));
+    btn.classList.add('bg-white/5');
+  }));
+
+  // Profile save
+  $('#saveProfileBtn').addEventListener('click', ()=>{
+    const name = $('#inputName').value.trim();
+    const email = $('#inputEmail').value.trim();
+    const phone = $('#inputPhone').value.trim();
+    const avatar = $('#inputAvatar').value.trim();
+    if(!name || !email) return toast('Name & email required');
+    const u = getUser() || {};
+    const newU = {...u, name, email, phone, avatar, memberSince: u.memberSince || new Date().toISOString().slice(0,10)};
+    setUser(newU);
+    toast('Profile saved');
+  });
+
+  // Auth modal handlers
+  function openAuth(){ $('#authModal').style.display = 'flex'; showAuth('signin'); }
+  function closeAuth(){ $('#authModal').style.display = 'none'; }
+  function showAuth(mode){
+    $('#authTitle').textContent = mode === 'signin' ? 'Sign In' : mode === 'register' ? 'Register' : 'Forgot password';
+    $('#signInForm').classList.toggle('hidden', mode !== 'signin');
+    $('#registerForm').classList.toggle('hidden', mode !== 'register');
+    $('#forgotForm').classList.toggle('hidden', mode !== 'forgot');
+  }
+  $('#openAuthBtn').addEventListener('click', openAuth);
+  $('#goRegister').addEventListener('click', ()=> showAuth('register'));
+  $('#goSignIn').addEventListener('click', ()=> showAuth('signin'));
+  $('#forgotLink').addEventListener('click', (e)=> { e.preventDefault(); showAuth('forgot'); });
+  $('#backSignIn').addEventListener('click', ()=> showAuth('signin'));
+
+  // Sign in demo: any credentials -> sign in
+  $('#signInForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const id = $('#siId').value.trim(), pw = $('#siPw').value;
+    if(!id || !pw) return toast('Enter credentials');
+    // create session
+    const sessions = getSess();
+    sessions.push({id:'s'+Math.random().toString(36).slice(2,8), device: navigator.userAgent.split(')')[0] + ')', lastActive: new Date().toISOString()});
+    setSess(sessions);
+    // ensure user exists
+    seedDemo();
+    renderProfileSection();
+    renderAddresses();
+    renderOrders();
+    renderPayments();
+    renderWishlist();
+    closeAuth();
+    toast('Signed in (demo)');
+  });
+
+  // Register demo
+  $('#registerForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = $('#rName').value.trim(), email = $('#rEmail').value.trim(), pw = $('#rPw').value;
+    if(!name || !email || !pw) return toast('Fill all fields');
+    const user = {id:Date.now(), name, email, phone:'', avatar: name.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase(), memberSince: new Date().toISOString().slice(0,10), twofa:false};
+    setUser(user);
+    seedDemo();
+    closeAuth();
+    toast('Account created (demo)');
+  });
+
+  // Forgot demo
+  $('#forgotForm').addEventListener('submit', (e)=>{
+    e.preventDefault(); const mail = $('#fpEmail').value.trim(); if(!mail) return toast('Enter email'); toast('Reset link sent (demo)'); showAuth('signin');
+  });
+
+  // Sign out
+  function signOut(){
+    localStorage.removeItem(KEY_SESS);
+    setSess([]);
+    // keep user data but show signed out UI
+    renderProfileSection();
+    toast('Signed out (demo)');
+  }
+
+  // Addresses modal handling
+  $('#addAddrBtn').addEventListener('click', ()=> {
+    $('#addrModalTitle').textContent = 'Add Address';
+    $('#addrLabel').value=''; $('#addrLine').value=''; $('#addrModal').style.display='flex';
+    delete $('#addrModal').dataset.edit;
+  });
+  function closeAddrModal(){ $('#addrModal').style.display='none'; delete $('#addrModal').dataset.edit; }
+
+  $('#addrForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const label = $('#addrLabel').value.trim() || 'Other'; const line = $('#addrLine').value.trim();
+    if(!line) return toast('Enter address');
+    const list = getAddrs();
+    if($('#addrModal').dataset.edit){
+      const id = Number($('#addrModal').dataset.edit);
+      const idx = list.findIndex(x=>x.id===id);
+      if(idx>-1) list[idx] = {id,label,line};
+      setAddrs(list);
+      toast('Address updated');
+    } else {
+      const id = Date.now();
+      list.push({id,label,line});
+      setAddrs(list);
+      toast('Address added');
+    }
+    closeAddrModal();
+  });
+
+  window.editAddr = function(id){
+    const list = getAddrs(); const a = list.find(x=>x.id===id); if(!a) return;
+    $('#addrModalTitle').textContent = 'Edit Address'; $('#addrLabel').value = a.label; $('#addrLine').value = a.line; $('#addrModal').style.display='flex'; $('#addrModal').dataset.edit = id;
+  };
+  window.delAddr = function(id){
+    if(!confirm('Delete address?')) return;
+    const list = getAddrs().filter(x=>x.id!==id); setAddrs(list); toast('Address deleted');
+  };
+
+  // Payments modal
+  $('#addPaymentBtn').addEventListener('click', ()=> {
+    $('#paymentModal').style.display='flex'; $('#pmLabel').value=''; $('#pmDetail').value=''; delete $('#paymentModal').dataset.edit;
+  });
+  function closePaymentModal(){ $('#paymentModal').style.display='none'; delete $('#paymentModal').dataset.edit; }
+
+  $('#paymentForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const label = $('#pmLabel').value.trim() || 'Method'; const detail = $('#pmDetail').value.trim();
+    if(!detail) return toast('Enter payment details');
+    const list = getPays();
+    const id = Date.now();
+    list.push({id,label,detail});
+    setPays(list);
+    closePaymentModal(); toast('Payment method added (demo)');
+  });
+  window.delPayment = function(id){
+    if(!confirm('Remove payment method?')) return;
+    setPays(getPays().filter(p=>p.id!==id));
+    toast('Removed');
+  };
+
+  // Wishlist
+  function renderWishlist(){ /* already implemented above */ }
+  window.removeWish = function(id){
+    setWish(getWish().filter(w=>w.id!==id)); toast('Removed from wishlist');
+  };
+
+  // Offers
+  // copyCode already implemented
+
+  // Security & sessions
+  $('#changePwBtn').addEventListener('click', ()=>{
+    const cur = $('#curPw').value; const n = $('#newPw').value; const c = $('#confirmPw').value;
+    if(!cur || !n) return toast('Enter current and new password (demo)');
+    if(n !== c) return toast('Passwords do not match');
+    $('#curPw').value = $('#newPw').value = $('#confirmPw').value = '';
+    toast('Password changed (demo)');
+  });
+
+  $('#toggle2faBtn').addEventListener('click', ()=>{
+    const u = getUser(); if(!u){ toast('Sign in to toggle 2FA'); return; }
+    u.twofa = !u.twofa; setUser(u); $('#twofaStatus').innerHTML = `2FA is <strong>${u.twofa ? 'enabled' : 'disabled'}</strong> (demo)`; toast('Toggled 2FA (demo)');
+  });
+
+  $('#logoutAllBtn').addEventListener('click', ()=>{
+    if(!confirm('Logout from all devices?')) return;
+    localStorage.removeItem(KEY_SESS); setSess([]); toast('Logged out from all devices (demo)');
+  });
+
+  // Preferences UI
+  $('#prefDarkMode').addEventListener('change', ()=> { const p=getPrefs(); p.dark = $('#prefDarkMode').checked; setPrefs(p); });
+  $('#prefReducedMotion').addEventListener('change', ()=> { const p=getPrefs(); p.reducedMotion = $('#prefReducedMotion').checked; setPrefs(p); });
+  $('#prefLargeFont').addEventListener('change', ()=> { const p=getPrefs(); p.largeFont = $('#prefLargeFont').checked; setPrefs(p); });
+  $('#prefHighContrast').addEventListener('change', ()=> { const p=getPrefs(); p.highContrast = $('#prefHighContrast').checked; setPrefs(p); });
+  $('#prefOrderUpdates').addEventListener('change', ()=> { const p=getPrefs(); p.notifyOrders = $('#prefOrderUpdates').checked; setPrefs(p); });
+  $('#prefPromos').addEventListener('change', ()=> { const p=getPrefs(); p.notifyPromos = $('#prefPromos').checked; setPrefs(p); });
+
+  // Data download & account actions
+  $('#downloadDataBtn').addEventListener('click', ()=>{
+    const payload = { user:getUser(), addresses:getAddrs(), orders:getOrders(), payments:getPays(), wishlist:getWish(), offers:getOffers() };
+    const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+    const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='my-data.json'; a.click(); URL.revokeObjectURL(a.href); toast('Download started');
+  });
+
+  $('#deactivateBtn').addEventListener('click', ()=>{
+    if(!confirm('Deactivate account?')) return;
+    const u = getUser(); if(u){ u.deactivated = true; setUser(u); toast('Account deactivated (demo)'); }
+  });
+
+  $('#deleteBtn').addEventListener('click', ()=>{
+    if(!confirm('This permanently deletes your demo data. Continue?')) return;
+    localStorage.removeItem(KEY_USER); localStorage.removeItem(KEY_ADDR); localStorage.removeItem(KEY_PAY); localStorage.removeItem(KEY_WIS); localStorage.removeItem(KEY_ORD); localStorage.removeItem(KEY_OFF); localStorage.removeItem(KEY_SESS);
+    seedDemo(); renderProfileSection(); renderAddresses(); renderPayments(); renderWishlist(); renderOrders(); renderOffers(); renderSessions(); toast('Account deleted (demo)');
+  });
+
+  // download invoice function implemented above
+
+  // small convenience: ctrl+k opens auth modal
+  document.addEventListener('keydown', e=> { if(e.ctrlKey && e.key.toLowerCase()==='k') openAuth(); });
+
+  // Initial visual prefs render
+  applyPrefs();
+
+  </script>
+</body>
+</html>

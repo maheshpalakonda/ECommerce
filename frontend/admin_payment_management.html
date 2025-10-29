@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin · Orders & Payments</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--bg:#0b1020;--card:#0f162e;--muted:#98a2b3;--primary:#6366f1;--success:#22c55e;--danger:#ef4444}
+    html,body{height:100%}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0b1020,#0d1226);color:#e6eef8}
+    .glass{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 24px rgba(2,6,23,.45)}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01)); border:1px solid rgba(255,255,255,.05)}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:10px;padding:.5rem .8rem;font-weight:600}
+    .btn-primary{background:var(--primary);color:white}
+    .btn-danger{background:var(--danger);color:white}
+    .chip{padding:.2rem .5rem;border-radius:999px;font-size:.75rem}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.6)}
+    .scroll-slim{scrollbar-width:thin}
+    .scroll-slim::-webkit-scrollbar{height:8px;width:8px}
+    .scroll-slim::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px}
+  </style>
+</head>
+<body>
+  <header class="glass sticky top-0 p-3 z-30">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div>
+        <h1 class="font-bold">Orders & Payments</h1>
+        <p class="text-sm text-slate-400">Manage orders, payments, refunds and free-delivery rules</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="goToCatalog" class="btn btn-primary">Catalog</button>
+        <button id="goToOffers" class="btn btn-ghost">Offers</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-4 space-y-6">
+    <!-- KPI cards -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="card rounded-2xl p-4">
+        <div class="text-sm text-slate-400">Today Orders</div>
+        <div id="kpiToday" class="text-2xl font-bold">0</div>
+      </div>
+      <div class="card rounded-2xl p-4">
+        <div class="text-sm text-slate-400">Paid</div>
+        <div id="kpiPaid" class="text-2xl font-bold">0</div>
+      </div>
+      <div class="card rounded-2xl p-4">
+        <div class="text-sm text-slate-400">Pending Payments</div>
+        <div id="kpiPending" class="text-2xl font-bold">0</div>
+      </div>
+      <div class="card rounded-2xl p-4">
+        <div class="text-sm text-slate-400">Free Delivery Used</div>
+        <div id="kpiFree" class="text-2xl font-bold">0</div>
+      </div>
+    </section>
+
+    <!-- Controls -->
+    <section class="glass rounded-2xl p-3">
+      <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+        <div class="flex gap-2 items-center">
+          <input id="orderSearch" placeholder="Search order id, customer, txn id" class="bg-white/5 px-3 py-2 rounded-xl w-72" />
+          <select id="statusFilter" class="bg-white/5 px-3 py-2 rounded-xl">
+            <option value="">All Status</option>
+            <option>Pending</option><option>Paid</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option><option>Refunded</option>
+          </select>
+          <input id="fromDate" type="date" class="bg-white/5 px-3 py-2 rounded-xl" />
+          <input id="toDate" type="date" class="bg-white/5 px-3 py-2 rounded-xl" />
+        </div>
+        <div class="flex gap-2">
+          <button id="refreshBtn" class="btn btn-ghost">Refresh</button>
+          <button id="manageFreeDelivery" class="btn btn-primary">Free Delivery Rules</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Orders table -->
+    <section class="card rounded-2xl overflow-hidden">
+      <div class="overflow-auto scroll-slim" style="max-height:520px;">
+        <table class="w-full text-sm">
+          <thead class="text-slate-400 text-xs"><tr><th>Order ID</th><th>Customer</th><th>Date</th><th>Total</th><th>Payment</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Payment logs (small) -->
+    <section class="glass rounded-2xl p-4">
+      <h3 class="font-bold mb-2">Recent Payment Events</h3>
+      <div id="paymentLogs" class="text-sm text-slate-300">No events yet.</div>
+    </section>
+  </main>
+
+  <!-- Order Drawer -->
+  <aside id="orderDrawer" class="fixed right-0 top-0 h-full w-[480px] transform translate-x-full transition-transform z-40">
+    <div class="h-full glass p-4 overflow-auto">
+      <div class="flex items-center justify-between"><h3 id="drawerTitle" class="font-bold">Order</h3><button onclick="toggleDrawer(false)">✕</button></div>
+      <div id="drawerBody" class="mt-3 text-sm space-y-3"></div>
+      <div class="mt-4 flex gap-2">
+        <button id="markShipped" class="btn btn-primary">Mark Shipped</button>
+        <button id="refundBtn" class="btn btn-danger">Refund</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Modal: Update Payment / Status -->
+  <div id="statusModal" class="modal">
+    <div class="bg-[#0f162e] p-4 rounded-xl w-full max-w-md">
+      <div class="flex items-center justify-between mb-3"><h3 id="statusModalTitle" class="font-bold">Update</h3><button id="closeStatus">✕</button></div>
+      <form id="statusForm" class="grid gap-3">
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Status</span><select id="statusInput" class="bg-white/5 px-3 py-2 rounded-xl"><option>Pending</option><option>Paid</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option><option>Refunded</option></select></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Payment Status</span><select id="paymentInput" class="bg-white/5 px-3 py-2 rounded-xl"><option>Pending</option><option>Completed</option><option>Failed</option><option>Refunded</option></select></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Transaction ID (optional)</span><input id="txnInput" class="bg-white/5 px-3 py-2 rounded-xl"/></label>
+        <div class="flex justify-end gap-2"><button type="button" class="btn btn-ghost" id="cancelStatus">Cancel</button><button class="btn btn-primary" type="submit">Save</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Free Delivery Rules -->
+  <div id="freeModal" class="modal">
+    <div class="bg-[#0f162e] p-4 rounded-xl w-full max-w-2xl">
+      <div class="flex items-center justify-between mb-3"><h3 class="font-bold">Free Delivery Rules</h3><button onclick="closeFreeModal()">✕</button></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <form id="freeForm" class="space-y-2">
+            <input type="hidden" id="freeId" />
+            <label class="grid gap-1"><span class="text-xs text-slate-400">Min Order Value (₹)</span><input id="freeMin" type="number" min="0" class="bg-white/5 px-3 py-2 rounded-xl"/></label>
+            <label class="grid gap-1"><span class="text-xs text-slate-400">Applies To (category ids or product ids comma separated)</span><input id="freeApplies" class="bg-white/5 px-3 py-2 rounded-xl"/></label>
+            <label class="grid gap-1"><span class="text-xs text-slate-400">Active</span><select id="freeActive" class="bg-white/5 px-3 py-2 rounded-xl"><option value="true">Yes</option><option value="false">No</option></select></label>
+            <div class="flex gap-2"><button type="submit" class="btn btn-primary">Save Rule</button><button type="button" id="addFreeBtn" class="btn btn-ghost">New</button></div>
+          </form>
+        </div>
+        <div>
+          <h4 class="text-slate-400 text-sm">Existing Rules</h4>
+          <ul id="freeList" class="mt-2 text-sm"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Demo data
+    let orders = [
+      { id: 'ORD1001', user:'Aarav Sharma', date:'2025-09-08T10:22', subtotal:1200, discount:100, shipping:40, total:1140, payment:{method:'Card',status:'Completed',txnId:'TXN1001'}, status:'Paid', freeDeliveryApplied:false, items:[{name:'T-Shirt',qty:2,price:400}] },
+      { id: 'ORD1002', user:'Isha Patel', date:'2025-09-08T11:05', subtotal:500, discount:0, shipping:60, total:560, payment:{method:'COD',status:'Pending',txnId:''}, status:'Pending', freeDeliveryApplied:false, items:[{name:'Mug',qty:1,price:500}] },
+      { id: 'ORD1003', user:'Neha Gupta', date:'2025-09-07T18:12', subtotal:2000, discount:200, shipping:0, total:1800, payment:{method:'UPI',status:'Completed',txnId:'UPI-9876'}, status:'Shipped', freeDeliveryApplied:true, items:[{name:'Shoes',qty:1,price:2000}] }
+    ];
+
+    let freeRules = [ { id:1, minOrder:1500, appliesTo:'', active:true, usageCount:5 } ];
+
+    const qs=(s,el=document)=>el.querySelector(s); const qsa=(s,el=document)=>Array.from(el.querySelectorAll(s));
+
+    function renderKPIs(){
+      const today = new Date().toISOString().slice(0,10);
+      const todays = orders.filter(o=> o.date.slice(0,10)===today).length;
+      qs('#kpiToday').textContent = todays;
+      qs('#kpiPaid').textContent = orders.filter(o=> o.payment.status==='Completed').length;
+      qs('#kpiPending').textContent = orders.filter(o=> o.payment.status==='Pending').length;
+      qs('#kpiFree').textContent = orders.filter(o=> o.freeDeliveryApplied).length;
+    }
+
+    function renderOrders(){
+      qs('#ordersBody').innerHTML = orders.map(o=>`<tr data-id="${o.id}"><td class="py-2 font-semibold">${o.id}</td><td>${o.user}</td><td>${new Date(o.date).toLocaleString()}</td><td>₹ ${o.total}</td><td>${o.payment.method}<div class="text-xs text-slate-400">${o.payment.status}${o.payment.txnId? ' • '+o.payment.txnId:''}</div></td><td>${o.status}</td><td class="text-right"><div class="inline-flex gap-2"><button class="btn btn-ghost viewOrder" data-id="${o.id}">View</button><button class="btn btn-primary updateOrder" data-id="${o.id}">Update</button></div></td></tr>`).join('');
+      qsa('.viewOrder').forEach(b=> b.addEventListener('click', e=> openDrawerFor(e.target.dataset.id)));
+      qsa('.updateOrder').forEach(b=> b.addEventListener('click', e=> openStatusModal(e.target.dataset.id)));
+    }
+
+    function openDrawerFor(id){ const o = orders.find(x=>x.id===id); qs('#drawerTitle').textContent = `Order ${o.id}`; qs('#drawerBody').innerHTML = `
+      <div><strong>Customer:</strong> ${o.user}</div>
+      <div><strong>Date:</strong> ${new Date(o.date).toLocaleString()}</div>
+      <div><strong>Items:</strong> ${o.items.map(i=> `${i.name} x${i.qty}`).join(', ')}</div>
+      <div><strong>Subtotal:</strong> ₹ ${o.subtotal}</div>
+      <div><strong>Discount:</strong> ₹ ${o.discount}</div>
+      <div><strong>Shipping:</strong> ₹ ${o.shipping}</div>
+      <div class="font-bold">Total: ₹ ${o.total}</div>
+      <div><strong>Payment:</strong> ${o.payment.method} • ${o.payment.status}</div>
+      <div><strong>Order Status:</strong> ${o.status}</div>
+    `; qs('#markShipped').onclick = ()=> { o.status='Shipped'; renderOrders(); renderKPIs(); toggleDrawer(false); toast('Marked shipped'); };
+      qs('#refundBtn').onclick = ()=> { if(confirm('Process refund?')){ o.status='Refunded'; o.payment.status='Refunded'; renderOrders(); renderKPIs(); toggleDrawer(false); toast('Refunded'); } };
+      toggleDrawer(true);
+    }
+    function toggleDrawer(open){ qs('#orderDrawer').style.transform = open? 'translateX(0)':'translateX(100%)'; }
+
+    // Status modal
+    let currentOrderForStatus=null;
+    function openStatusModal(id){ currentOrderForStatus = orders.find(x=>x.id===id); qs('#statusModal').style.display='flex'; qs('#statusInput').value = currentOrderForStatus.status; qs('#paymentInput').value = currentOrderForStatus.payment.status; qs('#txnInput').value = currentOrderForStatus.payment.txnId||''; }
+    function closeStatusModal(){ qs('#statusModal').style.display='none'; }
+    qs('#closeStatus').addEventListener('click', closeStatusModal); qs('#cancelStatus').addEventListener('click', closeStatusModal);
+    qs('#statusForm').addEventListener('submit', e=>{ e.preventDefault(); const s = qs('#statusInput').value; const p = qs('#paymentInput').value; const txn = qs('#txnInput').value; if(!currentOrderForStatus) return; currentOrderForStatus.status = s; currentOrderForStatus.payment.status = p; currentOrderForStatus.payment.txnId = txn; if(p==='Completed') currentOrderForStatus.payment.paidAt = new Date().toISOString(); renderOrders(); renderKPIs(); closeStatusModal(); toast('Order updated'); });
+
+    // Free delivery rules
+    function openFreeModal(){ qs('#freeModal').style.display='flex'; renderFreeList(); }
+    function closeFreeModal(){ qs('#freeModal').style.display='none'; }
+    qs('#manageFreeDelivery').addEventListener('click', openFreeModal);
+    function renderFreeList(){ qs('#freeList').innerHTML = freeRules.map(r=> `<li class="p-2 rounded-lg hover:bg-white/2"><div class="flex justify-between"><div>Min ₹${r.minOrder} ${r.appliesTo? '• Applies to: '+r.appliesTo : ''}</div><div><button class="btn btn-ghost editFree" data-id="${r.id}">Edit</button><button class="btn btn-danger deleteFree" data-id="${r.id}">Delete</button></div></div></li>`).join(''); qsa('.deleteFree').forEach(b=> b.addEventListener('click', e=>{ const id=Number(e.target.dataset.id); freeRules = freeRules.filter(x=>x.id!==id); renderFreeList(); toast('Rule deleted'); })); qsa('.editFree').forEach(b=> b.addEventListener('click', e=>{ const r=freeRules.find(x=>x.id===Number(e.target.dataset.id)); qs('#freeId').value=r.id; qs('#freeMin').value=r.minOrder; qs('#freeApplies').value=r.appliesTo||''; qs('#freeActive').value = r.active?'true':'false'; })); }
+    qs('#freeForm').addEventListener('submit', e=>{ e.preventDefault(); const id = qs('#freeId').value? Number(qs('#freeId').value): null; const payload = { id: id||(Math.max(0,...freeRules.map(r=>r.id))+1), minOrder: Number(qs('#freeMin').value)||0, appliesTo: qs('#freeApplies').value.trim(), active: qs('#freeActive').value==='true' }; if(id){ const idx = freeRules.findIndex(r=>r.id===id); freeRules[idx] = {...freeRules[idx], ...payload}; toast('Rule updated'); } else { freeRules.push({...payload, usageCount:0}); toast('Rule created'); } renderFreeList(); });
+    qs('#addFreeBtn').addEventListener('click', ()=>{ qs('#freeId').value=''; qs('#freeMin').value=''; qs('#freeApplies').value=''; qs('#freeActive').value='true'; });
+
+    // Apply free delivery when creating order (example function to call from server)
+    function applyFreeDeliveryToOrder(order){ for(const r of freeRules.filter(x=>x.active)){
+      if(order.subtotal >= r.minOrder){ order.shipping = 0; order.freeDeliveryApplied = true; r.usageCount = (r.usageCount||0)+1; return order; }
+    } return order; }
+
+    // Simple toasts and refresh
+    function toast(msg){ const t=document.createElement('div'); t.className='fixed bottom-6 right-6 glass px-4 py-2 rounded-xl'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=> t.remove(),2500); }
+    qs('#refreshBtn').addEventListener('click', ()=>{ renderOrders(); renderKPIs(); toast('Refreshed'); });
+
+    // Init
+    window.addEventListener('DOMContentLoaded', ()=>{ renderOrders(); renderKPIs(); const logs = orders.map(o=> `#${o.id} ${o.payment.status} ${o.payment.txnId||''}`).join('<br>'); qs('#paymentLogs').innerHTML = logs; });
+
+    // --- PLACEHOLDERS: Replace demo actions with fetch() calls to your Node.js API endpoints ---
+    // Example:
+    // async function loadOrders(){ const res = await fetch('http://localhost:5000/api/orders'); orders = await res.json(); renderOrders(); renderKPIs(); }
+    // async function updateOrderStatus(orderId, payload){ await fetch(`http://localhost:5000/api/orders/${orderId}/status`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)}); }
+
+  </script>
+</body>
+</html>

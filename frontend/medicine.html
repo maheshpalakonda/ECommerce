@@ -1,0 +1,2228 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickCart - Medicines</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        :root {
+            --primary: #4a6cfa;
+            --secondary: #ff6b6b;
+            --accent: #42b883;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border: #e1e5eb;
+        }
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+        header {
+            background: linear-gradient(to right, var(--primary), #6c8fff);
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        .logo i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin-left: 20px;
+            position: relative;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .search-bar .search-buttons {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            display: flex;
+            gap: 5px;
+        }
+        .search-bar button {
+            background: var(--secondary);
+            border: none;
+            color: white;
+            border-radius: 50px;
+            padding: 7px 15px;
+            cursor: pointer;
+        }
+        .search-bar button.mic-btn {
+            background: var(--accent);
+        }
+        .search-bar button.mic-btn.active {
+            background: #e74c3c;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+        .header-actions a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .header-actions .language-selector {
+            margin-left: 20px;
+        }
+        .header-actions .language-selector select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        .header-actions i {
+            font-size: 20px;
+            margin-right: 5px;
+        }
+        .cart-count {
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .wishlist-count {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        nav {
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .nav-links li {
+            margin: 0 15px;
+            position: relative;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        .nav-links i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        .section {
+            padding: 60px 0;
+            scroll-margin-top: 100px;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .section-title h2 {
+            font-size: 32px;
+            color: var(--dark);
+            display: inline-block;
+        }
+        .section-title h2:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: var(--secondary);
+            margin: 10px auto;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 35px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            cursor: move;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 15px;
+        }
+        .product-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .medicine-type {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        .product-vendor {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .product-vendor i {
+            margin-right: 5px;
+            color: var(--primary);
+        }
+        .product-price {
+            font-weight: 600;
+            font-size: 20px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 16px;
+        }
+        .discounted-price {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .discount-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .like-btn {
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .go-to-cart {
+            background: var(--primary);
+        }
+        .go-to-cart:hover {
+            background: #3a5ce5; /* A darker blue for hover */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 20px;
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--secondary);
+        }
+        .footer-column ul {
+            list-style: none;
+        }
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        .footer-column a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-column a:hover {
+            color: white;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: #ccc;
+        }
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark);
+            margin: 0;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .close-modal:hover {
+            background-color: #f0f0f0;
+            color: var(--dark);
+        }
+        .modal-body {
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        .modal-image {
+            flex: 1;
+            max-width: 300px;
+        }
+        .modal-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .modal-details {
+            flex: 2;
+        }
+        .modal-price {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        .modal-type {
+            font-size: 16px;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        .modal-vendor {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+        .modal-vendor i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+        .modal-description {
+            margin-top: 20px;
+        }
+        .modal-description h3 {
+            font-size: 18px;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        .modal-description p {
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .modal-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .modal-actions .btn {
+            flex: 1;
+            max-width: 200px;
+        }
+        @media (max-width: 768px) {
+            .modal-body {
+                flex-direction: column;
+            }
+            .modal-image {
+                max-width: 100%;
+            }
+            .modal-actions {
+                flex-direction: column;
+            }
+            .modal-actions .btn {
+                max-width: none;
+            }
+        }
+        .hidden {
+            display: none;
+        }
+        @media (max-width: 992px) {
+            .header-content {
+                flex-direction: column;
+            }
+            .header-left {
+                flex-direction: column;
+                width: 100%;
+            }
+            .search-bar {
+                width: 100%;
+                max-width: none;
+                margin: 15px 0 0 0;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+        @media (max-width: 768px) {
+            .nav-links li {
+                margin: 5px 10px;
+            }
+            .section-title h2 {
+                font-size: 28px;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 15px;
+            }
+        }
+        @media (max-width: 576px) {
+            .header-actions a span {
+                display: none;
+            }
+            .nav-links {
+                overflow-x: auto;
+                white-space: nowrap;
+                justify-content: flex-start;
+                padding-bottom: 10px;
+            }
+            .product-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+        .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+    color:white;
+}
+
+.logo-img {
+    width: 40px;
+    height: 40px;
+}
+
+.logo-text {
+    letter-spacing: 1px;
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    height: 600px;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Background Images Slider */
+.bg-slider-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.bg-slide {
+    min-width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.bg-slide::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* background: linear-gradient(135deg, rgba(74, 108, 250, 0.7), rgba(255, 107, 107, 0.5)); */
+    z-index: 1;
+}
+
+/* Static Content Overlay */
+.static-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slide-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color:white;
+    max-width: 600px;
+    padding: 0 20px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease-in-out;
+}
+
+.slide-content.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.slide-content h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.slide-content p {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.hero-btn {
+    background: var(--secondary);
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    color: white;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+.hero-btn:hover {
+    background: #ff5252;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+}
+
+/* Slider Controls */
+.slider-controls {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 15px;
+    z-index: 3;
+    transform: translateY(-50%);
+}
+
+.slider-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--primary);
+    font-size: 1.1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.slider-btn:hover {
+    background: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Slider Indicators */
+.slider-indicators {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 3;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    background: white;
+    transform: scale(1.2);
+}
+
+/* Hero Search Bar */
+.hero-search-container {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 700px;
+    z-index: 3;
+}
+
+.hero-search-bar {
+    background: white;
+    border-radius: 50px;
+    padding: 4px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    overflow: hidden;
+}
+
+.hero-search-bar input {
+    flex: 1;
+    border: none;
+    padding: 15px 20px;
+    font-size: 1rem;
+    outline: none;
+    background: transparent;
+}
+
+.hero-search-bar .search-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.hero-search-bar .search-btn:hover {
+    background: #3a5ce5;
+    transform: scale(1.05);
+}
+
+.quick-categories {
+    text-align: center;
+    margin-top: 12px;
+    color: white;
+    font-size: 0.85rem;
+}
+
+.quick-cat {
+    color: white;
+    text-decoration: none;
+    margin: 0 8px;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.quick-cat:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero {
+        height: 400px !important;
+    }
+    
+    .slide-content h2 {
+        font-size: 2rem;
+    }
+    
+    .slide-content p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero {
+        height: 350px !important;
+    }
+    
+    .slide-content h2 {
+        font-size: 1.8rem;
+    }
+    
+    .slide-content p {
+        font-size: 0.9rem;
+    }
+}
+ #medicine .section-title {
+  background: none;
+  text-align: center;
+  margin-top: 0;
+  padding: 25px 0;
+  margin-bottom: 40px;
+}
+
+/* Bold glossy red gradient text with stronger shadow */
+#medicine .section-title h2 {
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-family: 'Georgia', serif;
+  background: linear-gradient(180deg, #a00000 0%, #b22222 40%, #ff4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #b22222; /* keeps the text visibly thick */
+  color: #b22222; /* fallback for other browsers */
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.8),   /* soft outer glow */
+    2px 2px 8px rgba(0, 0, 0, 0.6),      /* dark shadow for depth */
+    -2px -2px 4px rgba(255, 80, 80, 0.4); /* subtle highlight */
+}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="header-left">
+                <div class="logo" onclick="redirectToHome()">
+    <img src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" alt="ShopNest Logo" class="logo-img">
+    <span class="logo-text">ShopNest</span>
+</div>
+                <!-- <div class="logo"onclick="redirectToHome()">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span data-translate="logo_text">QuickCart</span>
+                </div> -->
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for products, services..." data-translate-placeholder="">
+                    <div class="search-buttons">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                        <button class="mic-btn"><i class="fas fa-microphone"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="add1.html#wishlist?lang=en" data-page="wishlist"><i class="fas fa-heart"></i> <span data-translate="wishlist">Wishlist</span> <span class="wishlist-count">0</span></a>
+                <a href="add1.html#cart?lang=en" data-page="cart"><i class="fas fa-shopping-cart"></i> <span data-translate="cart">Cart</span> <span class="cart-count">0</span></a>
+                <div class="language-selector">
+                    <select id="language-select">
+                        <option value="en">English</option>
+                        <option value="hi">हिंदी</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="te">తెలుగు</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+    <nav>
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="add1.html#home?lang=en" data-page="home"><i class="fas fa-home"></i> <span data-translate="nav_home">Home</span></a></li>
+                <li><a href="add1.html#products?lang=en" data-page="home"><i class="fas fa-shopping-bag"></i> <span data-translate="nav_products">Products</span></a></li>
+                <li><a href="add1.html#services?lang=en" data-page="home"><i class="fas fa-tools"></i> <span data-translate="nav_services">Services</span></a></li>
+                <li><a href="add1.html#businesses?lang=en" data-page="home"><i class="fas fa-store"></i> <span data-translate="nav_businesses">Businesses</span></a></li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+<section class="hero" id="hero">
+    <div class="slider-container">
+        <!-- Background Images Slider -->
+        <div class="bg-slider-track">
+            <div class="bg-slide active" style="background-image: url('IMAGES/medicine-hero-1.jpg')"></div>
+            <div class="bg-slide" style="background-image: url('IMAGES/medicine-hero-2.jpg')"></div>
+            <div class="bg-slide" style="background-image: url('IMAGES/medicine-hero-3.jpg')"></div>
+        </div>
+        
+        <!-- Static Content Overlay -->
+        <div class="static-content">
+            <div class="slide-content active">
+                <!-- <h2 data-translate="slide1_title">Fresh Groceries Delivered</h2>
+                <p data-translate="slide1_desc">Get fresh produce and daily essentials delivered to your doorstep</p>
+                <a href="#categories" class="btn hero-btn" data-translate="shop_groceries">Shop Groceries</a> -->
+            </div>
+            <div class="slide-content">
+                <!-- <h2 data-translate="slide2_title">Local Businesses Near You</h2>
+                <p data-translate="slide2_desc">Support local vendors and discover unique products in your area</p>
+                <a href="#businesses" class="btn hero-btn" data-translate="explore_businesses">Explore Businesses</a> -->
+            </div>
+            <div class="slide-content">
+                <!-- <h2 data-translate="slide3_title">Fast & Reliable Delivery</h2>
+                <p data-translate="slide3_desc">Quick delivery services with real-time tracking</p>
+                <a href="#services" class="btn hero-btn" data-translate="learn_more">Learn More</a> -->
+            </div>
+        </div>
+        
+        <!-- Slider Controls -->
+        <div class="slider-controls">
+            <button class="slider-btn prev-btn" onclick="prevSlide()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="slider-btn next-btn" onclick="nextSlide()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <!-- Slider Indicators -->
+        <div class="slider-indicators">
+            <span class="indicator active" onclick="goToSlide(0)"></span>
+            <span class="indicator" onclick="goToSlide(1)"></span>
+            <span class="indicator" onclick="goToSlide(2)"></span>
+        </div>
+        
+        <!-- Search Bar
+        <div class="hero-search-container">
+            <div class="hero-search-bar">
+                <input type="text" placeholder="Search for products, businesses..." data-translate="search_placeholder">
+                <button class="search-btn" data-translate="search">
+                    <i class="fas fa-search"></i>
+                    Search
+                </button>
+            </div> -->
+            <div class="quick-categories">
+                <span data-translate="popular_categories">Popular: </span>
+                <a href="#categories" class="quick-cat">Food</a>
+                <a href="#categories" class="quick-cat">Electronics</a>
+                <a href="#categories" class="quick-cat">Fashion</a>
+                <a href="#categories" class="quick-cat">Home & Garden</a>
+            </div>
+        </div>
+    </div>
+</section>
+    <section id = "medicine" class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2 data-translate="category_medicines">Medicines</h2>
+            </div>
+            <div class="product-grid">
+                <!-- Product 1 -->
+                <div class="product-card" draggable="true" data-product='{"id":1401,"name":"name_101","price":49,"vendor":"vendor_101","category":"Medicines","image":"VitaminD3 2000IU.jpg","lat":17.4486,"lon":78.3908}'>
+                    <img src="IMAGES/Vitamin D3 2000IU1.jpg" alt="Vitamin D3 2000IU" class="product-img" data-translate-product="name_101" onerror="this.src='https://via.placeholder.com/200x200?text=Vitamin+D3+2000IU';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_101">Vitamin D3 2000IU</h3>
+                        <div class="medicine-type" data-translate-type="type_101">Tablet</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_101">MediCare Pharmacy</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 2 km</span></div>
+                        <div class="product-price">₹49</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 2 -->
+                <div class="product-card" draggable="true" data-product='{"id":1402,"name":"name_102","price":129,"vendor":"vendor_102","category":"Medicines","image":"PainRelief.jpg","lat":17.4512,"lon":78.3855}'>
+                    <img src="IMAGES/pain relif.jpg" alt="Pain Relief" class="product-img" data-translate-product="name_102" onerror="this.src='https://via.placeholder.com/200x200?text=Pain+Relief';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_102">Pain Relief</h3>
+                        <div class="medicine-type" data-translate-type="type_102">Capsule</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_102">HealthPlus</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 3 km</span></div>
+                        <div class="product-price">₹129</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 3 -->
+                <div class="product-card" draggable="true" data-product='{"id":1403,"name":"name_103","price":299,"vendor":"vendor_103","category":"Medicines","image":"VitaminC.jpg","lat":17.4421,"lon":78.3882}'>
+                    <img src="IMAGES/Vitamin-C-1000-mg-20-tablets-Orange_o.jpg" alt="Vitamin C 1000mg" class="product-img" data-translate-product="name_103" onerror="this.src='https://via.placeholder.com/200x200?text=Vitamin+C';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_103">Vitamin C 1000mg</h3>
+                        <div class="medicine-type" data-translate-type="type_103">Supplement</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_103">NutriWell</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 4 km</span></div>
+                        <div class="product-price">₹299</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 4 -->
+                <div class="product-card" draggable="true" data-product='{"id":1404,"name":"name_104","price":1499,"vendor":"vendor_104","category":"Medicines","image":"BPMonitor.jpg","lat":17.4550,"lon":78.3920}'>
+                    <img src="IMAGES/BPMonitor.jpg" alt="Blood Pressure Monitor" class="product-img" data-translate-product="name_104" onerror="this.src='https://via.placeholder.com/200x200?text=BP+Monitor';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_104">Blood Pressure Monitor</h3>
+                        <div class="medicine-type" data-translate-type="type_104">Medical Device</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_104">MediTech</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 5 km</span></div>
+                        <div class="product-price">₹1,499</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 5 -->
+                <div class="product-card" draggable="true" data-product='{"id":1405,"name":"name_105","price":189,"vendor":"vendor_105","category":"Medicines","image":"Atorvastatin.jpg","lat":17.4399,"lon":78.4421}'>
+                    <img src="IMAGES/Atorvastatin.jpg" alt="Atorvastatin 10mg" class="product-img" data-translate-product="name_105" onerror="this.src='https://via.placeholder.com/200x200?text=Atorvastatin';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_105">Atorvastatin 10mg</h3>
+                        <div class="medicine-type" data-translate-type="type_105">Tablet</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_105">PharmaCare</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 2 km</span></div>
+                        <div class="product-price">₹189</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 6 -->
+                <div class="product-card" draggable="true" data-product='{"id":1406,"name":"name_106","price":159,"vendor":"vendor_106","category":"Medicines","image":"Omeprazole.jpg","lat":17.4455,"lon":78.3800}'>
+                    <img src="IMAGES/Omeprazole.jpg" alt="Omeprazole 20mg" class="product-img" data-translate-product="name_106" onerror="this.src='https://via.placeholder.com/200x200?text=Omeprazole';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_106">Omeprazole 20mg</h3>
+                        <div class="medicine-type" data-translate-type="type_106">Capsule</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_106">MediExpress</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 3 km</span></div>
+                        <div class="product-price">₹159</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 7 -->
+                <div class="product-card" draggable="true" data-product='{"id":1407,"name":"name_107","price":799,"vendor":"vendor_107","category":"Medicines","image":"TestStrips.jpg","lat":17.4480,"lon":78.3890}'>
+                    <img src="IMAGES/TestStrips.jpg" alt="Diabetes Test Strips" class="product-img" data-translate-product="name_107" onerror="this.src='https://via.placeholder.com/200x200?text=Test+Strips';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_107">Diabetes Test Strips</h3>
+                        <div class="medicine-type" data-translate-type="type_107">Medical Supply</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_107">DiabeCare</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 4 km</span></div>
+                        <div class="product-price">₹799</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 8 -->
+                <div class="product-card" draggable="true" data-product='{"id":1408,"name":"name_108","price":99,"vendor":"vendor_108","category":"Medicines","image":"Metformin.jpg","lat":17.4520,"lon":78.3870}'>
+                    <img src="IMAGES/Metformin.jpg" alt="Metformin 500mg" class="product-img" data-translate-product="name_108" onerror="this.src='https://via.placeholder.com/200x200?text=Metformin';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_108">Metformin 500mg</h3>
+                        <div class="medicine-type" data-translate-type="type_108">Tablet</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_108">HealthFirst</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 3 km</span></div>
+                        <div class="product-price">₹99</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 9 -->
+                <div class="product-card" draggable="true" data-product='{"id":1409,"name":"name_109","price":499,"vendor":"vendor_109","category":"Medicines","image":"FirstAidKit.jpg","lat":17.4400,"lon":78.3850}'>
+                    <img src="IMAGES/FirstAidKit.jpg" alt="First Aid Kit" class="product-img" data-translate-product="name_109" onerror="this.src='https://via.placeholder.com/200x200?text=First+Aid+Kit';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_109">First Aid Kit</h3>
+                        <div class="medicine-type" data-translate-type="type_109">Medical Kit</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_109">SafeLife</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 2 km</span></div>
+                        <div class="product-price">₹499</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 10 -->
+                <div class="product-card" draggable="true" data-product='{"id":1410,"name":"name_110","price":79,"vendor":"vendor_110","category":"Medicines","image":"Ibuprofen.jpg","lat":17.4490,"lon":78.3950}'>
+                    <img src="IMAGES/ibprofen 400mg.jpg" alt="Ibuprofen 400mg" class="product-img" data-translate-product="name_110" onerror="this.src='https://via.placeholder.com/200x200?text=Ibuprofen';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_110">Ibuprofen 400mg</h3>
+                        <div class="medicine-type" data-translate-type="type_110">Tablet</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_110">QuickMeds</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 1 km</span></div>
+                        <div class="product-price">₹79</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 11 -->
+                <div class="product-card" draggable="true" data-product='{"id":1411,"name":"name_111","price":349,"vendor":"vendor_111","category":"Medicines","image":"VitaminD3.jpg","lat":17.4550,"lon":78.3920}'>
+                    <img src="IMAGES/VitaminD3.jpg" alt="Vitamin D3 1000IU" class="product-img" data-translate-product="name_111" onerror="this.src='https://via.placeholder.com/200x200?text=Vitamin+D3';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_111">Vitamin D3 1000IU</h3>
+                        <div class="medicine-type" data-translate-type="type_111">Supplement</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_111">WellnessPlus</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 3 km</span></div>
+                        <div class="product-price">₹349</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 12 -->
+                <div class="product-card" draggable="true" data-product='{"id":1412,"name":"name_112","price":249,"vendor":"vendor_112","category":"Medicines","image":"Thermometer.jpg","lat":17.4430,"lon":78.3860}'>
+                    <img src="IMAGES/Thermometer.jpg" alt="Thermometer Digital" class="product-img" data-translate-product="name_112" onerror="this.src='https://via.placeholder.com/200x200?text=Thermometer';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_112">Thermometer Digital</h3>
+                        <div class="medicine-type" data-translate-type="type_112">Medical Device</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_112">HealthGadgets</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 4 km</span></div>
+                        <div class="product-price">₹249</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 13 -->
+                <div class="product-card" draggable="true" data-product='{"id":1413,"name":"name_113","price":59,"vendor":"vendor_113","category":"Medicines","image":"Cetirizine.jpg","lat":17.4500,"lon":78.3840}'>
+                    <img src="IMAGES/Cetirizine.jpg" alt="Cetirizine 10mg" class="product-img" data-translate-product="name_113" onerror="this.src='https://via.placeholder.com/200x200?text=Cetirizine';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_113">Cetirizine 10mg</h3>
+                        <div class="medicine-type" data-translate-type="type_113">Tablet</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_113">AllergyCare</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 2 km</span></div>
+                        <div class="product-price">₹59</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 14 -->
+                <div class="product-card" draggable="true" data-product='{"id":1414,"name":"name_114","price":1899,"vendor":"vendor_114","category":"Medicines","image":"Nebulizer.jpg","lat":17.4470,"lon":78.3910}'>
+                    <img src="IMAGES/Nebulizer.jpg" alt="Nebulizer Machine" class="product-img" data-translate-product="name_114" onerror="this.src='https://via.placeholder.com/200x200?text=Nebulizer';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_114">Nebulizer Machine</h3>
+                        <div class="medicine-type" data-translate-type="type_114">Medical Equipment</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_114">BreathEasy</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 5 km</span></div>
+                        <div class="product-price">₹1,899</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 15 -->
+                <div class="product-card" draggable="true" data-product='{"id":1415,"name":"name_115","price":69,"vendor":"vendor_115","category":"Medicines","image":"Aspirin.jpg","lat":17.4400,"lon":78.3850}'>
+                    <img src="IMAGES/Aspirin.jpg" alt="Aspirin 75mg" class="product-img" data-translate-product="name_115" onerror="this.src='https://via.placeholder.com/200x200?text=Aspirin';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_115">Aspirin 75mg</h3>
+                        <div class="medicine-type" data-translate-type="type_115">Tablet</div>
+                        <div class="product-vendor"><i class="fas fa-clinic-medical"></i> <span data-translate-vendor="vendor_115">HeartCare</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span>Within 3 km</span></div>
+                        <div class="product-price">₹69</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3 data-translate="footer_quickcart">ShopNest</h3>
+                    <p data-translate="footer_description">Your one-stop multi-vendor e-commerce solution. Shop from local businesses with delivery or pickup options.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_quick_links">Quick Links</h3>
+                    <ul>
+                        <li><a href="medicines.html#home?lang=en" data-page="home" data-translate="footer_home">Home</a></li>
+                        <li><a href="medicines.html#products?lang=en" data-page="home" data-translate="footer_products">Products</a></li>
+                        <li><a href="medicines.html#services?lang=en" data-page="home" data-translate="footer_services">Services</a></li>
+                        <li><a href="medicines.html#businesses?lang=en" data-page="home" data-translate="footer_businesses">Businesses</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_customer_support">Customer Support</h3>
+                    <ul>
+                        <li><a href="#" data-translate="footer_help_center">Help Center</a></li>
+                        <li><a href="#" data-translate="footer_faqs">FAQs</a></li>
+                        <li><a href="#" data-translate="footer_contact_us">Contact Us</a></li>
+                        <li><a href="#" data-translate="footer_return_policy">Return Policy</a></li>
+                        <li><a href="#" data-translate="footer_privacy_policy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_contact_info">Contact Info</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Market St, City, Country</li>
+                        <li><i class="fas fa-phone"></i> <span data-translate="footer_phone">+1 234 567 8900</span></li>
+                        <li><i class="fas fa-envelope"></i> <span data-translate="footer_email">support@shopnest.com</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p data-translate="copyright">&copy; 2025 ShopNest. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        let offers = [];
+        function saveCart() {
+            try {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            } catch (error) {
+                console.error('Error saving cart to localStorage:', error);
+            }
+        }
+
+        function saveWishlist() {
+            try {
+                localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            } catch (error) {
+                console.error('Error saving wishlist to localStorage:', error);
+            }
+        }
+
+        async function fetchOffers() {
+            try {
+                const res = await fetch('/api/offers');
+                offers = await res.json();
+                offers = offers.filter(o => o.active && new Date(o.startAt) <= new Date() && new Date(o.endAt) >= new Date());
+            } catch (error) {
+                console.error('Error fetching offers:', error);
+            }
+        }
+
+        const pageTranslations = {
+            en: {
+                logo_text: "ShopNest",
+                search_placeholder: "Search for products, services or businesses...",
+                nav_home: "Home",
+                nav_products: "Products",
+                nav_services: "Services",
+                nav_businesses: "Businesses",
+                login: "Login",
+                admin: "Admin",
+                sell: "Sell",
+                cart: "Cart",
+                wishlist: "Wishlist",
+                category_medicines: "Medicines",
+                add_to_cart: "Add to Cart",
+                footer_quickcart: "ShopNest",
+                footer_description: "Your one-stop multi-vendor e-commerce solution. Shop from local businesses with delivery or pickup options.",
+                footer_quick_links: "Quick Links",
+                footer_home: "Home",
+                footer_products: "Products",
+                footer_services: "Services",
+                footer_businesses: "Businesses",
+                footer_customer_support: "Customer Support",
+                footer_help_center: "Help Center",
+                footer_faqs: "FAQs",
+                footer_contact_us: "Contact Us",
+                footer_return_policy: "Return Policy",
+                footer_privacy_policy: "Privacy Policy",
+                footer_contact_info: "Contact Info",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. All rights reserved.",
+                name_101: "Vitamin D3 2000IU",
+                vendor_101: "MediCare Pharmacy",
+                type_101: "Tablet",
+                distance_101: "Within 2 km",
+                name_102: "Pain Relief",
+                vendor_102: "HealthPlus",
+                type_102: "Capsule",
+                distance_102: "Within 3 km",
+                name_103: "Vitamin C 1000mg",
+                vendor_103: "NutriWell",
+                type_103: "Supplement",
+                distance_103: "Within 4 km",
+                name_104: "Blood Pressure Monitor",
+                vendor_104: "MediTech",
+                type_104: "Medical Device",
+                distance_104: "Within 5 km",
+                name_105: "Atorvastatin 10mg",
+                vendor_105: "PharmaCare",
+                type_105: "Tablet",
+                name_106: "Omeprazole 20mg",
+                vendor_106: "MediExpress",
+                type_106: "Capsule",
+                name_107: "Diabetes Test Strips",
+                vendor_107: "DiabeCare",
+                type_107: "Medical Supply",
+                name_108: "Metformin 500mg",
+                vendor_108: "HealthFirst",
+                type_108: "Tablet",
+                name_109: "First Aid Kit",
+                vendor_109: "SafeLife",
+                type_109: "Medical Kit",
+                name_110: "Ibuprofen 400mg",
+                vendor_110: "QuickMeds",
+                type_110: "Tablet",
+                distance_110: "Within 1 km",
+                name_111: "Vitamin D3 1000IU",
+                vendor_111: "WellnessPlus",
+                type_111: "Supplement",
+                name_112: "Thermometer Digital",
+                vendor_112: "HealthGadgets",
+                type_112: "Medical Device",
+                name_113: "Cetirizine 10mg",
+                vendor_113: "AllergyCare",
+                type_113: "Tablet",
+                name_114: "Nebulizer Machine",
+                vendor_114: "BreathEasy",
+                type_114: "Medical Equipment",
+                name_115: "Aspirin 75mg",
+                vendor_115: "HeartCare",
+                type_115: "Tablet",
+                desc_101: "Vitamin D3 2000IU is essential for bone health, immune function, and calcium absorption. Benefits include stronger bones and reduced risk of deficiency. Precautions: Consult a doctor if pregnant, nursing, or on medication.",
+                desc_102: "Pain Relief capsules provide fast relief from headaches, muscle pain, and inflammation. Benefits: Effective pain management without drowsiness. Precautions: Do not exceed recommended dosage; avoid if allergic to NSAIDs.",
+                desc_103: "Vitamin C 1000mg supplement boosts immunity, collagen production, and antioxidant protection. Benefits: Enhanced immune response and skin health. Precautions: High doses may cause stomach upset; consult a doctor if on blood thinners.",
+                desc_104: "Blood Pressure Monitor accurately measures systolic and diastolic pressure at home. Benefits: Helps monitor hypertension and prevent complications. Precautions: Ensure proper cuff size; consult a healthcare provider for interpretation.",
+                desc_105: "Atorvastatin 10mg lowers cholesterol levels and reduces the risk of cardiovascular disease. Benefits: Reduces LDL cholesterol and triglyceride levels. Precautions: May cause muscle pain; monitor liver function; avoid grapefruit juice.",
+                desc_106: "Omeprazole 20mg reduces stomach acid production for acid reflux and ulcers. Benefits: Relieves heartburn and promotes healing. Precautions: Long-term use may affect vitamin B12 absorption; consult a doctor if symptoms persist.",
+                desc_107: "Diabetes Test Strips measure blood glucose levels for diabetes management. Benefits: Enables self-monitoring and better control. Precautions: Use with a compatible glucometer; store properly to maintain accuracy.",
+                desc_108: "Metformin 500mg helps control blood sugar in type 2 diabetes. Benefits: Improves insulin sensitivity and reduces glucose production. Precautions: May cause digestive side effects; monitor kidney function.",
+                desc_109: "First Aid Kit contains essential supplies for minor injuries and emergencies. Benefits: Quick response for cuts, burns, and sprains. Precautions: Check expiration dates; restock used items regularly.",
+                desc_110: "Ibuprofen 400mg relieves pain, fever, and inflammation. Benefits: Effective for arthritis and menstrual cramps. Precautions: Avoid if allergic to NSAIDs; long-term use may increase heart risks.",
+                desc_111: "Vitamin D3 1000IU supports bone density and immune health. Benefits: Prevents rickets and osteomalacia. Precautions: Overdose can cause hypercalcemia; consult a doctor for dosage.",
+                desc_112: "Digital Thermometer provides accurate body temperature readings. Benefits: Fast and hygienic measurement. Precautions: Clean after use; ensure battery is functional.",
+                desc_113: "Cetirizine 10mg reduces allergy symptoms like runny nose and itching. Benefits: Non-drowsy antihistamine for hay fever. Precautions: May cause dry mouth; avoid alcohol.",
+                desc_114: "Nebulizer Machine converts liquid medicine into a mist for respiratory treatment. Benefits: Effective for asthma and COPD. Precautions: Clean regularly; use only prescribed medications.",
+                desc_115: "Aspirin 75mg prevents blood clots and reduces the risk of heart attack. Benefits: Anti-platelet action for cardiovascular disease. Precautions: May cause stomach bleeding; not for everyone; consult a doctor."
+            },
+            hi: {
+                logo_text: "शॉपनेस्ट",
+                search_placeholder: "उत्पादों, सेवाओं या व्यवसायों की खोज करें...",
+                nav_home: "होम",
+                nav_products: "उत्पाद",
+                nav_services: "सेवाएँ",
+                nav_businesses: "व्यवसाय",
+                login: "लॉगिन",
+                admin: "एडमिन",
+                sell: "बेचें",
+                cart: "कार्ट",
+                wishlist: "इच्छा-सूची",
+                category_medicines: "दवाइयाँ",
+                add_to_cart: "कार्ट में जोड़ें",
+                footer_quickcart: "शॉपनेस्ट",
+                footer_description: "आपका एक-स्टॉप मल्टी-वेंडर ई-कॉमर्स समाधान। स्थानीय व्यवसायों से डिलीवरी या पिकअप विकल्प के साथ शॉपिंग करें।",
+                footer_quick_links: "त्वरित लिंक",
+                footer_home: "होम",
+                footer_products: "उत्पाद",
+                footer_services: "सेवाएँ",
+                footer_businesses: "व्यवसाय",
+                footer_customer_support: "ग्राहक समर्थन",
+                footer_help_center: "सहायता केंद्र",
+                footer_faqs: "FAQs",
+                footer_contact_us: "हमसे संपर्क करें",
+                footer_return_policy: "रिटर्न नीति",
+                footer_privacy_policy: "गोपनीयता नीति",
+                footer_contact_info: "संपर्क जानकारी",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. सर्वाधिकार सुरक्षित।",
+                name_101: "विटामिन डी3 2000आईयू",
+                vendor_101: "मेडीकेयर फार्मेसी",
+                type_101: "टैबलेट",
+                distance_101: "2 किमी के भीतर",
+                name_102: "दर्द निवारक",
+                vendor_102: "हेल्थप्लस",
+                type_102: "कैप्सूल",
+                distance_102: "3 किमी के भीतर",
+                name_103: "विटामिन सी 1000मि.ग्रा.",
+                vendor_103: "न्यूट्रीवेल",
+                type_103: "पूरक",
+                distance_103: "4 किमी के भीतर",
+                name_104: "रक्तचाप मॉनिटर",
+                vendor_104: "मेडीटेक",
+                type_104: "मेडिकल डिवाइस",
+                distance_104: "5 किमी के भीतर",
+                name_105: "एटोरवास्टेटिन 10मि.ग्रा.",
+                vendor_105: "फार्माकेयर",
+                type_105: "टैबलेट",
+                name_106: "ओमेप्राज़ोल 20मि.ग्रा.",
+                vendor_106: "मेडीएक्सप्रेस",
+                type_106: "कैप्सूल",
+                name_107: "मधुमेह टेस्ट स्ट्रिप्स",
+                vendor_107: "डायबीकेयर",
+                type_107: "मेडिकल सप्लाई",
+                name_108: "मेटफॉर्मिन 500मि.ग्रा.",
+                vendor_108: "हेल्थफर्स्ट",
+                type_108: "टैबलेट",
+                name_109: "प्राथमिक चिकित्सा किट",
+                vendor_109: "सेफलाइफ",
+                type_109: "मेडिकल किट",
+                name_110: "इबुप्रोफेन 400मि.ग्रा.",
+                vendor_110: "क्विकमेड्स",
+                type_110: "टैबलेट",
+                distance_110: "1 किमी के भीतर",
+                name_111: "विटामिन डी3 1000आईयू",
+                vendor_111: "वेलनेसप्लस",
+                type_111: "पूरक",
+                name_112: "डिजिटल थर्मामीटर",
+                vendor_112: "हेल्थगैजेट्स",
+                type_112: "मेडिकल डिवाइस",
+                name_113: "सेटिरिज़िन 10मि.ग्रा.",
+                vendor_113: "एलर्जीकेयर",
+                type_113: "टैबलेट",
+                name_114: "नेबुलाइज़र मशीन",
+                vendor_114: "ब्रीथईज़ी",
+                type_114: "मेडिकल उपकरण",
+                name_115: "एस्पिरिन 75मि.ग्रा.",
+                vendor_115: "हार्टकेयर",
+                type_115: "टैबलेट",
+                desc_101: "विटामिन डी3 2000आईयू हड्डियों के स्वास्थ्य, प्रतिरक्षा कार्य, और कैल्शियम अवशोषण के लिए आवश्यक है। लाभों में मजबूत हड्डियाँ और कमी के जोखिम में कमी शामिल है। सावधानियाँ: यदि गर्भवती, स्तनपान कराने वाली, या दवाइयाँ ले रही हैं तो डॉक्टर से सलाह लें।",
+                desc_102: "दर्द राहत कैप्सूल सिरदर्द, मांसपेशी दर्द, और सूजन से तेजी से राहत प्रदान करते हैं। लाभ: बिना नींद के प्रभावी दर्द प्रबंधन। सावधानियाँ: अनुशंसित खुराक से अधिक न लें; यदि एनएसएआईडी से एलर्जी है तो बचें।",
+                desc_103: "विटामिन सी 1000मिलीग्राम पूरक प्रतिरक्षा, कोलेजन उत्पादन, और एंटीऑक्सीडेंट सुरक्षा बढ़ाता है। लाभ: बढ़ी हुई प्रतिरक्षा प्रतिक्रिया और त्वचा स्वास्थ्य। सावधानियाँ: उच्च खुराक पेट में परेशानी पैदा कर सकती है; यदि रक्त पतले पर हैं तो डॉक्टर से सलाह लें।",
+                desc_104: "रक्तचाप मॉनिटर घर पर सिस्टोलिक और डायस्टोलिक दबाव को सटीक रूप से मापता है। लाभ: उच्च रक्तचाप की निगरानी और जटिलताओं को रोकने में मदद करता है। सावधानियाँ: उचित कफ आकार सुनिश्चित करें; व्याख्या के लिए स्वास्थ्य सेवा प्रदाता से सलाह लें।",
+                desc_105: "एटोरवास्टेटिन 10मिलीग्राम कोलेस्ट्रॉल स्तर को कम करता है और हृदय रोग के जोखिम को कम करता है। लाभ: एलडीएल कोलेस्ट्रॉल और ट्राइग्लिसराइड स्तर को कम करता है। सावधानियाँ: मांसपेशी दर्द पैदा कर सकता है; यकृत कार्य की निगरानी करें; अनार के रस से बचें।",
+                desc_106: "ओमेप्राज़ोल 20मिलीग्राम एसिड रिफ्लक्स और अल्सर के लिए पेट एसिड उत्पादन को कम करता है। लाभ: हार्टबर्न से राहत और उपचार को बढ़ावा देता है। सावधानियाँ: दीर्घकालीन उपयोग विटामिन बी12 अवशोषण को प्रभावित कर सकता है; यदि लक्षण बने रहें तो डॉक्टर से सलाह लें।",
+                desc_107: "मधुमेह परीक्षण स्ट्रिप्स मधुमेह प्रबंधन के लिए रक्त ग्लूकोज स्तर को मापते हैं। लाभ: स्व-निगरानी और बेहतर नियंत्रण सक्षम करता है। सावधानियाँ: संगत ग्लूकोमीटर के साथ उपयोग करें; सटीकता बनाए रखने के लिए उचित रूप से संग्रहीत करें।",
+                desc_108: "मेटफॉर्मिन 500मिलीग्राम टाइप 2 मधुमेह में रक्त शर्करा को नियंत्रित करने में मदद करता है। लाभ: इंसुलिन संवेदनशीलता में सुधार और ग्लूकोज उत्पादन को कम करता है। सावधानियाँ: पाचन संबंधी दुष्प्रभाव पैदा कर सकता है; गुर्दे कार्य की निगरानी करें।",
+                desc_109: "प्राथमिक चिकित्सा किट मामूली चोटों और आपात स्थितियों के लिए आवश्यक आपूर्ति शामिल करता है। लाभ: कट, जलन, और मोच के लिए त्वरित प्रतिक्रिया। सावधानियाँ: समाप्ति तिथियों की जांच करें; नियमित रूप से उपयोग किए गए आइटम को फिर से भरें।",
+                desc_110: "इबुप्रोफेन 400मिलीग्राम दर्द, बुखार, और सूजन से राहत देता है। लाभ: गठिया और मासिक धर्म ऐंठन के लिए प्रभावी। सावधानियाँ: यदि एनएसएआईडी से एलर्जी है तो बचें; दीर्घकालीन उपयोग हृदय जोखिम बढ़ा सकता है।",
+                desc_111: "विटामिन डी3 1000आईयू हड्डी घनत्व और प्रतिरक्षा स्वास्थ्य का समर्थन करता है। लाभ: रिकेट्स और ऑस्टियोमैलेशिया को रोकता है। सावधानियाँ: अधिक मात्रा हाइपरकैल्सीमिया पैदा कर सकती है; खुराक के लिए डॉक्टर से सलाह लें।",
+                desc_112: "डिजिटल थर्मामीटर सटीक शरीर तापमान रीडिंग प्रदान करता है। लाभ: तेज और स्वच्छ माप। सावधानियाँ: उपयोग के बाद साफ करें; बैटरी कार्यात्मक सुनिश्चित करें।",
+                desc_113: "सेटिरिज़िन 10मिलीग्राम बहती नाक और खुजली जैसे एलर्जी लक्षणों को कम करता है। लाभ: हेव फीवर के लिए गैर-नींद लाने वाला एंटीहिस्टामाइन। सावधानियाँ: सूखी मुंह पैदा कर सकता है; शराब से बचें।",
+                desc_114: "नेबुलाइज़र मशीन द्रव दवा को श्वसन उपचार के लिए धुंध में परिवर्तित करता है। लाभ: अस्थमा और सीओपीडी के लिए प्रभावी। सावधानियाँ: नियमित रूप से साफ करें; केवल निर्धारित दवाइयाँ उपयोग करें।",
+                desc_115: "एस्पिरिन 75मिलीग्राम रक्त के थक्कों को रोकता है और हृदयाघात के जोखिम को कम करता है। लाभ: हृदय रोग के लिए एंटी-प्लेटलेट कार्रवाई। सावधानियाँ: पेट रक्तस्राव पैदा कर सकता है; सभी के लिए नहीं; डॉक्टर से सलाह लें।"
+            },
+            es: {
+                logo_text: "ShopNest",
+                search_placeholder: "Buscar productos, servicios o negocios...",
+                nav_home: "Inicio",
+                nav_products: "Productos",
+                nav_services: "Servicios",
+                nav_businesses: "Negocios",
+                login: "Iniciar Sesión",
+                admin: "Admin",
+                sell: "Vender",
+                cart: "Carrito",
+                wishlist: "Lista de deseos",
+                category_medicines: "Medicinas",
+                add_to_cart: "Añadir al Carrito",
+                footer_quickcart: "ShopNest",
+                footer_description: "Tu solución de comercio electrónico multi-vendedor todo en uno. Compra de negocios locales con opciones de entrega o recogida.",
+                footer_quick_links: "Enlaces Rápidos",
+                footer_home: "Inicio",
+                footer_products: "Productos",
+                footer_services: "Servicios",
+                footer_businesses: "Negocios",
+                footer_customer_support: "Soporte al Cliente",
+                footer_help_center: "Centro de Ayuda",
+                footer_faqs: "Preguntas Frecuentes",
+                footer_contact_us: "Contáctanos",
+                footer_return_policy: "Política de Devoluciones",
+                footer_privacy_policy: "Política de Privacidad",
+                footer_contact_info: "Información de Contacto",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. Todos los derechos reservados.",
+                name_101: "Vitamina D3 2000UI",
+                vendor_101: "Farmacia MediCare",
+                type_101: "Tableta",
+                distance_101: "Dentro de 2 km",
+                name_102: "Alivio del Dolor",
+                vendor_102: "HealthPlus",
+                type_102: "Cápsula",
+                distance_102: "Dentro de 3 km",
+                name_103: "Vitamina C 1000mg",
+                vendor_103: "NutriWell",
+                type_103: "Suplemento",
+                distance_103: "Dentro de 4 km",
+                name_104: "Monitor de Presión Arterial",
+                vendor_104: "MediTech",
+                type_104: "Dispositivo Médico",
+                distance_104: "Dentro de 5 km",
+                name_105: "Atorvastatina 10mg",
+                vendor_105: "PharmaCare",
+                type_105: "Tableta",
+                name_106: "Omeprazol 20mg",
+                vendor_106: "MediExpress",
+                type_106: "Cápsula",
+                name_107: "Tiras de Prueba para Diabetes",
+                vendor_107: "DiabeCare",
+                type_107: "Suministro Médico",
+                name_108: "Metformina 500mg",
+                vendor_108: "HealthFirst",
+                type_108: "Tableta",
+                name_109: "Botiquín de Primeros Auxilios",
+                vendor_109: "SafeLife",
+                type_109: "Kit Médico",
+                name_110: "Ibuprofeno 400mg",
+                vendor_110: "QuickMeds",
+                type_110: "Tableta",
+                distance_110: "Dentro de 1 km",
+                name_111: "Vitamina D3 1000UI",
+                vendor_111: "WellnessPlus",
+                type_111: "Suplemento",
+                name_112: "Termómetro Digital",
+                vendor_112: "HealthGadgets",
+                type_112: "Dispositivo Médico",
+                name_113: "Cetirizina 10mg",
+                vendor_113: "AllergyCare",
+                type_113: "Tableta",
+                name_114: "Máquina Nebulizadora",
+                vendor_114: "BreathEasy",
+                type_114: "Equipo Médico",
+                name_115: "Aspirina 75mg",
+                vendor_115: "HeartCare",
+                type_115: "Tableta"
+            },
+            fr: {
+                logo_text: "ShopNest",
+                search_placeholder: "Rechercher des produits, services ou entreprises...",
+                nav_home: "Accueil",
+                nav_products: "Produits",
+                nav_services: "Services",
+                nav_businesses: "Entreprises",
+                login: "Connexion",
+                admin: "Admin",
+                sell: "Vendre",
+                cart: "Panier",
+                wishlist: "Liste de souhaits",
+                category_medicines: "Médicaments",
+                add_to_cart: "Ajouter au Panier",
+                footer_quickcart: "ShopNest",
+                footer_description: "Votre solution e-commerce multi-vendeurs tout-en-un. Achetez auprès d'entreprises locales avec options de livraison ou ramassage.",
+                footer_quick_links: "Liens Rapides",
+                footer_home: "Accueil",
+                footer_products: "Produits",
+                footer_services: "Services",
+                footer_businesses: "Entreprises",
+                footer_customer_support: "Support Client",
+                footer_help_center: "Centre d'Aide",
+                footer_faqs: "FAQ",
+                footer_contact_us: "Contactez-Nous",
+                footer_return_policy: "Politique de Retour",
+                footer_privacy_policy: "Politique de Confidentialité",
+                footer_contact_info: "Informations de Contact",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. Tous droits réservés.",
+                name_101: "Vitamine D3 2000UI",
+                vendor_101: "Pharmacie MediCare",
+                type_101: "Comprimé",
+                distance_101: "Dans un rayon de 2 km",
+                name_102: "Soulagement de la Douleur",
+                vendor_102: "HealthPlus",
+                type_102: "Capsule",
+                distance_102: "Dans un rayon de 3 km",
+                name_103: "Vitamine C 1000mg",
+                vendor_103: "NutriWell",
+                type_103: "Supplément",
+                distance_103: "Dans un rayon de 4 km",
+                name_104: "Moniteur de Pression Artérielle",
+                vendor_104: "MediTech",
+                type_104: "Dispositif Médical",
+                distance_104: "Dans un rayon de 5 km",
+                name_105: "Atorvastatine 10mg",
+                vendor_105: "PharmaCare",
+                type_105: "Comprimé",
+                name_106: "Oméprazole 20mg",
+                vendor_106: "MediExpress",
+                type_106: "Capsule",
+                name_107: "Bandelettes de Test pour Diabète",
+                vendor_107: "DiabeCare",
+                type_107: "Fourniture Médicale",
+                name_108: "Metformine 500mg",
+                vendor_108: "HealthFirst",
+                type_108: "Comprimé",
+                name_109: "Trousse de Premiers Secours",
+                vendor_109: "SafeLife",
+                type_109: "Kit Médical",
+                name_110: "Ibuprofène 400mg",
+                vendor_110: "QuickMeds",
+                type_110: "Comprimé",
+                distance_110: "Dans un rayon de 1 km",
+                name_111: "Vitamine D3 1000UI",
+                vendor_111: "WellnessPlus",
+                type_111: "Supplément",
+                name_112: "Thermomètre Numérique",
+                vendor_112: "HealthGadgets",
+                type_112: "Dispositif Médical",
+                name_113: "Cétirizine 10mg",
+                vendor_113: "AllergyCare",
+                type_113: "Comprimé",
+                name_114: "Machine Nébuliseur",
+                vendor_114: "BreathEasy",
+                type_114: "Équipement Médical",
+                name_115: "Aspirine 75mg",
+                vendor_115: "HeartCare",
+                type_115: "Comprimé"
+            },
+            te: {
+                logo_text: "షాప్‌నెస్ట్",
+                search_placeholder: "ఉత్పత్తులు, సేవలు లేదా వ్యాపారాల కోసం శోధించండి...",
+                nav_home: "హోమ్",
+                nav_products: "ఉత్పత్తులు",
+                nav_services: "సేవలు",
+                nav_businesses: "వ్యాపారాలు",
+                login: "లాగిన్",
+                admin: "అడ్మిన్",
+                sell: "విక్రయించండి",
+                cart: "కార్ట్",
+                wishlist: "కోరికల జాబితా",
+                category_medicines: "మందులు",
+                add_to_cart: "కార్ట్‌లో జోడించండి",
+                footer_quickcart: "షాప్‌నెస్ట్",
+                footer_description: "మీ మల్టీ-వెండర్ ఈ-కామర్స్ సొల్యూషన్ ఒక్కోస్తపు స్థలం. డెలివరీ లేదా పికప్ ఆప్షన్లతో స్థానిక వ్యాపారాల నుండి షాపింగ్ చేయండి.",
+                footer_quick_links: "క్విక్ లింక్స్",
+                footer_home: "హోమ్",
+                footer_products: "ఉత్పత్తులు",
+                footer_services: "సేవలు",
+                footer_businesses: "వ్యాపారాలు",
+                footer_customer_support: "కస్టమర్ సపోర్ట్",
+                footer_help_center: "హెల్ప్ సెంటర్",
+                footer_faqs: "FAQs",
+                footer_contact_us: "మమ్మల్ని సంప్రదించండి",
+                footer_return_policy: "రిటర్న్ పాలసీ",
+                footer_privacy_policy: "ప్రైవసీ పాలసీ",
+                footer_contact_info: "కాంటాక్ట్ ఇన్ఫో",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. అన్ని హక్కులు రిజర్వ్ చేయబడ్డాయి.",
+                name_101: "విటమిన్ డి3 2000ఐయూ",
+                vendor_101: "మెడికేర్ ఫార్మసీ",
+                type_101: "టాబ్లెట్",
+                distance_101: "2 కి.మీ. లోపల",
+                name_102: "పెయిన్ రిలీఫ్",
+                vendor_102: "హెల్త్‌ప్లస్",
+                type_102: "క్యాప్సూల్",
+                distance_102: "3 కి.మీ. లోపల",
+                name_103: "విటమిన్ సి 1000మి.గ్రా.",
+                vendor_103: "న్యూట్రివెల్",
+                type_103: "సప్లిమెంట్",
+                distance_103: "4 కి.మీ. లోపల",
+                name_104: "బ్లడ్ ప్రెషర్ మానిటర్",
+                vendor_104: "మెడిటెక్",
+                type_104: "మెడికల్ డివైస్",
+                distance_104: "5 కి.మీ. లోపల",
+                name_105: "అటోర్వాస్టాటిన్ 10మి.గ్రా.",
+                vendor_105: "ఫార్మాకేర్",
+                type_105: "టాబ్లెట్",
+                name_106: "ఓమెప్రజోల్ 20మి.గ్రా.",
+                vendor_106: "మెడిఎక్స్‌ప్రెస్",
+                type_106: "క్యాప్సూల్",
+                name_107: "డయాబెటిస్ టెస్ట్ స్ట్రిప్స్",
+                vendor_107: "డయాబీకేర్",
+                type_107: "మెడికల్ సప్లై",
+                name_108: "మెట్‌ఫార్మిన్ 500మి.గ్రా.",
+                vendor_108: "హెల్త్‌ఫర్స్ట్",
+                type_108: "టాబ్లెట్",
+                name_109: "ఫస్ట్ ఎయిడ్ కిట్",
+                vendor_109: "సేఫ్‌లైఫ్",
+                type_109: "మెడికల్ కిట్",
+                name_110: "ఐబుప్రోఫెన్ 400మి.గ్రా.",
+                vendor_110: "క్విక్‌మెడ్స్",
+                type_110: "టాబ్లెట్",
+                distance_110: "1 కి.మీ. లోపల",
+                name_111: "విటమిన్ డి3 1000ఐయూ",
+                vendor_111: "వెల్‌నెస్‌ప్లస్",
+                type_111: "సప్లిమెంట్",
+                name_112: "డిజిటల్ థర్మామీటర్",
+                vendor_112: "హెల్త్‌గాడ్జెట్స్",
+                type_112: "మెడికల్ డివైస్",
+                name_113: "సెటిరిజైన్ 10మి.గ్రా.",
+                vendor_113: "అలెర్జీకేర్",
+                type_113: "టాబ్లెట్",
+                name_114: "నెబులైజర్ మెషిన్",
+                vendor_114: "బ్రీత్‌ఈజీ",
+                type_114: "మెడికల్ ఎక్విప్‌మెంట్",
+                name_115: "ఆస్పిరిన్ 75మి.గ్రా.",
+                vendor_115: "హార్ట్‌కేర్",
+                type_115: "టాబ్లెట్"
+            }
+        };
+        document.addEventListener('DOMContentLoaded', async function() {
+            updateDistances();
+            await fetchOffers();
+            updatePrices();
+            const urlParams = new URLSearchParams(window.location.search);
+            let currentLanguage = urlParams.get('lang') || localStorage.getItem('language') || 'en';
+            const languageSelect = document.getElementById('language-select');
+            if (languageSelect) {
+                languageSelect.value = currentLanguage;
+            }
+            function translatePage() {
+                const trans = pageTranslations[currentLanguage];
+                document.querySelectorAll('[data-translate]').forEach(el => {
+                    const key = el.getAttribute('data-translate');
+                    if (trans[key]) el.textContent = trans[key];
+                });
+                document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-translate-placeholder');
+                    if (trans[key]) el.placeholder = trans[key];
+                });
+                document.querySelectorAll('[data-translate-product]').forEach(el => {
+                    const key = el.getAttribute('data-translate-product');
+                    if (trans[key]) {
+                        el.textContent = trans[key];
+                        if (el.tagName === 'H3') {
+                            const productCard = el.closest('.product-card');
+                            if (productCard) {
+                                const img = productCard.querySelector('.product-img');
+                                if (img) img.alt = trans[key];
+                            }
+                        }
+                    }
+                });
+                document.querySelectorAll('[data-translate-vendor]').forEach(el => {
+                    const key = el.getAttribute('data-translate-vendor');
+                    if (trans[key]) el.textContent = trans[key];
+                });
+                document.querySelectorAll('[data-translate-type]').forEach(el => {
+                    const key = el.getAttribute('data-translate-type');
+                    if (trans[key]) el.textContent = trans[key];
+                });
+                document.querySelectorAll('[data-translate-distance]').forEach(el => {
+                    const key = el.getAttribute('data-translate-distance');
+                    if (trans[key]) el.textContent = trans[key];
+                });
+                updateLinks();
+            }
+            function updateLinks() {
+                document.querySelectorAll('a[data-page]').forEach(link => {
+                    const baseHref = link.getAttribute('href').split('?')[0];
+                    link.href = baseHref + '?lang=' + currentLanguage;
+                });
+            }
+            if (languageSelect) {
+                languageSelect.addEventListener('change', function() {
+                    currentLanguage = this.value;
+                    localStorage.setItem('language', currentLanguage);
+                    updateLinks();
+                    translatePage();
+                    performSearch(searchInput.value.trim().toLowerCase());
+                });
+            }
+            translatePage();
+            const productCards = document.querySelectorAll('.product-card');
+
+            productCards.forEach(card => {
+                const image = card.querySelector('.product-img');
+                if (image) {
+                    image.style.cursor = 'pointer';
+                    image.addEventListener('click', () => {
+                        const product = JSON.parse(card.getAttribute('data-product'));
+                        window.location.href = `medicine_product_detail.html?id=${product.id}&lang=${currentLanguage}`;
+                    });
+                }
+            });
+            productCards.forEach(card => {
+                card.addEventListener('dragstart', function(e) {
+                    const product = JSON.parse(card.getAttribute('data-product'));
+                    product.name = pageTranslations[currentLanguage][`name_${product.id}`] || product.name;
+                    product.vendor = pageTranslations[currentLanguage][`vendor_${product.id}`] || product.vendor;
+                    product.type = pageTranslations[currentLanguage][`type_${product.id}`] || product.type;
+                    product.distance = pageTranslations[currentLanguage][`distance_${product.id}`] || product.distance;
+                    e.dataTransfer.setData('text/plain', JSON.stringify(product));
+                });
+            });
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productCard = this.closest('.product-card');
+                    if (productCard) {
+                        const product = JSON.parse(productCard.getAttribute('data-product'));
+                        product.name = pageTranslations[currentLanguage][product.name] || product.name;
+                        product.image = productCard.querySelector('.product-img').src;
+                        product.vendor = pageTranslations[currentLanguage][product.vendor] || product.vendor;
+                        product.type = pageTranslations[currentLanguage][product.type] || product.type;
+                        product.distance = pageTranslations[currentLanguage][product.distance] || product.distance;
+                        addToCart(product, 1, this);
+                    }
+                });
+            });
+            productCards.forEach(card => {
+                const product = JSON.parse(card.getAttribute('data-product'));
+                if (cart.some(item => item.id === product.id)) {
+                    const button = card.querySelector('.add-to-cart');
+                    if (button) {
+                        const newButton = button.cloneNode(true);
+                        newButton.textContent = 'Go to Cart';
+                        newButton.classList.remove('add-to-cart');
+                        newButton.classList.add('go-to-cart');
+                        button.parentNode.replaceChild(newButton, button);
+                        newButton.onclick = () => window.location.href = 'add1.html#cart';
+                    }
+                }
+            });
+            const likeButtons = document.querySelectorAll('.like-btn');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productCard = this.closest('.product-card');
+                    if (productCard) {
+                        const product = JSON.parse(productCard.getAttribute('data-product'));
+                        toggleWishlist(product, this);
+                    }
+                });
+                const product = JSON.parse(button.closest('.product-card').getAttribute('data-product'));
+                if (wishlist.some(item => item.id === product.id)) {
+                    button.innerHTML = '<i class="fas fa-heart"></i>';
+                    button.style.color = 'var(--secondary)';
+                }
+            });
+            const searchInput = document.querySelector('.search-bar input');
+            const searchButton = document.querySelector('.search-bar .search-btn');
+            const micButton = document.querySelector('.search-bar .mic-btn');
+            function performSearch(query) {
+                if (!query) {
+                    productCards.forEach(card => card.classList.remove('hidden')); // Show all if query is empty
+                    return;
+                }
+                const matchingProducts = [];
+                productCards.forEach(card => {
+                    const product = JSON.parse(card.getAttribute('data-product'));
+                    const translatedName = pageTranslations[currentLanguage][product.name] || card.querySelector('.product-title').textContent;
+                    const translatedVendor = pageTranslations[currentLanguage][product.vendor] || card.querySelector('.product-vendor span').textContent;
+                    const translatedType = pageTranslations[currentLanguage][product.type] || card.querySelector('.medicine-type').textContent;
+                    const translatedDistance = pageTranslations[currentLanguage][product.distance] || card.querySelector('.product-distance span').textContent;
+                    if (translatedName.toLowerCase().includes(query) ||
+                        translatedVendor.toLowerCase().includes(query) ||
+                        translatedType.toLowerCase().includes(query) ||
+                        translatedDistance.toLowerCase().includes(query)) {
+                        matchingProducts.push(product.id);
+                    }
+                });
+                productCards.forEach(card => card.classList.toggle('hidden', !matchingProducts.includes(JSON.parse(card.dataset.product).id)));
+                if (matchingProducts.length === 0) {
+                    alert(`No products found for "${query}"`);
+                    productCards.forEach(card => card.classList.remove('hidden')); // Show all if no match
+                }
+                searchInput.value = ''; // Clear input after search
+            }
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performSearch(this.value.trim().toLowerCase());
+                    }
+                });
+            }
+            if (searchButton) {
+                searchButton.addEventListener('click', function() {
+                    performSearch(searchInput.value.trim().toLowerCase());
+                });
+            }
+            let recognition = null;
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    searchInput.value = transcript;
+                    performSearch(transcript.trim().toLowerCase());
+                };
+                recognition.onerror = function(event) {
+                    alert('Error with speech recognition: ' + event.error);
+                    micButton.classList.remove('active');
+                };
+                recognition.onend = function() {
+                    micButton.classList.remove('active');
+                };
+                if (micButton) {
+                    micButton.addEventListener('click', function() {
+                        if (micButton.classList.contains('active')) {
+                            recognition.stop();
+                            micButton.classList.remove('active');
+                        } else {
+                            let lang = 'en-US';
+                            if (currentLanguage === 'hi') lang = 'hi-IN';
+                            else if (currentLanguage === 'es') lang = 'es-ES';
+                            else if (currentLanguage === 'fr') lang = 'fr-FR';
+                            else if (currentLanguage === 'te') lang = 'te-IN';
+                            recognition.lang = lang;
+                            try {
+                                recognition.start();
+                                micButton.classList.add('active');
+                            } catch (error) {
+                                alert('Please allow microphone access to use this feature.');
+                                micButton.classList.remove('active');
+                            }
+                        }
+                    });
+                }
+                languageSelect.addEventListener('change', function() {
+                    if (recognition) {
+                        let lang = 'en-US';
+                        if (this.value === 'hi') lang = 'hi-IN';
+                        else if (this.value === 'es') lang = 'es-ES';
+                        else if (this.value === 'fr') lang = 'fr-FR';
+                        else if (this.value === 'te') lang = 'te-IN';
+                        recognition.lang = lang;
+                    }
+                });
+            } else {
+                if (micButton) {
+                    micButton.style.display = 'none';
+                }
+            }
+            updateCart();
+            updateWishlist();
+        });
+        function addToCart(product, quantity = 1, button) {
+            const existingItem = cart.find(item => item.id === product.id);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({ ...product, quantity });
+            }
+            updateCart();
+            saveCart();
+            if (button) { // To prevent the old listener from firing, we clone and replace the button 
+                const newButton = button.cloneNode(true);
+                newButton.textContent = 'Go to Cart';
+                newButton.classList.remove('add-to-cart');
+                newButton.classList.add('go-to-cart');
+                button.parentNode.replaceChild(newButton, button);
+                newButton.onclick = function() { window.location.href = 'add1.html#cart'; };
+            }
+        }
+        function toggleWishlist(product, button) {
+            const productCard = button.closest('.product-card');
+            product.name = productCard.querySelector('.product-title').textContent;
+            product.image = productCard.querySelector('.product-img').src;
+            product.vendor = productCard.querySelector('.product-vendor span').textContent;
+
+            const existingIndex = wishlist.findIndex(item => item.id === product.id);
+            if (existingIndex > -1) {
+                wishlist.splice(existingIndex, 1);
+                button.innerHTML = '<i class="far fa-heart"></i>';
+                button.style.color = 'var(--gray)';
+                alert(`${product.name} removed from wishlist!`);
+            } else {
+                wishlist.push(product);
+                button.innerHTML = '<i class="fas fa-heart"></i>';
+                button.style.color = 'var(--secondary)';
+                alert(`${product.name} added to wishlist!`);
+            }
+            updateWishlist();
+            saveWishlist();
+        }
+        function increaseQuantity(index) {
+            if (cart[index]) {
+                cart[index].quantity += 1;
+                updateCart();
+                saveCart();
+            }
+        }
+        function decreaseQuantity(index) {
+            if (cart[index]) {
+                if (cart[index].quantity > 1) {
+                    cart[index].quantity -= 1;
+                } else {
+                    cart.splice(index, 1);
+                }
+                updateCart();
+                saveCart();
+            }
+        }
+        function removeFromCart(index) {
+            if (cart[index]) {
+                cart.splice(index, 1);
+                updateCart();
+                saveCart();
+            }
+        }
+        function updateCart() {
+            const cartCount = document.querySelector('.cart-count');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+        }
+        function updateWishlist() {
+            const wishlistCount = document.querySelector('.wishlist-count');
+            if (wishlistCount)
+                wishlistCount.textContent = wishlist.length;
+        }
+
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const d = R * c; // Distance in km
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        function updateDistances() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+
+                    document.querySelectorAll('.product-card').forEach(card => {
+                        const productData = JSON.parse(card.getAttribute('data-product'));
+                        if (productData.lat && productData.lon) {
+                            const distance = getDistanceFromLatLonInKm(userLat, userLon, productData.lat, productData.lon);
+                            const distanceSpan = card.querySelector('.product-distance span');
+                            if (distanceSpan) {
+                                distanceSpan.textContent = `${distance.toFixed(1)} km away`;
+                            }
+                        }
+                    });
+                }, error => {
+                    console.warn(`Geolocation error: ${error.message}. Showing default distances.`);
+                    // If user denies or an error occurs, the default text remains.
+                });
+            } else {
+                console.warn("Geolocation is not supported by this browser. Showing default distances.");
+            }
+        }
+
+        function updatePrices() {
+            const category = 'medicine';
+            document.querySelectorAll('.product-card').forEach(card => {
+                const productData = JSON.parse(card.getAttribute('data-product'));
+                const priceElement = card.querySelector('.product-price');
+                const originalPrice = productData.price;
+                let bestDiscountedPrice = originalPrice;
+                let discountText = '';
+                let applicableOffer = null;
+
+                offers.forEach(offer => {
+                    if (offer.appliesTo && (offer.appliesTo.toLowerCase().includes(category.toLowerCase()) || offer.appliesTo.toLowerCase().includes('all')) && originalPrice >= (offer.minOrder || 0)) {
+                        let currentDiscountedPrice = originalPrice;
+                        let currentDiscountText = '';
+
+                        if (offer.type === 'percent') {
+                            const discount = originalPrice * (offer.value / 100);
+                            if (discount > 0) {
+                                currentDiscountedPrice = originalPrice - discount;
+                                currentDiscountText = `off ${offer.value}%`;
+                            }
+                        } else if (offer.type === 'flat') {
+                            const discount = offer.value;
+                            if (discount > 0 && discount < originalPrice) {
+                                currentDiscountedPrice = originalPrice - discount;
+                                currentDiscountText = `off ₹${offer.value}`;
+                            }
+                        }
+
+                        if (currentDiscountedPrice < bestDiscountedPrice) {
+                            bestDiscountedPrice = currentDiscountedPrice;
+                            discountText = currentDiscountText;
+                            applicableOffer = offer;
+                        }
+                    }
+                });
+
+                if (applicableOffer) {
+                    productData.price = Math.round(bestDiscountedPrice);
+                    card.setAttribute('data-product', JSON.stringify(productData));
+                    // Target the inner span to avoid overwriting translation attributes
+                    const priceSpan = priceElement.querySelector('span[data-translate-price]');
+                    if (priceSpan) {
+                        priceElement.innerHTML = `<span class="original-price">₹${originalPrice.toLocaleString()}</span> <span class="discounted-price">₹${Math.round(bestDiscountedPrice).toLocaleString()}</span> <span class="discount-badge">${discountText}</span>`;
+                    } else {
+                        priceElement.innerHTML = `<span class="original-price">₹${originalPrice.toLocaleString()}</span> <span class="discounted-price">₹${Math.round(bestDiscountedPrice).toLocaleString()}</span> <span class="discount-badge">${discountText}</span>`;
+                    }
+                }
+            });
+        }
+
+
+        function redirectToHome() {
+    window.location.href = "add1.html";
+  }
+  // Hero Slider Functionality
+let currentSlide = 0;
+const bgSlides = document.querySelectorAll('.bg-slide');
+const contentSlides = document.querySelectorAll('.slide-content');
+const indicators = document.querySelectorAll('.indicator');
+const totalSlides = bgSlides.length;
+const bgSliderTrack = document.querySelector('.bg-slider-track');
+let autoSlideInterval;
+
+// Initialize slider
+function initSlider() {
+    setHeroHeight();
+    updateSlider();
+    startAutoSlide();
+    
+    // Pause auto-slide on hover
+    const sliderContainer = document.querySelector('.slider-container');
+    sliderContainer.addEventListener('mouseenter', pauseAutoSlide);
+    sliderContainer.addEventListener('mouseleave', startAutoSlide);
+    
+    // Update height on resize
+    window.addEventListener('resize', setHeroHeight);
+}
+
+// Set hero height based on screen size
+function setHeroHeight() {
+    const hero = document.querySelector('.hero');
+    const screenWidth = window.innerWidth;
+    
+    if (screenWidth <= 576) {
+        hero.style.height = '350px';
+    } else if (screenWidth <= 768) {
+        hero.style.height = '400px';
+    } else {
+        hero.style.height = '600px';
+    }
+}
+
+// Update slider - only move background images
+function updateSlider() {
+    // Move background images
+    bgSliderTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+    
+    // Update content visibility
+    contentSlides.forEach((content, index) => {
+        content.classList.toggle('active', index === currentSlide);
+    });
+    
+    // Update indicators
+    indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === currentSlide);
+    });
+    
+    // Update background slides
+    bgSlides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === currentSlide);
+    });
+}
+
+// Next slide function
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateSlider();
+    resetAutoSlide();
+}
+
+// Previous slide function
+function prevSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    updateSlider();
+    resetAutoSlide();
+}
+
+// Go to specific slide
+function goToSlide(slideIndex) {
+    currentSlide = slideIndex;
+    updateSlider();
+    resetAutoSlide();
+}
+
+// Auto slide functionality
+function startAutoSlide() {
+    autoSlideInterval = setInterval(nextSlide, 5000);
+}
+
+function pauseAutoSlide() {
+    clearInterval(autoSlideInterval);
+}
+
+function resetAutoSlide() {
+    pauseAutoSlide();
+    startAutoSlide();
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initSlider();
+});
+
+// Export functions for global access
+window.nextSlide = nextSlide;
+window.prevSlide = prevSlide;
+window.goToSlide = goToSlide;
+
+    </script>
+</body>
+</html>

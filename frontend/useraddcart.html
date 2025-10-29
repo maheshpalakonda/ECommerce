@@ -1,0 +1,3217 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickCart - Multi-Vendor Marketplace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        :root {
+            --primary: #4a6cfa;
+            --secondary: #ff6b6b;
+            --accent: #42b883;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border: #e1e5eb;
+        }
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px; /* Reduced padding to decrease side gaps */
+        }
+        /* Header Styles */
+        header {
+            background: linear-gradient(to right, var(--primary), #6c8fff);
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        .logo i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin-left: 20px;
+            position: relative;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .search-bar .search-buttons {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            display: flex;
+            gap: 5px;
+        }
+        .search-bar button {
+            background: var(--secondary);
+            border: none;
+            color: white;
+            border-radius: 50px;
+            padding: 7px 15px;
+            cursor: pointer;
+        }
+        .search-bar button.mic-btn {
+            background: var(--accent);
+        }
+        .search-bar button.mic-btn.active {
+            background: #e74c3c;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+        .header-actions a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .header-actions .language-selector {
+            margin-left: 20px;
+        }
+        .header-actions .language-selector select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        .header-actions i {
+            font-size: 20px;
+            margin-right: 5px;
+        }
+        .cart-count {
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        /* Navigation */
+        nav {
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .nav-links li {
+            margin: 0 15px;
+            position: relative;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        .nav-links i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        /* Category Dropdown */
+        .category-dropdown {
+            position: relative;
+        }
+        .category-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .category-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 10;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--light);
+        }
+        .category-dropdown-menu::-webkit-scrollbar {
+            width: 8px;
+        }
+        .category-dropdown-menu::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+        .category-dropdown-menu::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        .category-dropdown:hover .category-dropdown-menu {
+            display: block;
+        }
+        .category-dropdown-menu a {
+            display: block;
+            padding: 10px 15px;
+            color: var(--dark);
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .category-dropdown-menu a:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1607082350899-7e105aa886ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid white;
+            margin-left: 10px;
+        }
+        .btn-outline:hover {
+            background: white;
+            color: var(--secondary);
+        }
+        /* Section Styles */
+        .section {
+            padding: 60px 0;
+            scroll-margin-top: 100px;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .section-title h2 {
+            font-size: 32px;
+            color: var(--dark);
+            display: inline-block;
+        }
+        .section-title h2:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: var(--secondary);
+            margin: 10px auto;
+        }
+        /* Categories */
+        .categories {
+            background: white;
+        }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Reduced minmax width for more cards */
+            gap: 35px; /* Reduced gap between cards */
+        }
+        .category-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            text-align: center;
+            padding: 40px 40px; /* Adjusted padding for tighter spacing */
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+        .category-icon {
+            width: 100px;
+            height: 100px;
+            background: var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            overflow: hidden;
+        }
+        .category-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .category-card h3 {
+            margin-bottom: 10px;
+        }
+        .category-card a {
+            text-decoration: none;
+            color: inherit;
+        }
+        /* Products */
+        .products {
+            background: var(--light);
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Reduced minmax width for more cards */
+            gap: 20px; /* Reduced gap between cards */
+        }
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            cursor: move;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 15px;
+        }
+        .product-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .product-vendor {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .product-vendor i {
+            margin-right: 5px;
+            color: var(--primary);
+        }
+        .product-price {
+            font-weight: 600;
+            font-size: 20px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            font-size: 16px;
+        }
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+        }
+        /* Business Section */
+        .businesses {
+            background: white;
+        }
+        .business-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .business-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        .business-header {
+            position: relative;
+        }
+        .business-cover {
+            height: 120px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .business-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            object-fit: cover;
+            position: absolute;
+            bottom: -30px;
+            left: 20px;
+            border: 3px solid white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .business-info {
+            padding: 40px 15px 20px;
+        }
+        .business-name {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        .business-category {
+            color: var(--gray);
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .business-distance {
+            display: flex;
+            align-items: center;
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        .business-distance i {
+            margin-right: 5px;
+        }
+        /* Services Section */
+        .services {
+            background: var(--light);
+        }
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: var(--primary);
+            font-size: 28px;
+        }
+        .service-card h3 {
+            margin-bottom: 10px;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .tabs button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: #eee;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .tabs button.active {
+            background: var(--primary);
+            color: white;
+        }
+        .form-container {
+            display: none;
+        }
+        .form-container.active {
+            display: block;
+        }
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-container input {
+            margin-bottom: 12px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+        .form-container button {
+            padding: 12px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .form-container button:hover {
+            background: #3654d4;
+        }
+        .toggle-link {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .toggle-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+       
+        /* Cart Section */
+        .cart-section {
+            background: white;
+            padding: 60px 0;
+        }
+        .cart-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .cart-drop-area {
+            border: 2px dashed var(--gray);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-height: 150px;
+            margin-bottom: 20px;
+            background: var(--light);
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .cart-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+        .cart-item-details {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        .cart-item-details span {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .cart-item-quantity button {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--border);
+            background: var(--light);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .cart-item-quantity button:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .cart-item-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            min-width: 80px;
+            text-align: right;
+        }
+        .cart-checkout {
+            margin-top: 20px;
+            background: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .cart-checkout select,
+        .cart-checkout input,
+        .cart-checkout textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            font-size: 16px;
+        }
+        .cart-checkout textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .cart-checkout .address-options {
+            margin-bottom: 20px;
+        }
+        .cart-checkout .payment-methods {
+            margin-bottom: 20px;
+        }
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            border-top: 1px solid var(--border);
+            margin-top: 20px;
+        }
+        .cart-summary.total {
+            font-size: 18px;
+            font-weight: bold;
+            border-top: 2px solid #ccc;
+            padding-top: 8px;
+        }
+        .cart-bill {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+        }
+        .cart-bill h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        .cart-bill-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .cart-bill-item:last-child {
+            border-bottom: none;
+        }
+        .cart-bill-item span {
+            font-size: 16px;
+        }
+        .cart-bill-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            border-top: 2px solid var(--border);
+            margin-top: 10px;
+        }
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 20px;
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--secondary);
+        }
+        .footer-column ul {
+            list-style: none;
+        }
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        .footer-column a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-column a:hover {
+            color: white;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: #ccc;
+        }
+        /* Active navigation link */
+        .nav-active {
+            color: var(--primary) !important;
+            position: relative;
+        }
+        .nav-active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        /* Page Content */
+        .page-content {
+            display: none;
+        }
+        .page-content.active {
+            display: block;
+        }
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .header-content {
+                flex-direction: column;
+            }
+            .header-left {
+                flex-direction: column;
+                width: 100%;
+            }
+            .search-bar {
+                width: 100%;
+                max-width: none;
+                margin: 15px 0 0 0;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+            }
+            .hero h1 {
+                font-size: 36px;
+            }
+            .hero p {
+                font-size: 18px;
+            }
+            .category-grid,
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjusted for smaller screens */
+            }
+        }
+        @media (max-width: 768px) {
+            .nav-links li {
+                margin: 5px 10px;
+            }
+            .hero {
+                padding: 60px 0;
+            }
+            .hero h1 {
+                font-size: 32px;
+            }
+            .section-title h2 {
+                font-size: 28px;
+            }
+            .category-grid,
+            .product-grid,
+            .business-grid,
+            .service-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Further reduced for smaller screens */
+                gap: 15px; /* Reduced gap for smaller screens */
+            }
+        }
+        @media (max-width: 576px) {
+            .header-actions a span {
+                display: none;
+            }
+            .nav-links {
+                overflow-x: auto;
+                white-space: nowrap;
+                justify-content: flex-start;
+                padding-bottom: 10px;
+            }
+            .btn-outline {
+                display: none;
+            }
+            .category-grid,
+            .product-grid,
+            .business-grid,
+            .service-grid {
+                grid-template-columns: 1fr;
+                gap: 10px; /* Minimal gap for mobile */
+            }
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .cart-item-price {
+                text-align: left;
+            }
+        }
+         /* Login Section */
+        .login-section {
+            background: white;
+            padding: 60px 0;
+        }
+        .login-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--light);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .tabs button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: #eee;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .tabs button.active {
+            background: var(--primary);
+            color: white;
+        }
+        .form-container {
+            display: none;
+        }
+        .form-container.active {
+            display: block;
+        }
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-container input {
+            margin-bottom: 12px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+        .form-container button {
+            padding: 12px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .form-container button:hover {
+            background: #3654d4;
+        }
+        .toggle-link {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .toggle-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        /* Admin Login Section
+        .admin-login-section {
+            background: white;
+            padding: 60px 0;
+        }
+        .admin-login-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--light);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        } */
+        /* .admin-login-container input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        /* Login Section */
+        /* .login-section {
+            background: white;
+            padding: 60px 0;
+        }
+        .login-container { 
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--light);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        } */
+        /* .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .tabs button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: #eee;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .tabs button.active { */
+            /* background: var(--primary);
+            color: white;
+        }
+        .form-container {
+            display: none;
+        }
+        .form-container.active {
+            display: block;
+        }
+        .form-container form {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-container input {
+            margin-bottom: 12px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        } */
+        /* .form-container button {
+            padding: 12px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .form-container button:hover {
+            background: #3654d4;
+        }
+        .toggle-link {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+        } */
+        /* .toggle-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        /* Admin Login Section */
+        .admin-login-section {
+            background: white;
+            padding: 60px 0;
+        }
+        .admin-login-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--light);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        } */
+        /* .admin-login-container input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 16px;
+        } */
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span data-translate="logo_text">QuickCart</span>
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for products, services or businesses..." data-translate-placeholder="search_placeholder">
+                    <div class="search-buttons">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                        <button class="mic-btn"><i class="fas fa-microphone"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <!-- <a href="#login" data-page="login"><i class="fas fa-user"></i> <span data-translate="login">Login</span></a>
+                <a href="#admin" data-page="admin"><i class="fas fa-user-shield"></i> <span data-translate="admin">Admin</span></a> -->
+                <a href="#cart" data-page="cart"><i class="fas fa-shopping-cart"></i> <span data-translate="cart">Cart</span> <span class="cart-count">0</span></a>
+                <div class="language-selector">
+                    <select id="language-select">
+                        <option value="en">English</option>
+                        <option value="hi">हिंदी</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="te">తెలుగు</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="#home" data-page="home" class="nav-active"><i class="fas fa-home"></i> <span data-translate="nav_home">Home</span></a></li>
+                <li><a href="#products" data-page="home"><i class="fas fa-shopping-bag"></i> <span data-translate="nav_products">Products</span></a></li>
+                <li><a href="#services" data-page="home"><i class="fas fa-tools"></i> <span data-translate="nav_services">Services</span></a></li>
+                <li><a href="#businesses" data-page="home"><i class="fas fa-store"></i> <span data-translate="nav_businesses">Businesses</span></a></li>
+                <li class="category-dropdown">
+                    <a class="category-dropdown-toggle"><i class="fas fa-list"></i> <span data-translate="categories">Categories</span></a>
+                    <div class="category-dropdown-menu" id="category-dropdown-menu">
+                        <a href="food-dine1.html" data-category="Food & Dining">Food & Dining</a>
+                        <a href="medicine.html" data-category="Medicines">Medicines</a>
+                        <a href="automative.html" data-category="Automotive">Automotive</a>
+                        <a href="service.html" data-category="Services">Services</a>
+                        <a href="Jewellery.html" data-category="Jewellery">Jewellery</a>
+                        <a href="clothes.html" data-category="Clothing">Clothing</a>
+                        <a href="beautyproducts.html" data-category="Beauty Products">Beauty Products</a>
+                        <a href="footwear.html" data-category="Footwear">Footwear</a>
+                        <a href="groceries.html" data-category="Groceries">Groceries</a>
+                        <a href="fruits.html" data-category="Fruits">Fruits</a>
+                        <a href="books (1).html" data-category="Books">Books</a>
+                        <a href="petfood.html" data-category="Pet Food">Pet Food</a>
+                        <a href="musical.html" data-category="Musical Instruments">Musical Instruments</a>
+                        <a href="homefurniture.html" data-category="Home Furniture">Home Furniture</a>
+                        <a href="bags.html" data-category="Bags">Bags</a>
+                        <a href="kitchenproducts.html" data-category="Kitchen Products">Kitchen Products</a>
+                        <a href="sports_fitness.html" data-category="Sports & Fitness">Sports & Fitness</a>
+                        <a href="home_decor.html" data-category="Home Decor & Improvements">Home Decor & Improvements</a>
+                        <a href="watches.html" data-category="Watches">Watches</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Page Content -->
+    <div id="home" class="page-content active">
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="container">
+                <h1 data-translate="hero_title">Shop from Local Vendors Near You</h1>
+                <p data-translate="hero_desc">Discover products and services from multiple vendors. Choose between delivery or pickup options.</p>
+                <a href="#products" data-page="home" class="btn" data-translate="shop_now">Shop Now</a>
+                <a href="#sell" data-page="sell" class="btn btn-outline" data-translate="become_seller">Become a Seller</a>
+            </div>
+        </section>
+        <!-- Categories Section -->
+        <section class="section categories" id="categories">
+            <div class="container">
+                <div class="section-title">
+                    <h2 data-translate="shop_by_category">Shop by Category</h2>
+                </div>
+                <div class="category-grid">
+                    <div class="category-card" data-category="Food & Dining">
+                        <a href="food-dine1.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="food and dine.jpg" alt="Food & Dining">
+                            </div>
+                            <h3>Food & Dining</h3>
+                            <p>Restaurants, cafes and more</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Medicines">
+                        <a href="medicine.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="medicine.jpg" alt="Medicines">
+                            </div>
+                            <h3>Medicines</h3>
+                            <p>Pharmacies and health products</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Automotive">
+                        <a href="automative.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="automative.jpg" alt="Automotive">
+                            </div>
+                            <h3>Automotive</h3>
+                            <p>Mechanics and car services</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Services">
+                        <a href="service.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="services.jpg" alt="Services">
+                            </div>
+                            <h3>Services</h3>
+                            <p>Home services and repairs</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Jewellery">
+                        <a href="Jewellery.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="jewellaery.jpg" alt="Jewellery">
+                            </div>
+                            <h3>Jewellery</h3>
+                            <p>Rings, necklaces and accessories</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Clothing">
+                        <a href="clothes.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="cloth.jpg" alt="Clothing">
+                            </div>
+                            <h3>Clothing</h3>
+                            <p>Fashion for men and women</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Beauty Products">
+                        <a href="beautyproducts.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="beauty products.jpg" alt="Beauty Products">
+                            </div>
+                            <h3>Beauty Products</h3>
+                            <p>Cosmetics and skincare</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Footwear">
+                        <a href="footwear.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="footwear.jpg" alt="Footwear">
+                            </div>
+                            <h3>Footwear</h3>
+                            <p>Shoes, sandals, and sneakers</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Groceries">
+                        <a href="groceries.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="grocesry.jpg" alt="Groceries">
+                            </div>
+                            <h3>Groceries</h3>
+                            <p>Daily essentials and pantry items</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Fruits">
+                        <a href="fruits.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="fruit.jpg" alt="Fruits">
+                            </div>
+                            <h3>Fruits</h3>
+                            <p>Fresh fruits and organic produce</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Books">
+                        <a href="books (1).html" class="category-link">
+                            <div class="category-icon">
+                                <img src="book.jpg" alt="Books">
+                            </div>
+                            <h3>Books</h3>
+                            <p>Novels, textbooks, and more</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Pet Food">
+                        <a href="petfood.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="petfood.jpg" alt="Pet Food">
+                            </div>
+                            <h3>Pet Food</h3>
+                            <p>Nutrition for your pets</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Musical Instruments">
+                        <a href="musical.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="music.jpg" alt="Musical Instruments">
+                            </div>
+                            <h3>Musical Instruments</h3>
+                            <p>Guitars, pianos, and accessories</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Home Furniture">
+                        <a href="homefurniture.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="furniture.jpg" alt="Home Furniture">
+                            </div>
+                            <h3>Home Furniture</h3>
+                            <p>Sofas, tables, and home essentials</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Bags">
+                        <a href="bags.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="bag.jpg" alt="Bags">
+                            </div>
+                            <h3>Bags</h3>
+                            <p>Backpacks, handbags, and luggage</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Kitchen Products">
+                        <a href="kitchenproducts.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="kitchen.jpg" alt="Kitchen Products">
+                            </div>
+                            <h3>Kitchen Products</h3>
+                            <p>Cookware and kitchen gadgets</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Sports & Fitness">
+                        <a href="sports_fitness.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="sports.jpg" alt="Sports & Fitness">
+                            </div>
+                            <h3>Sports & Fitness</h3>
+                            <p>Gym equipment and sportswear</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Home Decor & Improvements">
+                        <a href="home_decor .html" class="category-link">
+                            <div class="category-icon">
+                                <img src="decor.jpg" alt="Home Decor & Improvements">
+                            </div>
+                            <h3>Home Decor & Improvements</h3>
+                            <p>Decor items and home upgrades</p>
+                        </a>
+                    </div>
+                    <div class="category-card" data-category="Watches">
+                        <a href="watches.html" class="category-link">
+                            <div class="category-icon">
+                                <img src="watches.jpg" alt="Watches">
+                            </div>
+                            <h3>Watches</h3>
+                            <p>Stylish timepieces and smartwatches</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Products Section -->
+        <section class="section products" id="products">
+            <div class="container">
+                <div class="section-title">
+                    <h2 data-translate="popular_products">Popular Products</h2>
+                </div>
+                <div class="product-grid">
+                    <!-- Product 1 -->
+                    <div class="product-card" draggable="true"
+                         data-product='{"id":1,"name":"Fresh Garden Salad","price":1099,"vendor":"Green Cafe","category":"Food","image":"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1180&q=80"}'>
+                        <img src="Fresh Garden Salad.jpg"
+                             alt="Fresh Garden Salad" class="product-img">
+                        <div class="product-info">
+                            <h3 class="product-title">Fresh Garden Salad</h3>
+                            <div class="product-vendor">
+                                <i class="fas fa-store"></i> Green Cafe
+                            </div>
+                            <div class="product-price">₹1,099</div>
+                            <div class="product-actions">
+                                <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product 2 -->
+                    <div class="product-card" draggable="true"
+                         data-product='{"id":2,"name":"Classic Beef Burger","price":849,"vendor":"Burger Heaven","category":"Food","image":"https://images.unsplash.com/photo-1571091718767-18b5b1457add?auto=format&fit=crop&w=1172&q=80"}'>
+                        <img src="Classic Beef Burger.jpg"
+                             alt="Classic Beef Burger" class="product-img">
+                        <div class="product-info">
+                            <h3 class="product-title">Classic Beef Burger</h3>
+                            <div class="product-vendor">
+                                <i class="fas fa-store"></i> Burger Heaven
+                            </div>
+                            <div class="product-price">₹849</div>
+                            <div class="product-actions">
+                                <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product 3 -->
+                    <div class="product-card" draggable="true"
+                         data-product='{"id":3,"name":"Synthetic Engine Oil","price":2499,"vendor":"AutoCare","category":"Automotive","image":"caroil.jpeg"}'>
+                        <img src="Synthetic Engine Oil.jpg" alt="Synthetic Engine Oil" class="product-img">
+                        <div class="product-info">
+                            <h3 class="product-title">Synthetic Engine Oil</h3>
+                            <div class="product-vendor">
+                                <i class="fas fa-store"></i> AutoCare
+                            </div>
+                            <div class="product-price">₹2,499</div>
+                            <div class="product-actions">
+                                <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product 4 -->
+                    <div class="product-card" draggable="true"
+                         data-product='{"id":4,"name":"Vitamin Supplements","price":1299,"vendor":"HealthPlus","category":"Medicines","image":"https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=1130&q=80"}'>
+                        <img src="Vitamin Supplements.jpg"
+                             alt="Vitamin Supplements" class="product-img">
+                        <div class="product-info">
+                            <h3 class="product-title">Vitamin Supplements</h3>
+                            <div class="product-vendor">
+                                <i class="fas fa-store"></i> HealthPlus
+                            </div>
+                            <div class="product-price">₹1,299</div>
+                            <div class="product-actions">
+                                <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product 5 -->
+                    <div class="product-card" draggable="true"
+                         data-product='{"id":5,"name":"Gold Diamond Ring","price":24999,"vendor":"Sparkle Jewellers","category":"Jewellery","image":"https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1170&q=80"}'>
+                        <img src="Gold Diamond Ring.jpg"
+                             alt="Gold Diamond Ring" class="product-img">
+                        <div class="product-info">
+                            <h3 class="product-title">Gold Diamond Ring</h3>
+                            <div class="product-vendor">
+                                <i class="fas fa-store"></i> Sparkle Jewellers
+                            </div>
+                            <div class="product-price">₹24,999</div>
+                            <div class="product-actions">
+                                <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product 6 -->
+                    <div class="product-card" draggable="true"
+                         data-product='{"id":6,"name":"Designer Summer Dress","price":4199,"vendor":"Fashion Hub","category":"Clothing","image":"https://images.unsplash.com/photo-1529903384028-929ae5dccdf1?auto=format&fit=crop&w=1170&q=80"}'>
+                        <img src="Designer Summer Dress.jpg"
+                             alt="Designer Summer Dress" class="product-img">
+                        <div class="product-info">
+                            <h3 class="product-title">Designer Summer Dress</h3>
+                            <div class="product-vendor">
+                                <i class="fas fa-store"></i> Fashion Hub
+                            </div>
+                            <div class="product-price">₹4,199</div>
+                            <div class="product-actions">
+                                <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product 7 -->
+                    <div class="product-card" draggable="true"
+                         data-product='{"id":7,"name":"Luxury Skincare Set","price":7499,"vendor":"Beauty Palace","category":"Beauty Products","image":"https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1180&q=80"}'>
+                        <img src="Luxury Skincare Set.jpg"
+                             alt="Luxury Skincare Set" class="product-img">
+                        <div class="product-info">
+                            <h3 class="product-title">Luxury Skincare Set</h3>
+                            <div class="product-vendor">
+                                <i class="fas fa-store"></i> Beauty Palace
+                            </div>
+                            <div class="product-price">₹7,499</div>
+                            <div class="product-actions">
+                                <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product 8 -->
+                    <div class="product-card" draggable="true"
+                         data-product='{"id":8,"name":"Silver Pearl Necklace","price":10899,"vendor":"Elegance Jewels","category":"Jewellery","image":"silverperal.jpeg"}'>
+                        <img src="Silver Pearl Necklace.jpg" alt="Silver Pearl Necklace" class="product-img">
+                        <div class="product-info">
+                            <h3 class="product-title">Silver Pearl Necklace</h3>
+                            <div class="product-vendor">
+                                <i class="fas fa-store"></i> Elegance Jewels
+                            </div>
+                            <div class="product-price">₹10,899</div>
+                            <div class="product-actions">
+                                <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Services Section -->
+        <section class="section services" id="services">
+            <div class="container">
+                <div class="section-title">
+                    <h2 data-translate="our_services">Our Services</h2>
+                </div>
+                <div class="service-grid">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <h3 data-translate="fast_delivery">Fast Delivery</h3>
+                        <p data-translate="delivery_desc">Get your orders delivered to your doorstep within hours</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <h3 data-translate="pickup_service">Pickup Service</h3>
+                        <p data-translate="pickup_desc">Order online and pick up from the store at your convenience</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3 data-translate="support_247">24/7 Support</h3>
+                        <p data-translate="support_desc">Our customer support team is always ready to help you</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Business Section -->
+        <section class="section businesses" id="businesses">
+            <div class="container">
+                <div class="section-title">
+                    <h2 data-translate="featured_businesses">Featured Businesses</h2>
+                </div>
+                <div class="business-grid">
+                    <div class="business-card">
+                        <div class="business-header">
+                            <img src="Green Cafe.jpg" alt="Restaurant" class="business-cover">
+                            <img src="Green Cafe.jpg" alt="Logo" class="business-logo">
+                        </div>
+                        <div class="business-info">
+                            <h3 class="business-name">Green Cafe</h3>
+                            <div class="business-category">Restaurant • Healthy Food</div>
+                            <div class="business-distance">
+                                <i class="fas fa-location-dot"></i> 1.2 km away
+                            </div>
+                            <a href="#" class="btn" data-translate="view_store">View Store</a>
+                        </div>
+                    </div>
+                    <div class="business-card">
+                        <div class="business-header">
+                            <img src="AutoCare Center.jpg" alt="Auto Shop" class="business-cover">
+                            <img src="AutoCare Center.jpg" alt="Logo" class="business-logo">
+                        </div>
+                        <div class="business-info">
+                            <h3 class="business-name">AutoCare Center</h3>
+                            <div class="business-category">Automotive • Repairs</div>
+                            <div class="business-distance">
+                                <i class="fas fa-location-dot"></i> 2.5 km away
+                            </div>
+                            <a href="#" class="btn" data-translate="view_store">View Store</a>
+                        </div>
+                    </div>
+                    <div class="business-card">
+                        <div class="business-header">
+                            <img src="healthplus pharmacsy.jpg" alt="Pharmacy" class="business-cover">
+                            <img src="healthplus pharmacsy.jpg" alt="Logo" class="business-logo">
+                        </div>
+                        <div class="business-info">
+                            <h3 class="business-name">HealthPlus Pharmacy</h3>
+                            <div class="business-category">Pharmacy • Health Products</div>
+                            <div class="business-distance">
+                                <i class="fas fa-location-dot"></i> 0.8 km away
+                            </div>
+                            <a href="#" class="btn" data-translate="view_store">View Store</a>
+                        </div>
+                    </div>
+                    <div class="business-card">
+                        <div class="business-header">
+                            <img src="Sparkle Jewellers.jpg" alt="Jewellery Store" class="business-cover">
+                            <img src="Sparkle Jewellers.jpg" alt="Logo" class="business-logo">
+                        </div>
+                        <div class="business-info">
+                            <h3 class="business-name">Sparkle Jewellers</h3>
+                            <div class="business-category">Jewellery • Accessories</div>
+                            <div class="business-distance">
+                                <i class="fas fa-location-dot"></i> 1.5 km away
+                            </div>
+                            <a href="#" class="btn" data-translate="view_store">View Store</a>
+                        </div>
+                    </div>
+                    <div class="business-card">
+                        <div class="business-header">
+                            <img src="Fashion Hub.jpg" alt="Fashion Store" class="business-cover">
+                            <img src="Fashion Hub.jpg" alt="Logo" class="business-logo">
+                        </div>
+                        <div class="business-info">
+                            <h3 class="business-name">Fashion Hub</h3>
+                            <div class="business-category">Clothing • Accessories</div>
+                            <div class="business-distance">
+                                <i class="fas fa-location-dot"></i> 0.9 km away
+                            </div>
+                            <a href="#" class="btn" data-translate="view_store">View Store</a>
+                        </div>
+                    </div>
+                    <div class="business-card">
+                        <div class="business-header">
+                            <img src="Beauty Palace.jpg" alt="Beauty Store" class="business-cover">
+                            <img src="Beauty Palace.jpg" alt="Logo" class="business-logo">
+                        </div>
+                        <div class="business-info">
+                            <h3 class="business-name">Beauty Palace</h3>
+                            <div class="business-category">Cosmetics • Skincare</div>
+                            <div class="business-distance">
+                                <i class="fas fa-location-dot"></i> 1.8 km away
+                            </div>
+                            <a href="#" class="btn" data-translate="view_store">View Store</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+      <!-- Login Page
+    <div id="login" class="page-content">
+        <section class="login-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Login & Registration</h2>
+                </div>
+                <div class="login-container">
+                    Tabs -->
+                    <!-- <div class="tabs">
+                        <button class="tab-btn active" data-tab="customer-login">Customer</button>
+                        <button class="tab-btn" data-tab="seller-login">Seller</button>
+                    </div> -->
+
+                    <!-- CUSTOMER LOGIN -->
+                    <!-- <div id="customer-login" class="form-container active">
+                        <h3>Customer Login</h3>
+                        <form id="customerLoginForm">
+                            <input name="email" type="email" placeholder="Email" required>
+                            <input name="password" type="password" placeholder="Password" required>
+                            
+
+                            <button type="submit">Login</button>
+                        </form>
+                        <div class="toggle-link">
+                            Don't have an account? <a onclick="showForm('customer-register')">Register</a>
+                        </div>
+                    </div> -->
+
+                    <!-- CUSTOMER REGISTER -->
+                    <!-- <div id="customer-register" class="form-container">
+                        <h3>Customer Registration</h3>
+                        <form id="customerRegisterForm">
+                            <input name="fullname" type="text" placeholder="Full Name" required>
+                            <input name="email" type="email" placeholder="Email" required>
+                            <input name="password" type="password" placeholder="Password" required>
+                            <input name="confirmPassword" type="password" placeholder="Confirm Password" required>
+                            <button type="submit">Register</button>
+                        </form>
+                        <div class="toggle-link">
+                            Already have an account? <a onclick="showForm('customer-login')">Login</a>
+                        </div>
+                    </div> -->
+
+                    <!-- SELLER LOGIN -->
+                    <!-- <div id="seller-login" class="form-container">
+                        <h3>Seller Login</h3>
+                        <form id="sellerLoginForm">
+                            <input name="email" type="email" placeholder="Email" required>
+                            <input name="password" type="password" placeholder="Password" required>
+                            <button type="submit">Login</button>
+                        </form>
+                        <div class="toggle-link">
+                            Don't have an account? <a onclick="showForm('seller-register')">Register</a>
+                        </div>
+                    </div> -->
+
+                    <!-- SELLER REGISTER -->
+                    <!-- <div id="seller-register" class="form-container">
+                        <h3>Seller Registration</h3>
+                        <form id="sellerRegisterForm">
+                            <input name="fullname" type="text" placeholder="Full Name" required>
+                            <input name="business_name" type="text" placeholder="Business Name" required>
+                            <input name="business_type" type="text" placeholder="Business Type" required>
+                            <input name="email" type="email" placeholder="Email" required>
+                            <input name="password" type="password" placeholder="Password" required>
+                            <input name="confirmPassword" type="password" placeholder="Confirm Password" required>
+                            <button type="submit">Register</button>
+                        </form>
+                        <div class="toggle-link">
+                            Already have an account? <a onclick="showForm('seller-login')">Login</a>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+        <!-- </section>
+    </div> -->
+
+    <!-- Admin Login Page -->
+    <!-- <div id="admin" class="page-content">
+        <section class="admin-login-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Admin Login & Registration</h2>
+                </div>
+                <div class="admin-login-container">
+                    Tabs -->
+                    <!-- <div class="tabs">
+                        <button class="tab-btn active" data-tab="admin-login">Admin Login</button>
+                        <button class="tab-btn" data-tab="admin-register">Admin Register</button>
+                    </div> -->
+
+                    <!-- ADMIN LOGIN -->
+                    <!-- <div id="admin-login" class="form-container active">
+                        <h3>Admin Login</h3>
+                        <form id="adminLoginForm">
+                            <input name="email" type="email" placeholder="Email" required>
+                            <input name="password" type="password" placeholder="Password" required>
+                            <button type="submit">Login</button>
+                        </form>
+                        <div class="toggle-link">
+                            Don't have an account? <a onclick="showAdminForm('admin-register')">Register</a>
+                        </div>
+                    </div> -->
+
+                    <!-- ADMIN REGISTER -->
+                    <!-- <div id="admin-register" class="form-container">
+                        <h3>Admin Registration</h3>
+                        <form id="adminRegisterForm">
+                            <input name="fullname" type="text" placeholder="Full Name" required>
+                            <input name="email" type="email" placeholder="Email" required>
+                            <input name="password" type="password" placeholder="Password" required>
+                            <input name="confirmPassword" type="password" placeholder="Confirm Password" required>
+                            <button type="submit">Register</button>
+                        </form>
+                        <div class="toggle-link">
+                            Already have an account? <a onclick="showAdminForm('admin-login')">Login</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div> -->
+    <!-- Cart Page -->
+    <div id="cart" class="page-content">
+        <section class="section cart-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2 data-translate="your_cart">Your Cart</h2>
+                </div>
+                <div class="cart-container">
+                    <div class="cart-drop-area" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+                        <img id="empty-cart-image" src="" alt="Empty Cart" style="display: block; margin: 0 auto; max-width: 100px;">
+                        <p data-translate="drag_products">Drag products here or click "Add to Cart" to start shopping!</p>
+                    </div>
+                    <div id="cart-items"></div>
+                    <div class="cart-bill">
+                        <h3 data-translate="order_summary">Order Summary</h3>
+                        <div id="cart-bill-items"></div>
+                        <div class="cart-bill-item">
+                            <span data-translate="subtotal">Subtotal</span>
+                            <span id="cart-subtotal">₹0</span>
+                        </div>
+                        <div class="cart-bill-item">
+                            <span data-translate="commission">Admin Commission (5%)</span>
+                            <span id="cart-commission">₹0</span>
+                        </div>
+                        <div class="cart-bill-total">
+                            <span data-translate="total">Total</span>
+                            <span id="cart-total">₹0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="cart-checkout">
+                        <select id="delivery-option">
+                            <option value="" data-translate="delivery_option">Select Delivery Option</option>
+                            <option value="delivery" data-translate="delivery">Delivery</option>
+                            <option value="pickup" data-translate="pickup">Pickup</option>
+                        </select>
+                        <div class="address-options">
+                            <select id="saved-addresses">
+                                <option value="" data-translate="saved_addresses">Select Saved Address</option>
+                                <option value="123 Main St, City">123 Main St, City</option>
+                                <option value="456 Market St, City">456 Market St, City</option>
+                            </select>
+                            <textarea id="new-address" placeholder="Enter New Address" data-translate-placeholder="new_address"></textarea>
+                        </div>
+                        <div class="payment-methods">
+                            <select id="payment-method">
+                                <option value="" data-translate="payment_method">Select Payment Method</option>
+                                <option value="credit-card" data-translate="credit_card">Credit Card</option>
+                                <option value="debit-card" data-translate="debit_card">Debit Card</option>
+                                <option value="upi" data-translate="upi">UPI</option>
+                                <option value="cash-on-delivery" data-translate="cash_on_delivery">Cash on Delivery</option>
+                            </select>
+                        </div>
+                        <button class="btn" data-translate="checkout" onclick="handleCheckout()">Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3 data-translate="footer_quickcart">QuickCart</h3>
+                    <p data-translate="footer_description">Your one-stop multi-vendor e-commerce solution. Shop from local businesses with delivery or pickup options.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_quick_links">Quick Links</h3>
+                    <ul>
+                        <li><a href="#home" data-page="home" data-translate="footer_home">Home</a></li>
+                        <li><a href="#products" data-page="home" data-translate="footer_products">Products</a></li>
+                        <li><a href="#services" data-page="home" data-translate="footer_services">Services</a></li>
+                        <li><a href="#businesses" data-page="home" data-translate="footer_businesses">Businesses</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_customer_support">Customer Support</h3>
+                    <ul>
+                        <li><a href="#" data-translate="footer_help_center">Help Center</a></li>
+                        <li><a href="#" data-translate="footer_faqs">FAQs</a></li>
+                        <li><a href="#" data-translate="footer_contact_us">Contact Us</a></li>
+                        <li><a href="#" data-translate="footer_return_policy">Return Policy</a></li>
+                        <li><a href="#" data-translate="footer_privacy_policy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_contact_info">Contact Info</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Market St, City, Country</li>
+                        <li><i class="fas fa-phone"></i> <span data-translate="footer_phone">+1 234 567 8900</span></li>
+                        <li><i class="fas fa-envelope"></i> <span data-translate="footer_email">support@quickcart.com</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p data-translate="copyright">&copy; 2025 QuickCart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        // Initialize cart from localStorage
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        // Save cart to localStorage
+        function saveCart() {
+            try {
+                localStorage.setItem('cart', JSON.stringify(cart));
+                console.log('Cart saved to localStorage:', cart);
+            } catch (error) {
+                console.error('Error saving cart to localStorage:', error);
+            }
+        }
+        // Page translations
+        const pageTranslations = {
+            en: {
+                logo_text: "QuickCart",
+                hero_title: "Shop from Local Vendors Near You",
+                hero_desc: "Discover products and services from multiple vendors. Choose between delivery or pickup options.",
+                shop_now: "Shop Now",
+                become_seller: "Become a Seller",
+                search_placeholder: "Search for products, services or businesses...",
+                nav_home: "Home",
+                nav_products: "Products",
+                nav_services: "Services",
+                nav_businesses: "Businesses",
+                categories: "Categories",
+                login: "Login",
+                admin: "Admin",
+                sell: "Sell",
+                cart: "Cart",
+                shop_by_category: "Shop by Category",
+                popular_products: "Popular Products",
+                add_to_cart: "Add to Cart",
+                our_services: "Our Services",
+                fast_delivery: "Fast Delivery",
+                delivery_desc: "Get your orders delivered to your doorstep within hours",
+                pickup_service: "Pickup Service",
+                pickup_desc: "Order online and pick up from the store at your convenience",
+                support_247: "24/7 Support",
+                support_desc: "Our customer support team is always ready to help you",
+                featured_businesses: "Featured Businesses",
+                view_store: "View Store",
+                login_title: "Login",
+                customer: "Customer",
+                seller: "Seller",
+                username: "Username",
+                password: "Password",
+                login_btn: "Login",
+                admin_title: "Admin Login",
+                admin_login: "Login",
+                register_seller: "Register as a Seller",
+                business_name: "Business Name",
+                business_type: "Business Type (e.g., Cafe, Pharmacy)",
+                business_location: "Location (Address)",
+                business_email: "Email",
+                register: "Register",
+                your_cart: "Your Cart",
+                drag_products: "Drag products here or click \"Add to Cart\" to start shopping!",
+                order_summary: "Order Summary",
+                subtotal: "Subtotal",
+                commission: "Admin Commission (5%)",
+                total: "Total",
+                total_amount: "Total Amount",
+                delivery_option: "Select Delivery Option",
+                delivery: "Delivery",
+                pickup: "Pickup",
+                saved_addresses: "Select Saved Address",
+                new_address: "Enter New Address",
+                payment_method: "Select Payment Method",
+                credit_card: "Credit Card",
+                debit_card: "Debit Card",
+                upi: "UPI",
+                cash_on_delivery: "Cash on Delivery",
+                checkout: "Checkout",
+                footer_quickcart: "QuickCart",
+                footer_description: "Your one-stop multi-vendor e-commerce solution. Shop from local businesses with delivery or pickup options.",
+                footer_quick_links: "Quick Links",
+                footer_home: "Home",
+                footer_products: "Products",
+                footer_services: "Services",
+                footer_businesses: "Businesses",
+                footer_customer_support: "Customer Support",
+                footer_help_center: "Help Center",
+                footer_faqs: "FAQs",
+                footer_contact_us: "Contact Us",
+                footer_return_policy: "Return Policy",
+                footer_privacy_policy: "Privacy Policy",
+                footer_contact_info: "Contact Info",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@quickcart.com",
+                copyright: "© 2025 QuickCart. All rights reserved."
+            },
+            hi: {
+                logo_text: "क्विककार्ट",
+                hero_title: "आपके पास के स्थानीय विक्रेताओं से खरीदारी करें",
+                hero_desc: "एकाधिक विक्रेताओं से उत्पादों और सेवाओं की खोज करें। डिलीवरी या पिकअप विकल्प चुनें।",
+                shop_now: "अभी खरीदें",
+                become_seller: "विक्रेता बनें",
+                search_placeholder: "उत्पादों, सेवाओं या व्यवसायों की खोज करें...",
+                nav_home: "होम",
+                nav_products: "उत्पाद",
+                nav_services: "सेवाएँ",
+                nav_businesses: "व्यवसाय",
+                categories: "श्रेणियाँ",
+                login: "लॉगिन",
+                admin: "एडमिन",
+                sell: "बेचें",
+                cart: "कार्ट",
+                shop_by_category: "श्रेणी के अनुसार खरीदें",
+                popular_products: "लोकप्रिय उत्पाद",
+                add_to_cart: "कार्ट में जोड़ें",
+                our_services: "हमारी सेवाएँ",
+                fast_delivery: "तेज डिलीवरी",
+                delivery_desc: "अपने ऑर्डर को कुछ घंटों के भीतर आपके द्वार पर डिलीवर करें",
+                pickup_service: "पिकअप सेवा",
+                pickup_desc: "ऑनलाइन ऑर्डर करें और स्टोर से अपनी सुविधा के अनुसार पिकअप करें",
+                support_247: "24/7 समर्थन",
+                support_desc: "हमारी ग्राहक समर्थन टीम हमेशा आपकी मदद के लिए तैयार है",
+                featured_businesses: "विशेष व्यवसाय",
+                view_store: "स्टोर देखें",
+                login_title: "लॉगिन",
+                customer: "ग्राहक",
+                seller: "विक्रेता",
+                username: "उपयोगकर्ता नाम",
+                password: "पासवर्ड",
+                login_btn: "लॉगिन",
+                admin_title: "एडमिन लॉगिन",
+                admin_login: "लॉगिन",
+                register_seller: "विक्रेता के रूप में पंजीकरण करें",
+                business_name: "व्यवसाय का नाम",
+                business_type: "व्यवसाय प्रकार (उदाहरण, कैफे, फार्मेसी)",
+                business_location: "स्थान (पता)",
+                business_email: "ईमेल",
+                register: "पंजीकरण",
+                your_cart: "आपका कार्ट",
+                drag_products: "उत्पादों को यहाँ खींचें या \"कार्ट में जोड़ें\" पर क्लिक करके शॉपिंग शुरू करें!",
+                order_summary: "ऑर्डर सारांश",
+                subtotal: "उपयोग",
+                commission: "एडमिन कमीशन (5%)",
+                total: "कुल",
+                total_amount: "कुल राशि",
+                delivery_option: "डिलीवरी विकल्प चुनें",
+                delivery: "डिलीवरी",
+                pickup: "पिकअप",
+                saved_addresses: "सेव्ड पता चुनें",
+                new_address: "नया पता दर्ज करें",
+                payment_method: "भुगतान विधि चुनें",
+                credit_card: "क्रेडिट कार्ड",
+                debit_card: "डेबिट कार्ड",
+                upi: "UPI",
+                cash_on_delivery: "कैश ऑन डिलीवरी",
+                checkout: "चेकआउट",
+                footer_quickcart: "क्विककार्ट",
+                footer_description: "आपका एक-स्टॉप मल्टी-वेंडर ई-कॉमर्स समाधान। स्थानीय व्यवसायों से डिलीवरी या पिकअप विकल्प के साथ शॉपिंग करें।",
+                footer_quick_links: "त्वरित लिंक",
+                footer_home: "होम",
+                footer_products: "उत्पाद",
+                footer_services: "सेवाएँ",
+                footer_businesses: "व्यवसाय",
+                footer_customer_support: "ग्राहक समर्थन",
+                footer_help_center: "सहायता केंद्र",
+                footer_faqs: "FAQs",
+                footer_contact_us: "हमसे संपर्क करें",
+                footer_return_policy: "रिटर्न नीति",
+                footer_privacy_policy: "गोपनीयता नीति",
+                footer_contact_info: "संपर्क जानकारी",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@quickcart.com",
+                copyright: "© 2025 QuickCart. सर्वाधिकार सुरक्षित।"
+            },
+            es: {
+                logo_text: "QuickCart",
+                hero_title: "Compra de Vendedores Locales Cerca de Ti",
+                hero_desc: "Descubre productos y servicios de múltiples vendedores. Elige entre opciones de entrega o recogida.",
+                shop_now: "Comprar Ahora",
+                become_seller: "Conviértete en Vendedor",
+                search_placeholder: "Buscar productos, servicios o negocios...",
+                nav_home: "Inicio",
+                nav_products: "Productos",
+                nav_services: "Servicios",
+                nav_businesses: "Negocios",
+                categories: "Categorías",
+                login: "Iniciar Sesión",
+                admin: "Admin",
+                sell: "Vender",
+                cart: "Carrito",
+                shop_by_category: "Comprar por Categoría",
+                popular_products: "Productos Populares",
+                add_to_cart: "Añadir al Carrito",
+                our_services: "Nuestros Servicios",
+                fast_delivery: "Entrega Rápida",
+                delivery_desc: "Recibe tus pedidos en tu puerta en horas",
+                pickup_service: "Servicio de Recogida",
+                pickup_desc: "Pide en línea y recoge en la tienda a tu conveniencia",
+                support_247: "Soporte 24/7",
+                support_desc: "Nuestro equipo de soporte al cliente siempre está listo para ayudarte",
+                featured_businesses: "Negocios Destacados",
+                view_store: "Ver Tienda",
+                login_title: "Iniciar Sesión",
+                customer: "Cliente",
+                seller: "Vendedor",
+                username: "Nombre de Usuario",
+                password: "Contraseña",
+                login_btn: "Iniciar Sesión",
+                admin_title: "Inicio de Sesión de Admin",
+                admin_login: "Iniciar Sesión",
+                register_seller: "Regístrate como Vendedor",
+                business_name: "Nombre del Negocio",
+                business_type: "Tipo de Negocio (ej., Café, Farmacia)",
+                business_location: "Ubicación (Dirección)",
+                business_email: "Correo Electrónico",
+                register: "Registrar",
+                your_cart: "Tu Carrito",
+                drag_products: "Arrastra productos aquí o haz clic en \"Añadir al Carrito\" para comenzar a comprar!",
+                order_summary: "Resumen del Pedido",
+                subtotal: "Subtotal",
+                commission: "Comisión de Admin (5%)",
+                total: "Total",
+                total_amount: "Cantidad Total",
+                delivery_option: "Seleccionar Opción de Entrega",
+                delivery: "Entrega",
+                pickup: "Recogida",
+                saved_addresses: "Seleccionar Dirección Guardada",
+                new_address: "Ingresar Nueva Dirección",
+                payment_method: "Seleccionar Método de Pago",
+                credit_card: "Tarjeta de Crédito",
+                debit_card: "Tarjeta de Débito",
+                upi: "UPI",
+                cash_on_delivery: "Pago en Efectivo al Recibir",
+                checkout: "Checkout",
+                footer_quickcart: "QuickCart",
+                footer_description: "Tu solución de comercio electrónico multi-vendedor todo en uno. Compra de negocios locales con opciones de entrega o recogida.",
+                footer_quick_links: "Enlaces Rápidos",
+                footer_home: "Inicio",
+                footer_products: "Productos",
+                footer_services: "Servicios",
+                footer_businesses: "Negocios",
+                footer_customer_support: "Soporte al Cliente",
+                footer_help_center: "Centro de Ayuda",
+                footer_faqs: "Preguntas Frecuentes",
+                footer_contact_us: "Contáctanos",
+                footer_return_policy: "Política de Devoluciones",
+                footer_privacy_policy: "Política de Privacidad",
+                footer_contact_info: "Información de Contacto",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@quickcart.com",
+                copyright: "© 2025 QuickCart. Todos los derechos reservados."
+            },
+            fr: {
+                logo_text: "QuickCart",
+                hero_title: "Achetez auprès de Vendeurs Locaux Près de Chez Vous",
+                hero_desc: "Découvrez des produits et services de plusieurs vendeurs. Choisissez entre livraison ou ramassage.",
+                shop_now: "Acheter Maintenant",
+                become_seller: "Devenez Vendeur",
+                search_placeholder: "Rechercher des produits, services ou entreprises...",
+                nav_home: "Accueil",
+                nav_products: "Produits",
+                nav_services: "Services",
+                nav_businesses: "Entreprises",
+                categories: "Catégories",
+                login: "Connexion",
+                admin: "Admin",
+                sell: "Vendre",
+                cart: "Panier",
+                shop_by_category: "Acheter par Catégorie",
+                popular_products: "Produits Populaires",
+                add_to_cart: "Ajouter au Panier",
+                our_services: "Nos Services",
+                fast_delivery: "Livraison Rapide",
+                delivery_desc: "Recevez vos commandes à votre porte en quelques heures",
+                pickup_service: "Service de Ramassage",
+                pickup_desc: "Commandez en ligne et récupérez en magasin à votre convenance",
+                support_247: "Support 24/7",
+                support_desc: "Notre équipe de support client est toujours prête à vous aider",
+                featured_businesses: "Entreprises Mises en Avant",
+                view_store: "Voir la Boutique",
+                login_title: "Connexion",
+                customer: "Client",
+                seller: "Vendeur",
+                username: "Nom d'Utilisateur",
+                password: "Mot de Passe",
+                login_btn: "Connexion",
+                admin_title: "Connexion Admin",
+                admin_login: "Connexion",
+                register_seller: "S'inscrire en Tant que Vendeur",
+                business_name: "Nom de l'Entreprise",
+                business_type: "Type d'Entreprise (ex., Café, Pharmacie)",
+                business_location: "Emplacement (Adresse)",
+                business_email: "Email",
+                register: "S'inscrire",
+                your_cart: "Votre Panier",
+                drag_products: "Glissez des produits ici ou cliquez sur \"Ajouter au Panier\" pour commencer les achats !",
+                order_summary: "Résumé de la Commande",
+                subtotal: "Sous-Total",
+                commission: "Commission Admin (5%)",
+                total: "Total",
+                total_amount: "Montant Total",
+                delivery_option: "Sélectionner Option de Livraison",
+                delivery: "Livraison",
+                pickup: "Ramassage",
+                saved_addresses: "Sélectionner Adresse Sauvegardée",
+                new_address: "Entrer Nouvelle Adresse",
+                payment_method: "Sélectionner Méthode de Paiement",
+                credit_card: "Carte de Crédit",
+                debit_card: "Carte de Débit",
+                upi: "UPI",
+                cash_on_delivery: "Paiement à la Livraison",
+                checkout: "Passer à la Caisse",
+                footer_quickcart: "QuickCart",
+                footer_description: "Votre solution e-commerce multi-vendeurs tout-en-un. Achetez auprès d'entreprises locales avec options de livraison ou ramassage.",
+                footer_quick_links: "Liens Rapides",
+                footer_home: "Accueil",
+                footer_products: "Produits",
+                footer_services: "Services",
+                footer_businesses: "Entreprises",
+                footer_customer_support: "Support Client",
+                footer_help_center: "Centre d'Aide",
+                footer_faqs: "FAQ",
+                footer_contact_us: "Contactez-Nous",
+                footer_return_policy: "Politique de Retour",
+                footer_privacy_policy: "Politique de Confidentialité",
+                footer_contact_info: "Informations de Contact",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@quickcart.com",
+                copyright: "© 2025 QuickCart. Tous droits réservés."
+            },
+            te: {
+                logo_text: "క్విక్‌కార్ట్",
+                hero_title: "మీ సమీపంలోని స్థానిక విక్రేతల నుండి షాపింగ్ చేయండి",
+                hero_desc: "బహుళ విక్రేతల నుండి ఉత్పత్తులు మరియు సేవలను కనుగొనండి. డెలివరీ లేదా పికప్ ఎంపికల మధ్య ఎంచుకోండి.",
+                shop_now: "ఇప్పుడు కొనుగోలు చేయండి",
+                become_seller: "విక్రేతగా మారండి",
+                search_placeholder: "ఉత్పత్తులు, సేవలు లేదా వ్యాపారాల కోసం శోధించండి...",
+                nav_home: "హోమ్",
+                nav_products: "ఉత్పత్తులు",
+                nav_services: "సేవలు",
+                nav_businesses: "వ్యాపారాలు",
+                categories: "వర్గాలు",
+                login: "లాగిన్",
+                admin: "అడ్మిన్",
+                sell: "విక్రయించండి",
+                cart: "కార్ట్",
+                shop_by_category: "వర్గం ద్వారా షాపింగ్",
+                popular_products: "ప్రసిద్ధ ఉత్పత్తులు",
+                add_to_cart: "కార్ట్‌లో జోడించండి",
+                our_services: "మా సేవలు",
+                fast_delivery: "వేగవంతమైన డెలివరీ",
+                delivery_desc: "మీ ఆర్డర్‌లను కొన్ని గంటల్లో మీ మెట్టికి డెలివర్ చేయండి",
+                pickup_service: "పికప్ సర్వీస్",
+                pickup_desc: "ఆన్‌లైన్‌లో ఆర్డర్ చేయండి మరియు మీ సౌకర్యానికి అనుగుణంగా స్టోర్ నుండి పికప్ చేయండి",
+                support_247: "24/7 మద్దతు",
+                support_desc: "మా కస్టమర్ సపోర్ట్ టీమ్ ఎల్లప్పుడూ మీకు సహాయం చేయడానికి సిద్ధంగా ఉంది",
+                featured_businesses: "ప్రత్యేక వ్యాపారాలు",
+                view_store: "స్టోర్ చూడండి",
+                login_title: "లాగిన్",
+                customer: "కస్టమర్",
+                seller: "విక్రేత",
+                username: "యూజర్ నేమ్",
+                password: "పాస్‌వర్డ్",
+                login_btn: "లాగిన్",
+                admin_title: "అడ్మిన్ లాగిన్",
+                admin_login: "లాగిన్",
+                register_seller: "విక్రేతగా రిజిస్టర్ చేయండి",
+                business_name: "బిజినెస్ పేరు",
+                business_type: "బిజినెస్ రకం (ఉదా., కెఫె, ఫార్మసీ)",
+                business_location: "లొకేషన్ (అడ్రస్)",
+                business_email: "ఈమెయిల్",
+                register: "రిజిస్టర్",
+                your_cart: "మీ కార్ట్",
+                drag_products: "ఉత్పత్తులను ఇక్కడ డ్రాగ్ చేయండి లేదా \"కార్ట్‌లో జోడించండి\" క్లిక్ చేసి షాపింగ్ ప్రారంభించండి!",
+                order_summary: "ఆర్డర్ సమరీ",
+                subtotal: "సబ్‌టోటల్",
+                commission: "అడ్మిన్ కమిషన్ (5%)",
+                total: "మొత్తం",
+                total_amount: "మొత్తం మొత్తం",
+                delivery_option: "డెలివరీ ఆప్షన్ ఎంచుకోండి",
+                delivery: "డెలివరీ",
+                pickup: "పికప్",
+                saved_addresses: "సేవ్డ్ అడ్రస్ ఎంచుకోండి",
+                new_address: "కొత్త అడ్రస్ ఎంటర్ చేయండి",
+                payment_method: "పేమెంట్ మెథడ్ ఎంచుకోండి",
+                credit_card: "క్రెడిట్ కార్డ్",
+                debit_card: "డెబిట్ కార్డ్",
+                upi: "UPI",
+                cash_on_delivery: "క్యాష్ ఆన్ డెలివరీ",
+                checkout: "చెక్అవుట్",
+                footer_quickcart: "క్విక్‌కార్ట్",
+                footer_description: "మీ మల్టీ-వెండర్ ఈ-కామర్స్ సొల్యూషన్ ఒక్కోస్తపు స్థలం. డెలివరీ లేదా పికప్ ఆప్షన్లతో స్థానిక వ్యాపారాల నుండి షాపింగ్ చేయండి.",
+                footer_quick_links: "క్విక్ లింక్స్",
+                footer_home: "హోమ్",
+                footer_products: "ఉత్పత్తులు",
+                footer_services: "సేవలు",
+                footer_businesses: "వ్యాపారాలు",
+                footer_customer_support: "కస్టమర్ సపోర్ట్",
+                footer_help_center: "హెల్ప్ సెంటర్",
+                footer_faqs: "FAQs",
+                footer_contact_us: "మమ్మల్ని సంప్రదించండి",
+                footer_return_policy: "రిటర్న్ పాలసీ",
+                footer_privacy_policy: "ప్రైవసీ పాలసీ",
+                footer_contact_info: "కాంటాక్ట్ ఇన్ఫో",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@quickcart.com",
+                copyright: "© 2025 QuickCart. అన్ని హక్కులు రిజర్వ్ చేయబడ్డాయి."
+            }
+        };
+        // Category details with name and desc
+        const categoryDetails = {
+            en: {
+                "Food & Dining": {name: "Food & Dining", desc: "Restaurants, cafes and more"},
+                "Medicines": {name: "Medicines", desc: "Pharmacies and health products"},
+                "Automotive": {name: "Automotive", desc: "Mechanics and car services"},
+                "Services": {name: "Services", desc: "Home services and repairs"},
+                "Jewellery": {name: "Jewellery", desc: "Rings, necklaces and accessories"},
+                "Clothing": {name: "Clothing", desc: "Fashion for men and women"},
+                "Beauty Products": {name: "Beauty Products", desc: "Cosmetics and skincare"},
+                "Footwear": {name: "Footwear", desc: "Shoes, sandals, and sneakers"},
+                "Groceries": {name: "Groceries", desc: "Daily essentials and pantry items"},
+                "Fruits": {name: "Fruits", desc: "Fresh fruits and organic produce"},
+                "Books": {name: "Books", desc: "Novels, textbooks, and more"},
+                "Pet Food": {name: "Pet Food", desc: "Nutrition for your pets"},
+                "Musical Instruments": {name: "Musical Instruments", desc: "Guitars, pianos, and accessories"},
+                "Home Furniture": {name: "Home Furniture", desc: "Sofas, tables, and home essentials"},
+                "Bags": {name: "Bags", desc: "Backpacks, handbags, and luggage"},
+                "Kitchen Products": {name: "Kitchen Products", desc: "Cookware and kitchen gadgets"},
+                "Sports & Fitness": {name: "Sports & Fitness", desc: "Gym equipment and sportswear"},
+                "Home Decor & Improvements": {name: "Home Decor & Improvements", desc: "Decor items and home upgrades"},
+                "Watches": {name: "Watches", desc: "Stylish timepieces and smartwatches"}
+            },
+            hi: {
+                "Food & Dining": {name: "खाद्य & भोजन", desc: "रेस्टोरेंट, कैफे और अधिक"},
+                "Medicines": {name: "दवाइयाँ", desc: "फार्मेसी और स्वास्थ्य उत्पाद"},
+                "Automotive": {name: "ऑटोमोटिव", desc: "मैकेनिक और कार सेवाएं"},
+                "Services": {name: "सेवाएँ", desc: "घरेलू सेवाएं और मरम्मत"},
+                "Jewellery": {name: "आभूषण", desc: "अंगूठियां, हार और सामान"},
+                "Clothing": {name: "कपड़े", desc: "पुरुषों और महिलाओं के लिए फैशन"},
+                "Beauty Products": {name: "सौंदर्य उत्पाद", desc: "कॉस्मेटिक्स और स्किनकेयर"},
+                "Footwear": {name: "जूते", desc: "जूते, चप्पल, और स्नीकर्स"},
+                "Groceries": {name: "किराना", desc: "दैनिक आवश्यकताएं और पैंट्री आइटम"},
+                "Fruits": {name: "फल", desc: "ताजे फल और जैविक उत्पाद"},
+                "Books": {name: "किताबें", desc: "उपन्यास, पाठ्यपुस्तकें, और अधिक"},
+                "Pet Food": {name: "पालतू भोजन", desc: "आपके पालतू जानवरों के लिए पोषण"},
+                "Musical Instruments": {name: "संगीत वाद्ययंत्र", desc: "गिटार, पियानो, और सामान"},
+                "Home Furniture": {name: "घर का फर्नीचर", desc: "सोफे, टेबल, और घरेलू आवश्यकताएं"},
+                "Bags": {name: "बैग", desc: "बैकपैक, हैंडबैग, और सामान"},
+                "Kitchen Products": {name: "रसोई उत्पाद", desc: "कुकरवेयर और रसोई गैजेट्स"},
+                "Sports & Fitness": {name: "खेल & फिटनेस", desc: "जिम उपकरण और स्पोर्ट्सवियर"},
+                "Home Decor & Improvements": {name: "घर सजावट & सुधार", desc: "सजावट आइटम और घर अपग्रेड"},
+                "Watches": {name: "घड़ियाँ", desc: "स्टाइलिश टाइमपीस और स्मार्टवॉच"}
+            },
+            es: {
+                "Food & Dining": {name: "Comida & Restaurantes", desc: "Restaurantes, cafés y más"},
+                "Medicines": {name: "Medicinas", desc: "Farmacias y productos de salud"},
+                "Automotive": {name: "Automotriz", desc: "Mecánicos y servicios de autos"},
+                "Services": {name: "Servicios", desc: "Servicios domésticos y reparaciones"},
+                "Jewellery": {name: "Joyería", desc: "Anillos, collares y accesorios"},
+                "Clothing": {name: "Ropa", desc: "Moda para hombres y mujeres"},
+                "Beauty Products": {name: "Productos de Belleza", desc: "Cosméticos y cuidado de la piel"},
+                "Footwear": {name: "Calzado", desc: "Zapatos, sandalias y zapatillas"},
+                "Groceries": {name: "Comestibles", desc: "Esenciales diarios y artículos de despensa"},
+                "Fruits": {name: "Frutas", desc: "Frutas frescas y productos orgánicos"},
+                "Books": {name: "Libros", desc: "Novelas, libros de texto y más"},
+                "Pet Food": {name: "Comida para Mascotas", desc: "Nutrición para tus mascotas"},
+                "Musical Instruments": {name: "Instrumentos Musicales", desc: "Guitarras, pianos y accesorios"},
+                "Home Furniture": {name: "Muebles para el Hogar", desc: "Sofás, mesas y esenciales del hogar"},
+                "Bags": {name: "Bolsos", desc: "Mochilas, bolsos de mano y equipaje"},
+                "Kitchen Products": {name: "Productos de Cocina", desc: "Utensilios de cocina y gadgets"},
+                "Sports & Fitness": {name: "Deportes & Fitness", desc: "Equipo de gimnasio y ropa deportiva"},
+                "Home Decor & Improvements": {name: "Decoración del Hogar & Mejoras", desc: "Artículos de decoración y mejoras del hogar"},
+                "Watches": {name: "Relojes", desc: "Piezas de tiempo elegantes y relojes inteligentes"}
+            },
+            fr: {
+                "Food & Dining": {name: "Nourriture & Restauration", desc: "Restaurants, cafés et plus"},
+                "Medicines": {name: "Médicaments", desc: "Pharmacies et produits de santé"},
+                "Automotive": {name: "Automobile", desc: "Mécaniciens et services automobiles"},
+                "Services": {name: "Services", desc: "Services domestiques et réparations"},
+                "Jewellery": {name: "Bijouterie", desc: "Bagues, colliers et accessoires"},
+                "Clothing": {name: "Vêtements", desc: "Mode pour hommes et femmes"},
+                "Beauty Products": {name: "Produits de Beauté", desc: "Cosmétiques et soins de la peau"},
+                "Footwear": {name: "Chaussures", desc: "Chaussures, sandales et baskets"},
+                "Groceries": {name: "Épicerie", desc: "Essentiels quotidiens et articles de garde-manger"},
+                "Fruits": {name: "Fruits", desc: "Fruits frais et produits biologiques"},
+                "Books": {name: "Livres", desc: "Romans, manuels et plus"},
+                "Pet Food": {name: "Nourriture pour Animaux", desc: "Nutrition pour vos animaux"},
+                "Musical Instruments": {name: "Instruments de Musique", desc: "Guitares, pianos et accessoires"},
+                "Home Furniture": {name: "Meubles pour la Maison", desc: "Canapés, tables et essentiels domestiques"},
+                "Bags": {name: "Sacs", desc: "Sacs à dos, sacs à main et bagages"},
+                "Kitchen Products": {name: "Produits de Cuisine", desc: "Ustensiles de cuisine et gadgets"},
+                "Sports & Fitness": {name: "Sports & Fitness", desc: "Équipement de gym et vêtements de sport"},
+                "Home Decor & Improvements": {name: "Décoration & Améliorations du Foyer", desc: "Articles de décoration et améliorations domestiques"},
+                "Watches": {name: "Montres", desc: "Pièces de temps élégantes et montres intelligentes"}
+            },
+            te: {
+                "Food & Dining": {name: "ఆహారం & భోజనం", desc: "రెస్టారెంట్లు, కెఫెలు మరియు మరిన్ని"},
+                "Medicines": {name: "మందులు", desc: "మెడిసిన్ స్టోర్లు మరియు ఆరోగ్య ఉత్పత్తులు"},
+                "Automotive": {name: "ఆటోమోటివ్", desc: "మెకానిక్స్ మరియు కార్ సర్వీసులు"},
+                "Services": {name: "సేవలు", desc: "హోమ్ సర్వీసులు మరియు రిపేర్లు"},
+                "Jewellery": {name: "ఆభరణాలు", desc: "రింగులు, మాలలు మరియు యాక్సెసరీలు"},
+                "Clothing": {name: "దుస్తులు", desc: "పురుషులు మరియు మహిళలకు ఫ్యాషన్"},
+                "Beauty Products": {name: "సౌందర్య ఉత్పత్తులు", desc: "కాస్మెటిక్స్ మరియు స్కిన్‌కేర్"},
+                "Footwear": {name: "పాదుకలు", desc: "షూస్, సాండల్స్, మరియు స్నీకర్స్"},
+                "Groceries": {name: "కిరాణా", desc: "రోజువారీ అవసరాలు మరియు ప్యాంట్రీ ఐటమ్స్"},
+                "Fruits": {name: "పండ్లు", desc: "తాజా పండ్లు మరియు ఆర్గానిక్ ప్రొడ్యూస్"},
+                "Books": {name: "పుస్తకాలు", desc: "నవలలు, టెక్స్ట్‌బుక్స్ మరియు మరిన్ని"},
+                "Pet Food": {name: "పెట్ ఫుడ్", desc: "మీ పెట్స్ కోసం పోషకాహారం"},
+                "Musical Instruments": {name: "సంగీత వాద్యోపకరణాలు", desc: "గిటార్లు, పియానోలు మరియు యాక్సెసరీలు"},
+                "Home Furniture": {name: "హోమ్ ఫర్నిచర్", desc: "సోఫాలు, టేబుల్స్ మరియు హోమ్ ఎసెన్షియల్స్"},
+                "Bags": {name: "బ్యాగ్‌లు", desc: "బ్యాక్‌ప్యాక్‌లు, హ్యాండ్‌బ్యాగ్‌లు మరియు లగేజ్"},
+                "Kitchen Products": {name: "కిచెన్ ఉత్పత్తులు", desc: "కుక్వేర్ మరియు కిచెన్ గాడ్జెట్స్"},
+                "Sports & Fitness": {name: "స్పోర్ట్స్ & ఫిట్‌నెస్", desc: "జిమ్ ఎక్విప్‌మెంట్ మరియు స్పోర్ట్స్‌వేర్"},
+                "Home Decor & Improvements": {name: "హోమ్ డెకర్ & మెరుగుదలలు", desc: "డెకర్ ఐటమ్స్ మరియు హోమ్ అప్‌గ్రేడ్స్"},
+                "Watches": {name: "వాచ్‌లు", desc: "స్టైలిష్ టైమ్‌పీస్‌లు మరియు స్మార్ట్‌వాచ్‌లు"}
+            }
+        };
+        // Product details with name and vendor
+        const productDetails = {
+            en: {
+                1: {name: "Fresh Garden Salad", vendor: "Green Cafe"},
+                2: {name: "Classic Beef Burger", vendor: "Burger Heaven"},
+                3: {name: "Synthetic Engine Oil", vendor: "AutoCare"},
+                4: {name: "Vitamin Supplements", vendor: "HealthPlus"},
+                5: {name: "Gold Diamond Ring", vendor: "Sparkle Jewellers"},
+                6: {name: "Designer Summer Dress", vendor: "Fashion Hub"},
+                7: {name: "Luxury Skincare Set", vendor: "Beauty Palace"},
+                8: {name: "Silver Pearl Necklace", vendor: "Elegance Jewels"}
+            },
+            hi: {
+                1: {name: "ताजा गार्डन सलाद", vendor: "ग्रीन कैफे"},
+                2: {name: "क्लासिक बीफ बर्गर", vendor: "बर्गर हेवन"},
+                3: {name: "सिंथेटिक इंजन तेल", vendor: "ऑटो केयर"},
+                4: {name: "विटामिन सप्लीमेंट्स", vendor: "हेल्थ प्लस"},
+                5: {name: "गोल्ड डायमंड रिंग", vendor: "स्पार्कल ज्वेलर्स"},
+                6: {name: "डिजाइनर समर ड्रेस", vendor: "फैशन हब"},
+                7: {name: "लक्जरी स्किनकेयर सेट", vendor: "ब्यूटी पैलेस"},
+                8: {name: "सिल्वर पर्ल नेकलेस", vendor: "एलिगेंस ज्वेल्स"}
+            },
+            es: {
+                1: {name: "Ensalada Fresca de Jardín", vendor: "Green Cafe"},
+                2: {name: "Hamburguesa de Carne Clásica", vendor: "Burger Heaven"},
+                3: {name: "Aceite de Motor Sintético", vendor: "AutoCare"},
+                4: {name: "Suplementos de Vitaminas", vendor: "HealthPlus"},
+                5: {name: "Anillo de Diamante de Oro", vendor: "Sparkle Jewellers"},
+                6: {name: "Vestido de Verano de Diseñador", vendor: "Fashion Hub"},
+                7: {name: "Set de Cuidado de la Piel de Lujo", vendor: "Beauty Palace"},
+                8: {name: "Collar de Perla de Plata", vendor: "Elegance Jewels"}
+            },
+            fr: {
+                1: {name: "Salade Fraîche du Jardin", vendor: "Green Cafe"},
+                2: {name: "Burger de Boeuf Classique", vendor: "Burger Heaven"},
+                3: {name: "Huile Moteur Synthétique", vendor: "AutoCare"},
+                4: {name: "Suppléments Vitaminés", vendor: "HealthPlus"},
+                5: {name: "Bague en Diamant Or", vendor: "Sparkle Jewellers"},
+                6: {name: "Robe d'Été Designer", vendor: "Fashion Hub"},
+                7: {name: "Set de Soins de la Peau de Luxe", vendor: "Beauty Palace"},
+                8: {name: "Collier de Perle Argent", vendor: "Elegance Jewels"}
+            },
+            te: {
+                1: {name: "తాజా గార్డెన్ సలాడ్", vendor: "గ్రీన్ కెఫె"},
+                2: {name: "క్లాసిక్ బీఫ్ బర్గర్", vendor: "బర్గర్ హెవెన్"},
+                3: {name: "సింథటిక్ ఇంజిన్ ఆయిల్", vendor: "ఆటోకేర్"},
+                4: {name: "విటమిన్ సప్లిమెంట్స్", vendor: "హెల్త్‌ప్లస్"},
+                5: {name: "గోల్డ్ డైమండ్ రింగ్", vendor: "స్పార్కిల్ జ్యువెలర్స్"},
+                6: {name: "డిజైనర్ సమ్మర్ డ్రెస్", vendor: "ఫ్యాషన్ హబ్"},
+                7: {name: "లగ్జరీ స్కిన్‌కేర్ సెట్", vendor: "బ్యూటీ ప్యాలెస్"},
+                8: {name: "సిల్వర్ పెరల్ నెక్లెస్", vendor: "ఎలిగెన్స్ జ్యువెల్స్"}
+            }
+        };
+        // Categories for search
+        const categories = [
+            { name: "Food & Dining", url: "food-dine.html" },
+            { name: "Medicines", url: "medicine.html" },
+            { name: "Automotive", url: "automative.html" },
+            { name: "Services", url: "service.html" },
+            { name: "Jewellery", url: "Jewellery.html" },
+            { name: "Clothing", url: "clothes.html" },
+            { name: "Beauty Products", url: "beautyproducts.html" },
+            { name: "Footwear", url: "footwear.html" },
+            { name: "Groceries", url: "groceries.html" },
+            { name: "Fruits", url: "fruits.html" },
+            { name: "Books", url: "books (1).html" },
+            { name: "Pet Food", url: "petfood.html" },
+            { name: "Musical Instruments", url: "musical.html" },
+            { name: "Home Furniture", url: "homefurniture.html" },
+            { name: "Bags", url: "bags.html" },
+            { name: "Kitchen Products", url: "kitchenproducts.html" },
+            { name: "Sports & Fitness", url: "sports_fitness.html" },
+            { name: "Home Decor & Improvements", url: "home_decor .html" },
+            { name: "Watches", url: "watches.html" }
+        ];
+        // Page navigation and section scrolling
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing index page...');
+            const navLinks = document.querySelectorAll('.nav-links a, .header-actions a, .footer-column a, .hero a, .category-dropdown-menu a');
+            const pages = document.querySelectorAll('.page-content');
+            const sections = document.querySelectorAll('.section, .hero');
+            const languageSelect = document.getElementById('language-select');
+            let currentLanguage = localStorage.getItem('language') || 'en'; // Persist language from localStorage
+            languageSelect.value = currentLanguage; // Set initial select value
+            function translatePage() {
+                const trans = pageTranslations[currentLanguage];
+                document.querySelectorAll('[data-translate]').forEach(el => {
+                    const key = el.getAttribute('data-translate');
+                    if (trans[key]) el.textContent = trans[key];
+                });
+                document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-translate-placeholder');
+                    if (trans[key]) el.placeholder = trans[key];
+                });
+                document.querySelectorAll('option[data-translate]').forEach(el => {
+                    const key = el.getAttribute('data-translate');
+                    if (trans[key]) el.textContent = trans[key];
+                });
+                updateCategories();
+                updateProducts();
+                updateCategoryLinks(); // New: Update category links with lang param
+            }
+            function updateCategories() {
+                const details = categoryDetails[currentLanguage];
+                document.querySelectorAll('.category-card').forEach(card => {
+                    const catKey = card.getAttribute('data-category');
+                    if (catKey && details[catKey]) {
+                        card.querySelector('h3').textContent = details[catKey].name;
+                        card.querySelector('p').textContent = details[catKey].desc;
+                        card.querySelector('.category-icon img').alt = details[catKey].name; // Translate alt
+                    }
+                });
+            }
+            function updateProducts() {
+                const details = productDetails[currentLanguage];
+                document.querySelectorAll('.product-card').forEach(card => {
+                    const product = JSON.parse(card.getAttribute('data-product'));
+                    const trans = details[product.id];
+                    if (trans) {
+                        card.querySelector('.product-title').textContent = trans.name;
+                        const vendorDiv = card.querySelector('.product-vendor');
+                        vendorDiv.childNodes[1].nodeValue = ' ' + trans.vendor;
+                        card.querySelector('.product-img').alt = trans.name; // Translate alt
+                    }
+                });
+            }
+            function updateCategoryDropdown() {
+                const dropdownMenu = document.getElementById('category-dropdown-menu');
+                dropdownMenu.innerHTML = '';
+                categories.forEach(category => {
+                    const details = categoryDetails[currentLanguage][category.name];
+                    const translatedName = details ? details.name : category.name;
+                    const link = document.createElement('a');
+                    link.href = category.url + '?lang=' + currentLanguage; // Append lang param
+                    link.setAttribute('data-category', category.name);
+                    link.textContent = translatedName;
+                    dropdownMenu.appendChild(link);
+                });
+            }
+            function updateCategoryLinks() {
+                // Update all category links (including grid) with lang param
+                document.querySelectorAll('a[data-category]').forEach(link => {
+                    const baseHref = link.getAttribute('href').split('?')[0];
+                    link.href = baseHref + '?lang=' + currentLanguage;
+                });
+            }
+            if (languageSelect) {
+                languageSelect.addEventListener('change', function() {
+                    currentLanguage = this.value;
+                    localStorage.setItem('language', currentLanguage); // Save to localStorage
+                    console.log(`Language changed to: ${currentLanguage}`);
+                    updateCategoryDropdown();
+                    translatePage();
+                });
+            }
+            updateCategoryDropdown();
+            translatePage();
+            function showPage(pageId) {
+                try {
+                    console.log(`Showing page: ${pageId}`);
+                    pages.forEach(page => page.classList.remove('active'));
+                    const targetPage = document.getElementById(pageId);
+                    if (targetPage) {
+                        targetPage.classList.add('active');
+                        navLinks.forEach(link => link.classList.remove('nav-active'));
+                        const activeLinks = document.querySelectorAll(`a[data-page="${pageId}"]`);
+                        activeLinks.forEach(link => link.classList.add('nav-active'));
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                        console.error(`Page with ID ${pageId} not found`);
+                    }
+                } catch (error) {
+                    console.error('Error in showPage:', error);
+                }
+            }
+            function scrollToSection(sectionId) {
+                try {
+                    console.log(`Scrolling to section: ${sectionId}`);
+                    const targetSection = document.getElementById(sectionId);
+                    if (targetSection) {
+                        showPage('home');
+                        window.scrollTo({
+                            top: targetSection.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        navLinks.forEach(link => link.classList.remove('nav-active'));
+                        const activeLink = document.querySelector(`a[href="#${sectionId}"]`);
+                        if (activeLink) activeLink.classList.add('nav-active');
+                    } else {
+                        console.error(`Section with ID ${sectionId} not found`);
+                    }
+                } catch (error) {
+                    console.error('Error in scrollToSection:', error);
+                }
+            }
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    try {
+                        e.preventDefault();
+                        const pageId = this.getAttribute('data-page');
+                        const href = this.getAttribute('href');
+                        console.log(`Nav link clicked: page=${pageId}, href=${href}`);
+                        if (href.includes('.html')) {
+                            window.location.href = href;
+                        } else if (pageId && pageId !== 'home') {
+                            showPage(pageId);
+                        } else if (href && href.startsWith('#')) {
+                            scrollToSection(href.substring(1));
+                        }
+                    } catch (error) {
+                        console.error('Error in nav link click:', error);
+                    }
+                });
+            });
+            // Scroll-based navigation highlight
+            window.addEventListener('scroll', function() {
+                try {
+                    if (document.querySelector('#home').classList.contains('active')) {
+                        let current = '';
+                        sections.forEach(section => {
+                            const sectionTop = section.offsetTop;
+                            const sectionHeight = section.clientHeight;
+                            if (pageYOffset >= (sectionTop - 100)) {
+                                current = section.getAttribute('id');
+                            }
+                        });
+                        navLinks.forEach(link => {
+                            link.classList.remove('nav-active');
+                            if (link.getAttribute('href').substring(1) === current) {
+                                link.classList.add('nav-active');
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error in scroll handler:', error);
+                }
+            });
+            // Drag and Drop for Cart
+            const productCards = document.querySelectorAll('.product-card');
+            console.log(`Found ${productCards.length} product cards`);
+            productCards.forEach(card => {
+                card.addEventListener('dragstart', function(e) {
+                    try {
+                        console.log('Dragstart on product card:', card.getAttribute('data-product'));
+                        e.dataTransfer.setData('text/plain', card.getAttribute('data-product'));
+                    } catch (error) {
+                        console.error('Error in dragstart:', error);
+                    }
+                });
+            });
+            // Add to Cart
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            console.log(`Found ${addToCartButtons.length} add-to-cart buttons`);
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    try {
+                        e.preventDefault();
+                        const productCard = this.closest('.product-card');
+                        if (productCard) {
+                            console.log('Add to cart clicked for:', productCard.getAttribute('data-product'));
+                            const product = JSON.parse(productCard.getAttribute('data-product'));
+                            addToCart(product);
+                        } else {
+                            console.error('Product card not found for add-to-cart button');
+                        }
+                    } catch (error) {
+                        console.error('Error in add-to-cart click:', error);
+                    }
+                });
+            });
+            // Search functionality
+            const searchInput = document.querySelector('.search-bar input');
+            const searchButton = document.querySelector('.search-bar .search-btn');
+            const micButton = document.querySelector('.search-bar .mic-btn');
+            function performSearch() {
+                try {
+                    const query = searchInput.value.trim().toLowerCase();
+                    if (!query) return;
+                    const matchedCategory = categories.find(cat => {
+                        const details = categoryDetails[currentLanguage][cat.name];
+                        const translatedName = details ? details.name : cat.name;
+                        return translatedName.toLowerCase().includes(query);
+                    });
+                    if (matchedCategory) {
+                        window.location.href = matchedCategory.url + '?lang=' + currentLanguage;
+                    } else {
+                        const productCards = document.querySelectorAll('.product-card');
+                        let found = false;
+                        productCards.forEach(card => {
+                            const product = JSON.parse(card.getAttribute('data-product'));
+                            const details = productDetails[currentLanguage][product.id];
+                            const translatedName = details ? details.name : product.name;
+                            const translatedVendor = details ? details.vendor : product.vendor;
+                            const catDetails = categoryDetails[currentLanguage][product.category];
+                            const translatedCategory = catDetails ? catDetails.name : product.category;
+                            if (translatedName.toLowerCase().includes(query) || translatedVendor.toLowerCase().includes(query) || translatedCategory.toLowerCase().includes(query)) {
+                                card.scrollIntoView({ behavior: 'smooth' });
+                                found = true;
+                            }
+                        });
+                        if (!found) {
+                            alert(`No products or categories found for "${query}"`);
+                        }
+                    }
+                    searchInput.value = '';
+                } catch (error) {
+                    console.error('Error in performSearch:', error);
+                }
+            }
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performSearch();
+                    }
+                });
+            }
+            if (searchButton) {
+                searchButton.addEventListener('click', performSearch);
+            }
+            // Microphone functionality
+            let recognition = null;
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    searchInput.value = transcript;
+                    console.log(`Speech recognized: ${transcript}`);
+                    performSearch();
+                };
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    alert('Error with speech recognition: ' + event.error);
+                    micButton.classList.remove('active');
+                };
+                recognition.onend = function() {
+                    micButton.classList.remove('active');
+                    console.log('Speech recognition ended');
+                };
+                if (micButton) {
+                    micButton.addEventListener('click', function() {
+                        try {
+                            if (micButton.classList.contains('active')) {
+                                recognition.stop();
+                                micButton.classList.remove('active');
+                            } else {
+                                let lang = 'en-US';
+                                if (currentLanguage === 'hi') lang = 'hi-IN';
+                                else if (currentLanguage === 'es') lang = 'es-ES';
+                                else if (currentLanguage === 'fr') lang = 'fr-FR';
+                                else if (currentLanguage === 'te') lang = 'te-IN';
+                                recognition.lang = lang;
+                                recognition.start();
+                                micButton.classList.add('active');
+                                console.log('Speech recognition started');
+                            }
+                        } catch (error) {
+                            console.error('Error in mic button click:', error);
+                            alert('Speech recognition is not supported in this browser.');
+                        }
+                    });
+                }
+                languageSelect.addEventListener('change', function() {
+                    if (recognition) {
+                        let lang = 'en-US';
+                        if (this.value === 'hi') lang = 'hi-IN';
+                        else if (this.value === 'es') lang = 'es-ES';
+                        else if (this.value === 'fr') lang = 'fr-FR';
+                        else if (this.value === 'te') lang = 'te-IN';
+                        recognition.lang = lang;
+                    }
+                });
+            } else {
+                if (micButton) {
+                    micButton.style.display = 'none';
+                    console.log('Speech recognition not supported in this browser');
+                }
+            }
+            // Initialize cart display
+            console.log('Initializing cart...');
+            updateCart();
+        });
+        // Handle Drag and Drop
+        function handleDragOver(e) {
+            try {
+                e.preventDefault();
+            } catch (error) {
+                console.error('Error in handleDragOver:', error);
+            }
+        }
+        function handleDrop(e) {
+            try {
+                e.preventDefault();
+                console.log('Drop event triggered');
+                const productData = e.dataTransfer.getData('text/plain');
+                const product = JSON.parse(productData);
+                addToCart(product);
+            } catch (error) {
+                console.error('Error in handleDrop:', error);
+            }
+        }
+        // Add to Cart Function
+        function addToCart(product, quantity = 1) {
+            try {
+                if (!product || !product.id) {
+                    throw new Error('Invalid product data');
+                }
+                console.log('Adding to cart:', product);
+                const existingItem = cart.find(item => item.id === product.id);
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                    console.log(`Incremented quantity for ${product.name} to ${existingItem.quantity}`);
+                } else {
+                    cart.push({ ...product, quantity });
+                    console.log(`Added new item: ${product.name}`);
+                }
+                updateCart();
+                saveCart();
+                alert(`${product.name} added to cart!`);
+            } catch (error) {
+                console.error('Error in addToCart:', error);
+            }
+        }
+        // Increase Quantity
+        function increaseQuantity(index) {
+            try {
+                if (cart[index]) {
+                    cart[index].quantity += 1;
+                    console.log(`Increased quantity for ${cart[index].name} to ${cart[index].quantity}`);
+                    updateCart();
+                    saveCart();
+                } else {
+                    console.error(`Cart item at index ${index} not found`);
+                }
+            } catch (error) {
+                console.error('Error in increaseQuantity:', error);
+            }
+        }
+        // Decrease Quantity
+        function decreaseQuantity(index) {
+            try {
+                if (cart[index]) {
+                    if (cart[index].quantity > 1) {
+                        cart[index].quantity -= 1;
+                        console.log(`Decreased quantity for ${cart[index].name} to ${cart[index].quantity}`);
+                    } else {
+                        console.log(`Removing item: ${cart[index].name}`);
+                        cart.splice(index, 1);
+                    }
+                    updateCart();
+                    saveCart();
+                } else {
+                    console.error(`Cart item at index ${index} not found`);
+                }
+            } catch (error) {
+                console.error('Error in decreaseQuantity:', error);
+            }
+        }
+        // Remove from Cart
+        function removeFromCart(index) {
+            try {
+                if (cart[index]) {
+                    console.log(`Removing item: ${cart[index].name}`);
+                    cart.splice(index, 1);
+                    updateCart();
+                    saveCart();
+                } else {
+                    console.error(`Cart item at index ${index} not found`);
+                }
+            } catch (error) {
+                console.error('Error in removeFromCart:', error);
+            }
+        }
+        // Update Cart Display
+        function updateCart() {
+            try {
+                const cartItems = document.getElementById('cart-items');
+                const cartBillItems = document.getElementById('cart-bill-items');
+                const cartCount = document.querySelector('.cart-count');
+                const emptyCartImage = document.getElementById('empty-cart-image');
+                const cartDropAreaText = document.querySelector('.cart-drop-area p');
+                const cartSubtotal = document.getElementById('cart-subtotal');
+                const cartCommission = document.getElementById('cart-commission');
+                const cartTotal = document.getElementById('cart-total');
+                if (!cartItems || !cartBillItems || !cartCount || !emptyCartImage || !cartDropAreaText || !cartSubtotal || !cartCommission || !cartTotal) {
+                    console.error('Cart elements not found');
+                    return;
+                }
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                cartCount.textContent = totalItems;
+                console.log(`Updating cart: ${totalItems} items`);
+                cartItems.innerHTML = '';
+                cartBillItems.innerHTML = '';
+                let subtotal = 0
+                if (totalItems > 0) {
+                    emptyCartImage.style.display = 'none';
+                    cartDropAreaText.style.display = 'none';
+                } else {
+                    emptyCartImage.style.display = 'block';
+                    cartDropAreaText.style.display = 'block';
+                }
+                cart.forEach((item, index) => {
+                    const itemTotal = item.price * item.quantity;
+                    subtotal += itemTotal;
+                    // Update cart items display
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item';
+                    itemElement.innerHTML = `
+                        <div class="cart-item-details">
+                            <img src="${item.image}" alt="${item.name}">
+                            <span>${item.name} - ${item.vendor}${item.category && item.category !== 'undefined' ? ` (${item.category})` : ''}</span>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button onclick="decreaseQuantity(${index})">-</button>
+                            <span>${item.quantity}</span>
+                            <button onclick="increaseQuantity(${index})">+</button>
+                        </div>
+                        <span class="cart-item-price">₹${itemTotal.toFixed(0)}</span>
+                        <button class="btn btn-outline" data-translate="remove" onclick="removeFromCart(${index})">Remove</button>
+                    `;
+                    cartItems.appendChild(itemElement);
+                    // Update bill items
+                    const billItem = document.createElement('div');
+                    billItem.className = 'cart-bill-item';
+                    billItem.innerHTML = `
+                        <span>${item.name} x ${item.quantity}</span>
+                        <span>₹${itemTotal.toFixed(0)}</span>
+                    `;
+                    cartBillItems.appendChild(billItem);
+                });
+                // Update bill summary
+                const commission = subtotal * 0.05;
+                const totalWithCommission = subtotal + commission;
+                cartSubtotal.textContent = `₹${subtotal.toFixed(0)}`;
+                cartCommission.textContent = `₹${commission.toFixed(0)}`;
+                cartTotal.textContent = `₹${totalWithCommission.toFixed(0)}`;
+            } catch (error) {
+                console.error('Error in updateCart:', error);
+            }
+        }
+      
+   
+       // =============================
+// Login/Registration Tab Switching
+// =============================
+//function showForm(formId) {
+   // console.log('Showing form:', formId);
+    
+    // Hide all forms in the current container
+    // const container = document.getElementById(formId).closest('.login-container');
+    // const forms = container.querySelectorAll('.form-container');
+    // forms.forEach(form => form.classList.remove('active'));
+    
+    // Show the selected form
+    // document.getElementById(formId).classList.add('active');
+//}
+
+// function showAdminForm(formId) {
+//     console.log('Showing admin form:', formId);
+    
+    // Hide all forms in the admin container
+    // const container = document.getElementById(formId).closest('.admin-login-container');
+    // const forms = container.querySelectorAll('.form-container');
+    // forms.forEach(form => form.classList.remove('active'));
+    
+    // Show the selected form
+//     document.getElementById(formId).classList.add('active');
+// }
+
+// Tab switching functionality
+//document.addEventListener('DOMContentLoaded', function() {
+    // Customer/Seller tabs
+    // const customerTabs = document.querySelectorAll('.tab-btn[data-tab]');
+    // customerTabs.forEach(tab => {
+    //     tab.addEventListener('click', function() {
+          // const tabId = this.getAttribute('data-tab');
+            
+            // Remove active class from all tabs
+            // const tabs = this.closest('.tabs').querySelectorAll('.tab-btn');
+            // tabs.forEach(t => t.classList.remove('active'));
+            
+            // Add active class to clicked tab
+           // this.classList.add('active');
+            
+            // Show corresponding form
+           //
+
+    // Admin tabs
+    // const adminTabs = document.querySelectorAll('.admin-login-container .tab-btn[data-tab]');
+    // adminTabs.forEach(tab => {
+    //     tab.addEventListener('click', function() {
+    //         const tabId = this.getAttribute('data-tab');
+            
+            // Remove active class from all tabs
+            // const tabs = this.closest('.tabs').querySelectorAll('.tab-btn');
+            // tabs.forEach(t => t.classList.remove('active'));
+            
+            // Add active class to clicked tab
+           // this.classList.add('active');
+            
+            // Show corresponding form
+//             const forms = this.closest('.admin-login-container').querySelectorAll('.form-container');
+//             forms.forEach(form => form.classList.remove('active'));
+            
+//             document.getElementById(tabId).classList.add('active');
+//         });
+//     });
+// });
+
+// =============================
+// Form Validation and Submission
+// =============================
+// function validateForm(formData) {
+//     const email = formData.get('email');
+//     const password = formData.get('password');
+    
+    // Basic email validation
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // if (!emailRegex.test(email)) {
+    //     alert('Please enter a valid email address');
+    //     return false;
+    // }
+    
+    // Password length check
+//     if (password.length < 6) {
+//         alert('Password must be at least 6 characters long');
+//         return false;
+//     }
+    
+//     return true;
+// }
+
+// function validateRegistrationForm(formData) {
+//     if (!validateForm(formData)) {
+//         return false;
+//     }
+    
+//     const password = formData.get('password');
+//     const confirmPassword = formData.get('confirmPassword');
+    
+    // Check if passwords match
+//     if (password !== confirmPassword) {
+//         alert('Passwords do not match!');
+//         return false;
+//     }
+    
+//     return true;
+// }
+
+// =============================
+// Form Event Listeners
+// =============================
+document.addEventListener('DOMContentLoaded', function() {
+    // Customer Login Form
+    const customerLoginForm = document.getElementById('customerLoginForm');
+    if (customerLoginForm) {
+        customerLoginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            fetch('http://localhost:3000/login/customer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(result => {
+                alert(result.message);
+                if (result.user) {
+                    showPage('home');
+                    updateActiveNav('home');
+                }
+            })
+            .catch(err => {
+                console.error('Customer Login Error:', err);
+                alert('An error occurred during login.');
+            });
+        });
+    }
+
+    // Customer Registration Form
+    const customerRegisterForm = document.getElementById('customerRegisterForm');
+    if (customerRegisterForm) {
+        customerRegisterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            if (validateRegistrationForm(formData)) {
+                fetch('http://localhost:3000/register/customer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(res => res.json())
+                .then(result => {
+                    alert(result.message);
+                    if (!result.error) {
+                        showForm('customer-login');
+                    }
+                })
+                .catch(err => {
+                    console.error('Customer Registration Error:', err);
+                    alert('An error occurred during registration.');
+                });
+            }
+        });
+    }
+
+    // Seller Login Form
+    const sellerLoginForm = document.getElementById('sellerLoginForm');
+    if (sellerLoginForm) {
+        sellerLoginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            fetch('http://localhost:3000/login/seller', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(result => {
+                alert(result.message);
+                if (result.seller) {
+                    showPage('home');
+                    updateActiveNav('home');
+                }
+            })
+            .catch(err => {
+                console.error('Seller Login Error:', err);
+                alert('An error occurred during login.');
+            });
+        });
+    }
+
+    // Seller Registration Form
+    const sellerRegisterForm = document.getElementById('sellerRegisterForm');
+    if (sellerRegisterForm) {
+        sellerRegisterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            if (validateRegistrationForm(formData)) {
+                fetch('http://localhost:3000/register/seller', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(res => res.json())
+                .then(result => {
+                    alert(result.message);
+                    if (!result.error) {
+                        showForm('seller-login');
+                    }
+                })
+                .catch(err => {
+                    console.error('Seller Registration Error:', err);
+                    alert('An error occurred during registration.');
+                });
+            }
+        });
+    }
+
+    // Admin Login Form
+    const adminLoginForm = document.getElementById('adminLoginForm');
+    if (adminLoginForm) {
+        adminLoginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            fetch('http://localhost:3000/login/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(result => {
+                alert(result.message);
+                if (result.admin) {
+                    showPage('home');
+                    updateActiveNav('home');
+                }
+            })
+            .catch(err => {
+                console.error('Admin Login Error:', err);
+                alert('An error occurred during login.');
+            });
+        });
+    }
+
+    // Admin Registration Form
+    const adminRegisterForm = document.getElementById('adminRegisterForm');
+    if (adminRegisterForm) {
+        adminRegisterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            if (validateRegistrationForm(formData)) {
+                fetch('http://localhost:3000/register/admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(res => res.json())
+                .then(result => {
+                    alert(result.message);
+                    if (!result.error) {
+                        showAdminForm('admin-login');
+                    }
+                })
+                .catch(err => {
+                    console.error('Admin Registration Error:', err);
+                    alert('An error occurred during registration.');
+                });
+            }
+        });
+    }
+});
+
+// =============================
+// Navigation Helper Functions
+// =============================
+function updateActiveNav(pageId) {
+    const navLinks = document.querySelectorAll('.nav-links a, .header-actions a');
+    navLinks.forEach(link => link.classList.remove('nav-active'));
+    
+    const activeLinks = document.querySelectorAll(`a[data-page="${pageId}"]`);
+    activeLinks.forEach(link => link.classList.add('nav-active'));
+}
+
+function switchTab(tabId) {
+    const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+    if (tabBtn) {
+        tabBtn.click();
+    }
+}
+
+       
+        // Handle Checkout
+        function handleCheckout() {
+            try {
+                const deliveryOption = document.getElementById('delivery-option');
+                const savedAddress = document.getElementById('saved-addresses');
+                const newAddress = document.getElementById('new-address');
+                const paymentMethod = document.getElementById('payment-method');
+                if (!deliveryOption || !savedAddress || !newAddress || !paymentMethod) {
+                    console.error('Checkout elements not found');
+                    return;
+                }
+                if (cart.length === 0) {
+                    alert('Your cart is empty!');
+                    return;
+                }
+                if (!savedAddress.value && !newAddress.value) {
+                    alert('Please select or enter a delivery address!');
+                    return;
+                }
+                if (!paymentMethod.value) {
+                    alert('Please select a payment method!');
+                    return;
+                }
+                const address = savedAddress.value || newAddress.value;
+                const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                const commission = subtotal * 0.05;
+                const total = subtotal + commission;
+                console.log('Checkout initiated:', { deliveryOption: deliveryOption.value, address, paymentMethod: paymentMethod.value, subtotal, commission, total });
+                let orderSummary = 'Order Summary:\n';
+                cart.forEach(item => {
+                    orderSummary += `${item.name} x ${item.quantity}: ₹${(item.price * item.quantity).toFixed(0)}\n`;
+                });
+                orderSummary += `\nSubtotal: ₹${subtotal.toFixed(0)}\n`;
+                orderSummary += `Admin Commission (5%): ₹${commission.toFixed(0)}\n`;
+                orderSummary += `Total: ₹${total.toFixed(0)}\n`;
+                orderSummary += `Delivery Option: ${deliveryOption.value}\n`;
+                orderSummary += `Address: ${address}\n`;
+                orderSummary += `Payment Method: ${paymentMethod.value}`;
+                alert(`Order placed successfully!\n\n${orderSummary}`);
+                cart = [];
+                localStorage.removeItem('cart');
+                savedAddress.value = '';
+                newAddress.value = '';
+                paymentMethod.value = '';
+                updateCart();
+                console.log('Cart cleared after checkout');
+            } catch (error) {
+                console.error('Error in handleCheckout:', error);
+            }
+        }
+    </script>
+</body>
+</html>

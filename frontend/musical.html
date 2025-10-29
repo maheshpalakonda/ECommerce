@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickCart - Kitchen Products</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        :root {
+            --primary: #4a6cfa;
+            --secondary: #ff6b6b;
+            --accent: #42b883;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border: #e1e5eb;
+        }
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+        header {
+            background: linear-gradient(to right, var(--primary), #6c8fff);
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        .logo i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin-left: 20px;
+            position: relative;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .search-bar .search-buttons {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            display: flex;
+            gap: 5px;
+        }
+        .search-bar button {
+            background: var(--secondary);
+            border: none;
+            color: white;
+            border-radius: 50px;
+            padding: 7px 15px;
+            cursor: pointer;
+        }
+        .search-bar button.mic-btn {
+            background: var(--accent);
+        }
+        .search-bar button.mic-btn.active {
+            background: #e74c3c;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+        .header-actions a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .header-actions .language-selector {
+            margin-left: 20px;
+        }
+        .header-actions .language-selector select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        .header-actions i {
+            font-size: 20px;
+            margin-right: 5px;
+        }
+        .cart-count {
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .wishlist-count {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        nav {
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .nav-links li {
+            margin: 0 15px;
+            position: relative;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        .nav-links i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        .section {
+            padding: 60px 0;
+            scroll-margin-top: 100px;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .section-title h2 {
+            font-size: 32px;
+            color: var(--dark);
+            display: inline-block;
+        }
+        .section-title h2:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: var(--secondary);
+            margin: 10px auto;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 35px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            cursor: move;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 15px;
+        }
+        .product-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .product-vendor {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .product-vendor i {
+            margin-right: 5px;
+            color: var(--primary);
+        }
+        .product-price {
+            font-weight: 600;
+            font-size: 20px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 16px;
+        }
+        .discounted-price {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .discount-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .like-btn {
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+
+
+        .go-to-cart {
+            background: var(--primary);
+        }
+        .go-to-cart:hover {
+            background: #3a5ce5; /* A darker blue for hover */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 20px;
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--secondary);
+        }
+        .footer-column ul {
+            list-style: none;
+        }
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        .footer-column a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-column a:hover {
+            color: white;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: #ccc;
+        }
+        @media (max-width: 992px) {
+            .header-content {
+                flex-direction: column;
+            }
+            .header-left {
+                flex-direction: column;
+                width: 100%;
+            }
+            .search-bar {
+                width: 100%;
+                max-width: none;
+                margin: 15px 0 0 0;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+        @media (max-width: 768px) {
+            .nav-links li {
+                margin: 5px 10px;
+            }
+            .section-title h2 {
+                font-size: 28px;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 15px;
+            }
+        }
+        @media (max-width: 576px) {
+            .header-actions a span {
+                display: none;
+            }
+            .nav-links {
+                overflow-x: auto;
+                white-space: nowrap;
+                justify-content: flex-start;
+                padding-bottom: 10px;
+            }
+            .product-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+        .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+    color:white;
+}
+
+.logo-img {
+    width: 40px;
+    height: 40px;
+}
+
+.logo-text {
+    letter-spacing: 1px;
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    height: 600px;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Background Images Slider */
+.bg-slider-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.bg-slide {
+    min-width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.bg-slide::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* background: linear-gradient(135deg, rgba(74, 108, 250, 0.7), rgba(255, 107, 107, 0.5)); */
+    z-index: 1;
+}
+
+/* Static Content Overlay */
+.static-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slide-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color:white;
+    max-width: 600px;
+    padding: 0 20px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease-in-out;
+}
+
+.slide-content.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.slide-content h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.slide-content p {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.hero-btn {
+    background: var(--secondary);
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    color: white;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+.hero-btn:hover {
+    background: #ff5252;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+}
+
+/* Slider Controls */
+.slider-controls {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 15px;
+    z-index: 3;
+    transform: translateY(-50%);
+}
+
+.slider-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--primary);
+    font-size: 1.1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.slider-btn:hover {
+    background: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Slider Indicators */
+.slider-indicators {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 3;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    background: white;
+    transform: scale(1.2);
+}
+
+/* Hero Search Bar */
+.hero-search-container {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 700px;
+    z-index: 3;
+}
+
+.hero-search-bar {
+    background: white;
+    border-radius: 50px;
+    padding: 4px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    overflow: hidden;
+}
+
+.hero-search-bar input {
+    flex: 1;
+    border: none;
+    padding: 15px 20px;
+    font-size: 1rem;
+    outline: none;
+    background: transparent;
+}
+
+.hero-search-bar .search-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.hero-search-bar .search-btn:hover {
+    background: #3a5ce5;
+    transform: scale(1.05);
+}
+
+.quick-categories {
+    text-align: center;
+    margin-top: 12px;
+    color: white;
+    font-size: 0.85rem;
+}
+
+.quick-cat {
+    color: white;
+    text-decoration: none;
+    margin: 0 8px;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.quick-cat:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero {
+        height: 400px !important;
+    }
+    
+    .slide-content h2 {
+        font-size: 2rem;
+    }
+    
+    .slide-content p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero {
+        height: 350px !important;
+    }
+    
+    .slide-content h2 {
+        font-size: 1.8rem;
+    }
+    
+    .slide-content p {
+        font-size: 0.9rem;
+    }
+}
+#Kitchen .section-title {
+  background: none;
+  text-align: center;
+  margin-top: 0;
+  padding: 25px 0;
+  margin-bottom: 40px;
+}
+
+/* Bold glossy red gradient text with stronger shadow */
+#Kitchen .section-title h2 {
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-family: 'Georgia', serif;
+  background: linear-gradient(180deg, #a00000 0%, #b22222 40%, #ff4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #b22222; /* keeps the text visibly thick */
+  color: #b22222; /* fallback for other browsers */
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.8),   /* soft outer glow */
+    2px 2px 8px rgba(0, 0, 0, 0.6),      /* dark shadow for depth */
+    -2px -2px 4px rgba(255, 80, 80, 0.4); /* subtle highlight */
+}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="header-left">
+                <div class="logo" onclick="redirectToHome()">
+    <img src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" alt="ShopNest Logo" class="logo-img">
+    <span class="logo-text">ShopNest</span>
+</div>
+                <!-- <div class="logo"onclick="redirectToHome()">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span data-translate="logo_text">QuickCart</span>
+                </div> -->
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for products, services..." data-translate-placeholder="">
+                    <div class="search-buttons">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                        <button class="mic-btn"><i class="fas fa-microphone"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="add1.html#wishlist?lang=en" data-page="wishlist"><i class="fas fa-heart"></i> <span data-translate="wishlist">Wishlist</span> <span class="wishlist-count">0</span></a>
+                <a href="add1.html#cart?lang=en" data-page="cart"><i class="fas fa-shopping-cart"></i> <span data-translate="cart">Cart</span> <span class="cart-count">0</span></a>
+                <div class="language-selector">
+                    <select id="language-select">
+                        <option value="en">English</option>
+                        <option value="hi">हिंदी</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="te">తెలుగు</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+    <nav>
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="add1.html#home?lang=en" data-page="home"><i class="fas fa-home"></i> <span data-translate="nav_home">Home</span></a></li>
+                <li><a href="add1.html#products?lang=en" data-page="home"><i class="fas fa-shopping-bag"></i> <span data-translate="nav_products">Products</span></a></li>
+                <li><a href="add1.html#services?lang=en" data-page="home"><i class="fas fa-tools"></i> <span data-translate="nav_services">Services</span></a></li>
+                <li><a href="add1.html#businesses?lang=en" data-page="home"><i class="fas fa-store"></i> <span data-translate="nav_businesses">Businesses</span></a></li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+<section class="hero" id="hero">
+    <div class="slider-container">
+        <!-- Background Images Slider -->
+        <div class="bg-slider-track">
+            <div class="bg-slide active" style="background-image: url('IMAGES/musical-hero-1.jpg')"></div>
+            <div class="bg-slide" style="background-image: url('IMAGES/musical-hero-2.png')"></div>
+            <div class="bg-slide" style="background-image: url('IMAGES/musical-hero-3.jpg')"></div>
+        </div>
+        
+        <!-- Static Content Overlay -->
+        <div class="static-content">
+            <div class="slide-content active">
+                <!-- <h2 data-translate="slide1_title">Fresh Groceries Delivered</h2>
+                <p data-translate="slide1_desc">Get fresh produce and daily essentials delivered to your doorstep</p>
+                <a href="#categories" class="btn hero-btn" data-translate="shop_groceries">Shop Groceries</a> -->
+            </div>
+            <div class="slide-content">
+                <!-- <h2 data-translate="slide2_title">Local Businesses Near You</h2>
+                <p data-translate="slide2_desc">Support local vendors and discover unique products in your area</p>
+                <a href="#businesses" class="btn hero-btn" data-translate="explore_businesses">Explore Businesses</a> -->
+            </div>
+            <div class="slide-content">
+                <!-- <h2 data-translate="slide3_title">Fast & Reliable Delivery</h2>
+                <p data-translate="slide3_desc">Quick delivery services with real-time tracking</p>
+                <a href="#services" class="btn hero-btn" data-translate="learn_more">Learn More</a> -->
+            </div>
+        </div>
+        
+        <!-- Slider Controls -->
+        <div class="slider-controls">
+            <button class="slider-btn prev-btn" onclick="prevSlide()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="slider-btn next-btn" onclick="nextSlide()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <!-- Slider Indicators -->
+        <div class="slider-indicators">
+            <span class="indicator active" onclick="goToSlide(0)"></span>
+            <span class="indicator" onclick="goToSlide(1)"></span>
+            <span class="indicator" onclick="goToSlide(2)"></span>
+        </div>
+        
+        <!-- Search Bar
+        <div class="hero-search-container">
+            <div class="hero-search-bar">
+                <input type="text" placeholder="Search for products, businesses..." data-translate="search_placeholder">
+                <button class="search-btn" data-translate="search">
+                    <i class="fas fa-search"></i>
+                    Search
+                </button>
+            </div> -->
+            <div class="quick-categories">
+                <span data-translate="popular_categories">Popular: </span>
+                <a href="#categories" class="quick-cat">Food</a>
+                <a href="#categories" class="quick-cat">Electronics</a>
+                <a href="#categories" class="quick-cat">Fashion</a>
+                <a href="#categories" class="quick-cat">Home & Garden</a>
+            </div>
+        </div>
+    </div>
+</section>
+    <section id = "musical" class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2 data-translate="category_music">Music</h2>
+            </div>
+            <div class="product-grid">
+                <!-- Product 1 -->
+                <div class="product-card" draggable="true" data-product='{"id":1501,"name":"name_1","price":799,"vendor":"vendor_1","image":"Acoustic Guitar.jpg","distance":"distance_1", "lat": 17.4486, "lon": 78.3908}'>
+                    <img src="IMAGES/Acoustic Guitar.jpg" alt="Acoustic Guitar" class="product-img" data-translate-product="name_1" onerror="this.src='https://via.placeholder.com/200x200?text=Acoustic+Guitar';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_1">Acoustic Guitar</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_1">Music Haven</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_1">Within 3 km</span></div>
+                        <div class="product-price">₹799</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 2 -->
+                <div class="product-card" draggable="true" data-product='{"id":1502,"name":"name_2","price":499,"vendor":"vendor_2","image":"Electric Guitar.jpg","distance":"distance_2", "lat": 17.4512, "lon": 78.3855}'>
+                    <img src="IMAGES/Electric Guitar.jpg" alt="Electric Guitar" class="product-img" data-translate-product="name_2" onerror="this.src='https://via.placeholder.com/200x200?text=Electric+Guitar';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_2">Electric Guitar</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_2">Rock Shop</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_2">Within 4 km</span></div>
+                        <div class="product-price">₹499</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 3 -->
+                <div class="product-card" draggable="true" data-product='{"id":1503,"name":"name_3","price":899,"vendor":"vendor_3","image":"Digital Piano.jpg","distance":"distance_3", "lat": 17.4421, "lon": 78.3882}'>
+                    <img src="IMAGES/Digital Piano.jpg" alt="Digital Piano" class="product-img" data-translate-product="name_3" onerror="this.src='https://via.placeholder.com/200x200?text=Digital+Piano';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_3">Digital Piano</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_3">Melody Mart</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_3">Within 2 km</span></div>
+                        <div class="product-price">₹899</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 4 -->
+                <div class="product-card" draggable="true" data-product='{"id":1504,"name":"name_4","price":749,"vendor":"vendor_4","image":"Drum Kit.jpg","distance":"distance_4", "lat": 17.4550, "lon": 78.3920}'>
+                    <img src="IMAGES/Drum Kit.jpg" alt="Drum Kit" class="product-img" data-translate-product="name_4" onerror="this.src='https://via.placeholder.com/200x200?text=Drum+Kit';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_4">Drum Kit</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_4">Music Haven</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_4">Within 5 km</span></div>
+                        <div class="product-price">₹749</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 5 -->
+                <div class="product-card" draggable="true" data-product='{"id":1505,"name":"name_5","price":999,"vendor":"vendor_5","image":"Violin.jpg","distance":"distance_5", "lat": 17.4399, "lon": 78.4421}'>
+                    <img src="IMAGES/Violin.jpg" alt="Violin" class="product-img" data-translate-product="name_5" onerror="this.src='https://via.placeholder.com/200x200?text=Violin';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_5">Violin</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_5">Classical Sounds</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_5">Within 6 km</span></div>
+                        <div class="product-price">₹999</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 6 -->
+                <div class="product-card" draggable="true" data-product='{"id":1506,"name":"name_6","price":399,"vendor":"vendor_6","image":"Guitar Strings.jpg","distance":"distance_1", "lat": 17.4455, "lon": 78.3800}'>
+                    <img src="IMAGES/Guitar Strings.jpg" alt="Guitar Strings" class="product-img" data-translate-product="name_6" onerror="this.src='https://via.placeholder.com/200x200?text=Guitar+Strings';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_6">Guitar Strings</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_6">Tune Up Co.</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_1">Within 3 km</span></div>
+                        <div class="product-price">₹399</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 7 -->
+                <div class="product-card" draggable="true" data-product='{"id":1507,"name":"name_7","price":349,"vendor":"vendor_7","image":"Drumsticks.jpg","distance":"distance_2", "lat": 17.4480, "lon": 78.3890}'>
+                    <img src="IMAGES/Drumsticks.jpg" alt="Drumsticks" class="product-img" data-translate-product="name_7" onerror="this.src='https://via.placeholder.com/200x200?text=Drumsticks';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_7">Drumsticks</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_7">Rhythm Gear</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_2">Within 4 km</span></div>
+                        <div class="product-price">₹349</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 8 -->
+                <div class="product-card" draggable="true" data-product='{"id":1508,"name":"name_8","price":599,"vendor":"vendor_8","image":"Ukulele.jpg","distance":"distance_1", "lat": 17.4520, "lon": 78.3870}'>
+                    <img src="IMAGES/Ukulele.jpg" alt="Ukulele" class="product-img" data-translate-product="name_8" onerror="this.src='https://via.placeholder.com/200x200?text=Ukulele';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_8">Ukulele</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_8">Music Haven</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_1">Within 3 km</span></div>
+                        <div class="product-price">₹599</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 9 -->
+                <div class="product-card" draggable="true" data-product='{"id":1509,"name":"name_9","price":799,"vendor":"vendor_9","image":"Saxophone.jpg","distance":"distance_4", "lat": 17.4400, "lon": 78.3850}'>
+                    <img src="IMAGES/Saxophone.jpg" alt="Saxophone" class="product-img" data-translate-product="name_9" onerror="this.src='https://via.placeholder.com/200x200?text=Saxophone';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_9">Saxophone</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_9">Classical Sounds</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_4">Within 5 km</span></div>
+                        <div class="product-price">₹799</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 10 -->
+                <div class="product-card" draggable="true" data-product='{"id":1510,"name":"name_10","price":499,"vendor":"vendor_10","image":"Harmonica.jpg","distance":"distance_2", "lat": 17.4490, "lon": 78.3950}'>
+                    <img src="IMAGES/Harmonica.jpg" alt="Harmonica" class="product-img" data-translate-product="name_10" onerror="this.src='https://via.placeholder.com/200x200?text=Harmonica';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_10">Harmonica</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_10">Tune Up Co.</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_2">Within 4 km</span></div>
+                        <div class="product-price">₹499</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 11 -->
+                <div class="product-card" draggable="true" data-product='{"id":1511,"name":"name_11","price":699,"vendor":"vendor_11","image":"Flute.jpg","distance":"distance_1", "lat": 17.4550, "lon": 78.3920}'>
+                    <img src="IMAGES/Flute.jpg" alt="Flute" class="product-img" data-translate-product="name_11" onerror="this.src='https://via.placeholder.com/200x200?text=Flute';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_11">Flute</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_11">Classical Sounds</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_1">Within 3 km</span></div>
+                        <div class="product-price">₹699</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 12 -->
+                <div class="product-card" draggable="true" data-product='{"id":1512,"name":"name_12","price":999,"vendor":"vendor_12","image":"Electric Keyboard.jpg","distance":"distance_3", "lat": 17.4430, "lon": 78.3860}'>
+                    <img src="IMAGES/Electric Keyboard.jpg" alt="Electric Keyboard" class="product-img" data-translate-product="name_12" onerror="this.src='https://via.placeholder.com/200x200?text=Electric+Keyboard';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_12">Electric Keyboard</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_12">Melody Mart</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_3">Within 2 km</span></div>
+                        <div class="product-price">₹999</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 13 -->
+                <div class="product-card" draggable="true" data-product='{"id":1513,"name":"name_13","price":399,"vendor":"vendor_13","image":"Guitar Picks.jpg","distance":"distance_4", "lat": 17.4500, "lon": 78.3840}'>
+                    <img src="IMAGES/Guitar Picks.jpg" alt="Guitar Picks" class="product-img" data-translate-product="name_13" onerror="this.src='https://via.placeholder.com/200x200?text=Guitar+Picks';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_13">Guitar Picks</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_13">Tune Up Co.</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_4">Within 5 km</span></div>
+                        <div class="product-price">₹399</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 14 -->
+                <div class="product-card" draggable="true" data-product='{"id":1514,"name":"name_14","price":849,"vendor":"vendor_14","image":"Trumpet.jpg","distance":"distance_2", "lat": 17.4470, "lon": 78.3910}'>
+                    <img src="IMAGES/Trumpet.jpg" alt="Trumpet" class="product-img" data-translate-product="name_14" onerror="this.src='https://via.placeholder.com/200x200?text=Trumpet';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_14">Trumpet</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_14">Classical Sounds</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_2">Within 4 km</span></div>
+                        <div class="product-price">₹849</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 15
+                <div class="product-card" draggable="true" data-product='{"id":1515,"name":"name_15","price":299,"vendor":"vendor_15","image":"Metronome.jpg","distance":"distance_3"}'>
+                    <img src="Metronome.jpg" alt="Metronome" class="product-img" data-translate-product="name_15" onerror="this.src='https://via.placeholder.com/200x200?text=Metronome';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_15">Metronome</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-product="vendor_15">Rhythm Gear</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_3">Within 2 km</span></div>
+                        <div class="product-price">₹299</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3 data-translate="footer_quickcart">ShopNest</h3>
+                    <p data-translate="footer_description">Your one-stop multi-vendor e-commerce solution. Shop from local businesses with delivery or pickup options.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_quick_links">Quick Links</h3>
+                    <ul>
+                        <li><a href="music.html#home?lang=en" data-page="home" data-translate="footer_home">Home</a></li>
+                        <li><a href="music.html#products?lang=en" data-page="home" data-translate="footer_products">Products</a></li>
+                        <li><a href="music.html#services?lang=en" data-page="home" data-translate="footer_services">Services</a></li>
+                        <li><a href="music.html#businesses?lang=en" data-page="home" data-translate="footer_businesses">Businesses</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_customer_support">Customer Support</h3>
+                    <ul>
+                        <li><a href="#" data-translate="footer_help_center">Help Center</a></li>
+                        <li><a href="#" data-translate="footer_faqs">FAQs</a></li>
+                        <li><a href="#" data-translate="footer_contact_us">Contact Us</a></li>
+                        <li><a href="#" data-translate="footer_return_policy">Return Policy</a></li>
+                        <li><a href="#" data-translate="footer_privacy_policy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_contact_info">Contact Info</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Market St, City, Country</li>
+                        <li><i class="fas fa-phone"></i> <span data-translate="footer_phone">+1 234 567 8900</span></li>
+                        <li><i class="fas fa-envelope"></i> <span data-translate="footer_email">support@shopnest.com</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p data-translate="copyright">&copy; 2025 ShopNest. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        function saveCart() {
+            try {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            } catch (error) {
+                console.error('Error saving cart to localStorage:', error);
+            }
+        }
+
+        function saveWishlist() {
+            try {
+                localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            } catch (error) {
+                console.error('Error saving wishlist to localStorage:', error);
+            }
+        }
+
+        async function fetchOffers() {
+            try {
+                const res = await fetch('/api/offers');
+                offers = await res.json();
+                offers = offers.filter(o => o.active && new Date(o.startAt) <= new Date() && new Date(o.endAt) >= new Date());
+            } catch (error) {
+                console.error('Error fetching offers:', error);
+            }
+        }
+
+        function updatePrices() {
+            const category = 'musical';
+            document.querySelectorAll('.product-card').forEach(card => {
+                const productData = JSON.parse(card.getAttribute('data-product'));
+                const priceElement = card.querySelector('.product-price');
+                const originalPrice = productData.price;
+                let discountedPrice = originalPrice;
+                let discountText = '';
+                let applicableOffer = null;
+                let bestDiscountedPrice = originalPrice;
+
+                offers.forEach(offer => {
+                    if (offer.appliesTo && (offer.appliesTo.toLowerCase().includes(category) || offer.appliesTo.toLowerCase().includes('all')) && originalPrice >= (offer.minOrder || 0)) {
+                        let currentDiscountedPrice = originalPrice;
+                        let currentDiscountText = '';
+                        if (offer.type === 'percent') {
+                            const discount = originalPrice * (offer.value / 100);
+                            if (discount > 0) {
+                                currentDiscountedPrice = originalPrice - discount;
+                                currentDiscountText = `off ${offer.value}%`;
+                            }
+                        } else if (offer.type === 'flat') {
+                            const discount = offer.value;
+                            if (discount > 0 && discount < originalPrice) {
+                                currentDiscountedPrice = originalPrice - discount;
+                                currentDiscountText = `₹${offer.value} off`;
+                            }
+                        }
+                        if (currentDiscountedPrice < bestDiscountedPrice) {
+                            bestDiscountedPrice = currentDiscountedPrice;
+                            discountText = currentDiscountText;
+                            applicableOffer = offer;
+                        }
+                    }
+                });
+
+                if (applicableOffer) {
+                    productData.price = Math.round(bestDiscountedPrice);
+                    card.setAttribute('data-product', JSON.stringify(productData));
+                    priceElement.innerHTML = `<span class="original-price">₹${originalPrice.toLocaleString()}</span> <span class="discounted-price">₹${Math.round(bestDiscountedPrice).toLocaleString()}</span> <span class="discount-badge">${discountText}</span>`;
+                }
+            });
+        }
+        const pageTranslations = {
+            en: {
+                logo_text: "ShopNest",
+                search_placeholder: "Search for products, services or businesses...",
+                nav_home: "Home",
+                nav_products: "Products",
+                nav_services: "Services",
+                nav_businesses: "Businesses",
+                login: "Login",
+                admin: "Admin",
+                sell: "Sell",
+                cart: "Cart",
+                wishlist: "Wishlist",
+                category_music: "Music",
+                add_to_cart: "Add to Cart",
+                footer_quickcart: "ShopNest",
+                footer_description: "Your one-stop multi-vendor e-commerce solution. Shop from local businesses with delivery or pickup options.",
+                footer_quick_links: "Quick Links",
+                footer_home: "Home",
+                footer_products: "Products",
+                footer_services: "Services",
+                footer_businesses: "Businesses",
+                footer_customer_support: "Customer Support",
+                footer_help_center: "Help Center",
+                footer_faqs: "FAQs",
+                footer_contact_us: "Contact Us",
+                footer_return_policy: "Return Policy",
+                footer_privacy_policy: "Privacy Policy",
+                footer_contact_info: "Contact Info",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. All rights reserved.",
+                name_1: "Acoustic Guitar",
+                vendor_1: "Music Haven",
+                name_2: "Electric Guitar",
+                vendor_2: "Rock Shop",
+                name_3: "Digital Piano",
+                vendor_3: "Melody Mart",
+                name_4: "Drum Kit",
+                vendor_4: "Music Haven",
+                name_5: "Violin",
+                vendor_5: "Classical Sounds",
+                name_6: "Guitar Strings",
+                vendor_6: "Tune Up Co.",
+                name_7: "Drumsticks",
+                vendor_7: "Rhythm Gear",
+                name_8: "Ukulele",
+                vendor_8: "Music Haven",
+                name_9: "Saxophone",
+                vendor_9: "Classical Sounds",
+                name_10: "Harmonica",
+                vendor_10: "Tune Up Co.",
+                name_11: "Flute",
+                vendor_11: "Classical Sounds",
+                name_12: "Electric Keyboard",
+                vendor_12: "Melody Mart",
+                name_13: "Guitar Picks",
+                vendor_13: "Tune Up Co.",
+                name_14: "Trumpet",
+                vendor_14: "Classical Sounds",
+                name_15: "Metronome",
+                vendor_15: "Rhythm Gear",
+                distance_1: "Within 3 km",
+                distance_2: "Within 4 km",
+                distance_3: "Within 2 km",
+                distance_4: "Within 5 km",
+                distance_5: "Within 6 km"
+            },
+            hi: {
+                logo_text: "शॉपनेस्ट",
+                search_placeholder: "उत्पादों, सेवाओं या व्यवसायों की खोज करें...",
+                nav_home: "होम",
+                nav_products: "उत्पाद",
+                nav_services: "सेवाएँ",
+                nav_businesses: "व्यवसाय",
+                login: "लॉगिन",
+                admin: "एडमिन",
+                sell: "बेचें",
+                cart: "कार्ट",
+                wishlist: "इच्छा-सूची",
+                category_music: "संगीत",
+                add_to_cart: "कार्ट में जोड़ें",
+                footer_quickcart: "शॉपनेस्ट",
+                footer_description: "आपका एक-स्टॉप मल्टी-वेंडर ई-कॉमर्स समाधान। स्थानीय व्यवसायों से डिलीवरी या पिकअप विकल्प के साथ शॉपिंग करें।",
+                footer_quick_links: "त्वरित लिंक",
+                footer_home: "होम",
+                footer_products: "उत्पाद",
+                footer_services: "सेवाएँ",
+                footer_businesses: "व्यवसाय",
+                footer_customer_support: "ग्राहक समर्थन",
+                footer_help_center: "सहायता केंद्र",
+                footer_faqs: "FAQs",
+                footer_contact_us: "हमसे संपर्क करें",
+                footer_return_policy: "रिटर्न नीति",
+                footer_privacy_policy: "गोपनीयता नीति",
+                footer_contact_info: "संपर्क जानकारी",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. सर्वाधिकार सुरक्षित।",
+                name_1: "ध्वनिक गिटार",
+                vendor_1: "म्यूजिक हेवन",
+                name_2: "इलेक्ट्रिक गिटार",
+                vendor_2: "रॉक शॉप",
+                name_3: "डिजिटल पियानो",
+                vendor_3: "मेलोडी मार्ट",
+                name_4: "ड्रम किट",
+                vendor_4: "म्यूजिक हेवन",
+                name_5: "वायलिन",
+                vendor_5: "क्लासिकल साउंड्स",
+                name_6: "गिटार स्ट्रिंग्स",
+                vendor_6: "ट्यून अप कंपनी",
+                name_7: "ड्रमस्टिक्स",
+                vendor_7: "रिदम गियर",
+                name_8: "यूकुलेले",
+                vendor_8: "म्यूजिक हेवन",
+                name_9: "सैक्सोफोन",
+                vendor_9: "क्लासिकल साउंड्स",
+                name_10: "हारमोनिका",
+                vendor_10: "ट्यून अप कंपनी",
+                name_11: "बांसुरी",
+                vendor_11: "क्लासिकल साउंड्स",
+                name_12: "इलेक्ट्रिक कीबोर्ड",
+                vendor_12: "मेलोडी मार्ट",
+                name_13: "गिटार पिक्स",
+                vendor_13: "ट्यून अप कंपनी",
+                name_14: "ट्रम्पेट",
+                vendor_14: "क्लासिकल साउंड्स",
+                name_15: "मेट्रोनोम",
+                vendor_15: "रिदम गियर",
+                distance_1: "3 किमी के भीतर",
+                distance_2: "4 किमी के भीतर",
+                distance_3: "2 किमी के भीतर",
+                distance_4: "5 किमी के भीतर",
+                distance_5: "6 किमी के भीतर"
+            },
+            es: {
+                logo_text: "ShopNest",
+                search_placeholder: "Buscar productos, servicios o negocios...",
+                nav_home: "Inicio",
+                nav_products: "Productos",
+                nav_services: "Servicios",
+                nav_businesses: "Negocios",
+                login: "Iniciar Sesión",
+                admin: "Admin",
+                sell: "Vender",
+                cart: "Carrito",
+                wishlist: "Lista de deseos",
+                category_music: "Música",
+                add_to_cart: "Añadir al Carrito",
+                footer_quickcart: "ShopNest",
+                footer_description: "Tu solución de comercio electrónico multi-vendedor todo en uno. Compra de negocios locales con opciones de entrega o recogida.",
+                footer_quick_links: "Enlaces Rápidos",
+                footer_home: "Inicio",
+                footer_products: "Productos",
+                footer_services: "Servicios",
+                footer_businesses: "Negocios",
+                footer_customer_support: "Soporte al Cliente",
+                footer_help_center: "Centro de Ayuda",
+                footer_faqs: "Preguntas Frecuentes",
+                footer_contact_us: "Contáctanos",
+                footer_return_policy: "Política de Devoluciones",
+                footer_privacy_policy: "Política de Privacidad",
+                footer_contact_info: "Información de Contacto",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. Todos los derechos reservados.",
+                name_1: "Guitarra Acústica",
+                vendor_1: "Refugio Musical",
+                name_2: "Guitarra Eléctrica",
+                vendor_2: "Tienda de Rock",
+                name_3: "Piano Digital",
+                vendor_3: "Mercado de Melodías",
+                name_4: "Batería",
+                vendor_4: "Refugio Musical",
+                name_5: "Violín",
+                vendor_5: "Sonidos Clásicos",
+                name_6: "Cuerdas de Guitarra",
+                vendor_6: "Compañía de Afinación",
+                name_7: "Baquetas",
+                vendor_7: "Equipo de Ritmo",
+                name_8: "Ukelele",
+                vendor_8: "Refugio Musical",
+                name_9: "Saxofón",
+                vendor_9: "Sonidos Clásicos",
+                name_10: "Armónica",
+                vendor_10: "Compañía de Afinación",
+                name_11: "Flauta",
+                vendor_11: "Sonidos Clásicos",
+                name_12: "Teclado Eléctrico",
+                vendor_12: "Mercado de Melodías",
+                name_13: "Púas de Guitarra",
+                vendor_13: "Compañía de Afinación",
+                name_14: "Trompeta",
+                vendor_14: "Sonidos Clásicos",
+                name_15: "Metrónomo",
+                vendor_15: "Equipo de Ritmo",
+                distance_1: "Dentro de 3 km",
+                distance_2: "Dentro de 4 km",
+                distance_3: "Dentro de 2 km",
+                distance_4: "Dentro de 5 km",
+                distance_5: "Dentro de 6 km"
+            },
+            fr: {
+                logo_text: "ShopNest",
+                search_placeholder: "Rechercher des produits, services ou entreprises...",
+                nav_home: "Accueil",
+                nav_products: "Produits",
+                nav_services: "Services",
+                nav_businesses: "Entreprises",
+                login: "Connexion",
+                admin: "Admin",
+                sell: "Vendre",
+                cart: "Panier",
+                wishlist: "Liste de souhaits",
+                category_music: "Musique",
+                add_to_cart: "Ajouter au Panier",
+                footer_quickcart: "ShopNest",
+                footer_description: "Votre solution e-commerce multi-vendeurs tout-en-un. Achetez auprès d'entreprises locales avec options de livraison ou ramassage.",
+                footer_quick_links: "Liens Rapides",
+                footer_home: "Accueil",
+                footer_products: "Produits",
+                footer_services: "Services",
+                footer_businesses: "Entreprises",
+                footer_customer_support: "Support Client",
+                footer_help_center: "Centre d'Aide",
+                footer_faqs: "FAQ",
+                footer_contact_us: "Contactez-Nous",
+                footer_return_policy: "Politique de Retour",
+                footer_privacy_policy: "Politique de Confidentialité",
+                footer_contact_info: "Informations de Contact",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. Tous droits réservés.",
+                name_1: "Guitare Acoustique",
+                vendor_1: "Havre Musical",
+                name_2: "Guitare Électrique",
+                vendor_2: "Boutique de Rock",
+                name_3: "Piano Numérique",
+                vendor_3: "Marché des Mélodies",
+                name_4: "Batterie",
+                vendor_4: "Havre Musical",
+                name_5: "Violon",
+                vendor_5: "Sons Classiques",
+                name_6: "Cordes de Guitare",
+                vendor_6: "Compagnie d'Accordage",
+                name_7: "Baguettes",
+                vendor_7: "Équipement de Rythme",
+                name_8: "Ukulele",
+                vendor_8: "Havre Musical",
+                name_9: "Saxophone",
+                vendor_9: "Sons Classiques",
+                name_10: "Harmonica",
+                vendor_10: "Compagnie d'Accordage",
+                name_11: "Flûte",
+                vendor_11: "Sons Classiques",
+                name_12: "Clavier Électrique",
+                vendor_12: "Marché des Mélodies",
+                name_13: "Médiators de Guitare",
+                vendor_13: "Compagnie d'Accordage",
+                name_14: "Trompette",
+                vendor_14: "Sons Classiques",
+                name_15: "Métronom",
+                vendor_15: "Équipement de Rythme",
+                distance_1: "Dans un rayon de 3 km",
+                distance_2: "Dans un rayon de 4 km",
+                distance_3: "Dans un rayon de 2 km",
+                distance_4: "Dans un rayon de 5 km",
+                distance_5: "Dans un rayon de 6 km"
+            },
+            te: {
+                logo_text: "షాప్‌నెస్ట్",
+                search_placeholder: "ఉత్పత్తులు, సేవలు లేదా వ్యాపారాల కోసం శోధించండి...",
+                nav_home: "హోమ్",
+                nav_products: "ఉత్పత్తులు",
+                nav_services: "సేవలు",
+                nav_businesses: "వ్యాపారాలు",
+                login: "లాగిన్",
+                admin: "అడ్మిన్",
+                sell: "విక్రయించండి",
+                cart: "కార్ట్",
+                wishlist: "కోరికల జాబితా",
+                category_music: "సంగీత వాయిద్యాలు",
+                add_to_cart: "కార్ట్‌లో జోడించండి",
+                footer_quickcart: "షాప్‌నెస్ట్",
+                footer_description: "మీ మల్టీ-వెండర్ ఈ-కామర్స్ సొల్యూషన్ ఒక్కోస్తపు స్థలం. డెలివరీ లేదా పికప్ ఆప్షన్లతో స్థానిక వ్యాపారాల నుండి షాపింగ్ చేయండి.",
+                footer_quick_links: "క్విక్ లింక్స్",
+                footer_home: "హోమ్",
+                footer_products: "ఉత్పత్తులు",
+                footer_services: "సేవలు",
+                footer_businesses: "వ్యాపారాలు",
+                footer_customer_support: "కస్టమర్ సపోర్ట్",
+                footer_help_center: "హెల్ప్ సెంటర్",
+                footer_faqs: "FAQs",
+                footer_contact_us: "మమ్మల్ని సంప్రదించండి",
+                footer_return_policy: "రిటర్న్ పాలసీ",
+                footer_privacy_policy: "ప్రైవసీ పాలసీ",
+                footer_contact_info: "కాంటాక్ట్ ఇన్ఫో",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. అన్ని హక్కులు రిజర్వ్ చేయబడ్డాయి.",
+                name_1: "అకౌస్టిక్ గిటార్",
+                vendor_1: "మ్యూజిక్ హెవెన్",
+                name_2: "ఎలక్ట్రిక్ గిటార్",
+                vendor_2: "రాక్ షాప్",
+                name_3: "డిజిటల్ పియానో",
+                vendor_3: "మెలోడీ మార్ట్",
+                name_4: "డ్రమ్ కిట్",
+                vendor_4: "మ్యూజిక్ హెవెన్",
+                name_5: "వయోలిన్",
+                vendor_5: "క్లాసికల్ సౌండ్స్",
+                name_6: "గిటార్ స్ట్రింగ్స్",
+                vendor_6: "ట్యూన్ అప్ కంపెనీ",
+                name_7: "డ్రమ్‌స్టిక్స్",
+                vendor_7: "రిథమ్ గేర్",
+                name_8: "యూకులేలే",
+                vendor_8: "మ్యూజిక్ హెవెన్",
+                name_9: "సాక్సోఫోన్",
+                vendor_9: "క్లాసికల్ సౌండ్స్",
+                name_10: "హార్మోనికా",
+                vendor_10: "ట్యూన్ అప్ కంపెనీ",
+                name_11: "ఫ్లూట్",
+                vendor_11: "క్లాసికల్ సౌండ్స్",
+                name_12: "ఎలక్ట్రిక్ కీబోర్డ్",
+                vendor_12: "మెలోడీ మార్ట్",
+                name_13: "గిటార్ పిక్స్",
+                vendor_13: "ట్యూన్ అప్ కంపెనీ",
+                name_14: "ట్రంపెట్",
+                vendor_14: "క్లాసికల్ సౌండ్స్",
+                name_15: "మెట్రోనోమ్",
+                vendor_15: "రిథమ్ గేర్",
+                distance_1: "3 కి.మీ. లోపల",
+                distance_2: "4 కి.మీ. లోపల",
+                distance_3: "2 కి.మీ. లోపల",
+                distance_4: "5 కి.మీ. లోపల",
+                distance_5: "6 కి.మీ. లోపల"
+            }
+        };
+        document.addEventListener('DOMContentLoaded', async function() {
+            await fetchOffers();
+            updatePrices();
+            updateDistances();
+            const urlParams = new URLSearchParams(window.location.search);
+            let currentLanguage = urlParams.get('lang') || localStorage.getItem('language') || 'en';
+            const languageSelect = document.getElementById('language-select');
+            if (languageSelect) {
+                languageSelect.value = currentLanguage;
+            }
+            function translatePage() {
+                const trans = pageTranslations[currentLanguage];
+                document.querySelectorAll('[data-translate]').forEach(el => {
+                    const key = el.getAttribute('data-translate');
+                    if (trans[key]) el.textContent = trans[key];
+                });
+                document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-translate-placeholder');
+                    if (trans[key]) el.placeholder = trans[key];
+                });
+                document.querySelectorAll('[data-translate-product]').forEach(el => {
+                    const key = el.getAttribute('data-translate-product');
+                    if (trans[key]) {
+                        el.textContent = trans[key];
+                        if (el.tagName === 'IMG') {
+                            el.alt = trans[key];
+                        }
+                    }
+                });
+                updateLinks();
+            }
+            function updateLinks() {
+                document.querySelectorAll('a[data-page]').forEach(link => {
+                    const baseHref = link.getAttribute('href').split('?')[0];
+                    link.href = baseHref + '?lang=' + currentLanguage;
+                });
+            }
+            if (languageSelect) {
+                languageSelect.addEventListener('change', function() {
+                    currentLanguage = this.value;
+                    localStorage.setItem('language', currentLanguage);
+                    updateLinks();
+                    translatePage();
+                });
+            }
+            translatePage();
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                card.addEventListener('dragstart', function(e) {
+                    const product = JSON.parse(card.getAttribute('data-product'));
+                    product.name = pageTranslations[currentLanguage][product.name] || product.name;
+                    product.vendor = pageTranslations[currentLanguage][product.vendor] || product.vendor;
+                    e.dataTransfer.setData('text/plain', JSON.stringify(product));
+                });
+            });
+
+            productCards.forEach(card => {
+                const image = card.querySelector('.product-img');
+                if (image) {
+                    image.style.cursor = 'pointer';
+                    image.addEventListener('click', () => {
+                        const product = JSON.parse(card.getAttribute('data-product'));
+                        window.location.href = `musical_product_detail.html?id=${product.id}&lang=${currentLanguage}`;
+                    });
+                }
+            });
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productCard = this.closest('.product-card');
+                    if (productCard) {
+                        const product = JSON.parse(productCard.getAttribute('data-product'));
+                        product.image = productCard.querySelector('.product-img').src;
+                        product.name = pageTranslations[currentLanguage][product.name] || product.name;
+                        product.vendor = pageTranslations[currentLanguage][product.vendor] || product.vendor;
+                        addToCart(product, 1, this);
+                    }
+                });
+            });
+            productCards.forEach(card => {
+                const product = JSON.parse(card.getAttribute('data-product'));
+                if (cart.some(item => item.id === product.id)) {
+                    const button = card.querySelector('.add-to-cart');
+                    if (button) {
+                        const newButton = button.cloneNode(true);
+                        newButton.textContent = 'Go to Cart';
+                        newButton.classList.remove('add-to-cart');
+                        newButton.classList.add('go-to-cart');
+                        button.parentNode.replaceChild(newButton, button);
+                        newButton.onclick = () => window.location.href = 'add1.html#cart';
+                    }
+                }
+            });
+            const likeButtons = document.querySelectorAll('.like-btn');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productCard = this.closest('.product-card');
+                    if (productCard) {
+                        const product = JSON.parse(productCard.getAttribute('data-product'));
+                        toggleWishlist(product, this);
+                    }
+                });
+                const product = JSON.parse(button.closest('.product-card').getAttribute('data-product'));
+                if (wishlist.some(item => item.id === product.id)) {
+                    button.innerHTML = '<i class="fas fa-heart"></i>';
+                    button.style.color = 'var(--secondary)';
+                }
+            });
+            const searchInput = document.querySelector('.search-bar input');
+            const searchButton = document.querySelector('.search-bar .search-btn');
+            const micButton = document.querySelector('.search-bar .mic-btn');
+            function performSearch(query) {
+                query = query.trim().toLowerCase();
+                const productCards = document.querySelectorAll('.product-card');
+                let found = false;
+                productCards.forEach(card => {
+                    card.style.display = 'none';
+                    const product = JSON.parse(card.getAttribute('data-product'));
+                    const translatedName = pageTranslations[currentLanguage][product.name] || product.name;
+                    const translatedVendor = pageTranslations[currentLanguage][product.vendor] || product.vendor;
+                    if (query === '' || translatedName.toLowerCase().includes(query) || translatedVendor.toLowerCase().includes(query)) {
+                        card.style.display = 'block';
+                        card.scrollIntoView({ behavior: 'smooth' });
+                        found = true;
+                    }
+                });
+                if (!found && query !== '') {
+                    alert(`No products found for "${query}"`);
+                }
+            }
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    performSearch(this.value);
+                });
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performSearch(this.value);
+                    }
+                });
+            }
+            if (searchButton) {
+                searchButton.addEventListener('click', function() {
+                    performSearch(searchInput.value);
+                });
+            }
+            let recognition = null;
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    searchInput.value = transcript;
+                    performSearch(transcript);
+                };
+                recognition.onerror = function(event) {
+                    alert('Error with speech recognition: ' + event.error);
+                    micButton.classList.remove('active');
+                };
+                recognition.onend = function() {
+                    micButton.classList.remove('active');
+                };
+                if (micButton) {
+                    micButton.addEventListener('click', function() {
+                        if (micButton.classList.contains('active')) {
+                            recognition.stop();
+                            micButton.classList.remove('active');
+                        } else {
+                            let lang = 'en-US';
+                            if (currentLanguage === 'hi') lang = 'hi-IN';
+                            else if (currentLanguage === 'es') lang = 'es-ES';
+                            else if (currentLanguage === 'fr') lang = 'fr-FR';
+                            else if (currentLanguage === 'te') lang = 'te-IN';
+                            recognition.lang = lang;
+                            recognition.start();
+                            micButton.classList.add('active');
+                        }
+                    });
+                }
+                languageSelect.addEventListener('change', function() {
+                    if (recognition) {
+                        let lang = 'en-US';
+                        if (this.value === 'hi') lang = 'hi-IN';
+                        else if (this.value === 'es') lang = 'es-ES';
+                        else if (this.value === 'fr') lang = 'fr-FR';
+                        else if (this.value === 'te') lang = 'te-IN';
+                        recognition.lang = lang;
+                    }
+                });
+            } else {
+                if (micButton) {
+                    micButton.style.display = 'none';
+                }
+            }
+            updateCart();
+            updateWishlist();
+        });
+        function addToCart(product, quantity = 1, button) {
+            const existingItem = cart.find(item => item.id === product.id);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({ ...product, quantity });
+            }
+            updateCart();
+            saveCart();
+            if (button) { // To prevent the old listener from firing, we clone and replace the button 
+                const newButton = button.cloneNode(true);
+                newButton.textContent = 'Go to Cart';
+                newButton.classList.remove('add-to-cart');
+                newButton.classList.add('go-to-cart');
+                button.parentNode.replaceChild(newButton, button);
+                newButton.onclick = function() { window.location.href = 'add1.html#cart'; };
+            }
+        }
+        function toggleWishlist(product, button) {
+            const productCard = button.closest('.product-card');
+            product.name = productCard.querySelector('.product-title').textContent;
+            product.image = productCard.querySelector('.product-img').src;
+            product.vendor = productCard.querySelector('.product-vendor span').textContent;
+            const existingIndex = wishlist.findIndex(item => item.id === product.id);
+            if (existingIndex > -1) {
+                wishlist.splice(existingIndex, 1);
+                button.innerHTML = '<i class="far fa-heart"></i>';
+                button.style.color = 'var(--gray)';
+                alert(`${product.name} removed from wishlist!`);
+            } else {
+                wishlist.push(product);
+                button.innerHTML = '<i class="fas fa-heart"></i>';
+                button.style.color = 'var(--secondary)';
+                alert(`${product.name} added to wishlist!`);
+            }
+            updateWishlist();
+            saveWishlist();
+        }
+        function increaseQuantity(index) {
+            if (cart[index]) {
+                cart[index].quantity += 1;
+                updateCart();
+                saveCart();
+            }
+        }
+        function decreaseQuantity(index) {
+            if (cart[index]) {
+                if (cart[index].quantity > 1) {
+                    cart[index].quantity -= 1;
+                } else {
+                    cart.splice(index, 1);
+                }
+                updateCart();
+                saveCart();
+            }
+        }
+        function removeFromCart(index) {
+            if (cart[index]) {
+                cart.splice(index, 1);
+                updateCart();
+                saveCart();
+            }
+        }
+        function updateCart() {
+            const cartCount = document.querySelector('.cart-count');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+        }
+        function updateWishlist() {
+            const wishlistCount = document.querySelector('.wishlist-count');
+            if (wishlistCount)
+                wishlistCount.textContent = wishlist.length;
+        }
+
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const d = R * c; // Distance in km
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        function updateDistances() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+
+                    document.querySelectorAll('.product-card').forEach(card => {
+                        const productData = JSON.parse(card.getAttribute('data-product'));
+                        if (productData.lat && productData.lon) {
+                            const distance = getDistanceFromLatLonInKm(userLat, userLon, productData.lat, productData.lon);
+                            const distanceSpan = card.querySelector('.product-distance span');
+                            if (distanceSpan) {
+                                distanceSpan.textContent = `${distance.toFixed(1)} km away`;
+                            }
+                        }
+                    });
+                }, error => {
+                    console.warn(`Geolocation error: ${error.message}. Showing default distances.`);
+                });
+            } else {
+                console.warn("Geolocation is not supported by this browser. Showing default distances.");
+            }
+        }
+         function redirectToHome() {
+    window.location.href = "add1.html";
+  }
+
+  // Hero Slider Functionality
+let currentSlide = 0;
+const bgSlides = document.querySelectorAll('.bg-slide');
+const contentSlides = document.querySelectorAll('.slide-content');
+const indicators = document.querySelectorAll('.indicator');
+const totalSlides = bgSlides.length;
+const bgSliderTrack = document.querySelector('.bg-slider-track');
+let autoSlideInterval;
+
+// Initialize slider
+function initSlider() {
+    setHeroHeight();
+    updateSlider();
+    startAutoSlide();
+    
+    // Pause auto-slide on hover
+    const sliderContainer = document.querySelector('.slider-container');
+    sliderContainer.addEventListener('mouseenter', pauseAutoSlide);
+    sliderContainer.addEventListener('mouseleave', startAutoSlide);
+    
+    // Update height on resize
+    window.addEventListener('resize', setHeroHeight);
+}
+
+// Set hero height based on screen size
+function setHeroHeight() {
+    const hero = document.querySelector('.hero');
+    const screenWidth = window.innerWidth;
+    
+    if (screenWidth <= 576) {
+        hero.style.height = '350px';
+    } else if (screenWidth <= 768) {
+        hero.style.height = '400px';
+    } else {
+        hero.style.height = '600px';
+    }
+}
+
+// Update slider - only move background images
+function updateSlider() {
+    // Move background images
+    bgSliderTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+    
+    // Update content visibility
+    contentSlides.forEach((content, index) => {
+        content.classList.toggle('active', index === currentSlide);
+    });
+    
+    // Update indicators
+    indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === currentSlide);
+    });
+    
+    // Update background slides
+    bgSlides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === currentSlide);
+    });
+}
+
+// Next slide function
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateSlider();
+    resetAutoSlide();
+}
+
+// Previous slide function
+function prevSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    updateSlider();
+    resetAutoSlide();
+}
+
+// Go to specific slide
+function goToSlide(slideIndex) {
+    currentSlide = slideIndex;
+    updateSlider();
+    resetAutoSlide();
+}
+
+// Auto slide functionality
+function startAutoSlide() {
+    autoSlideInterval = setInterval(nextSlide, 5000);
+}
+
+function pauseAutoSlide() {
+    clearInterval(autoSlideInterval);
+}
+
+function resetAutoSlide() {
+    pauseAutoSlide();
+    startAutoSlide();
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initSlider();
+});
+
+// Export functions for global access
+window.nextSlide = nextSlide;
+window.prevSlide = prevSlide;
+window.goToSlide = goToSlide;
+
+    </script>
+</body>
+</html>

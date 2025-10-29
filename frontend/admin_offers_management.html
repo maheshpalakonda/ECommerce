@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin · Special Offers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--bg:#0b1020;--card:#0f162e;--muted:#98a2b3;--primary:#6366f1;--danger:#ef4444}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0b1020,#0d1226);color:#e6eef8}
+    .glass{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06);box-shadow:0 10px 30px rgba(2,6,23,.45)}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:12px;padding:.5rem .9rem;font-weight:600}
+    .btn-primary{background:var(--primary);color:white}
+    .btn-ghost{background:rgba(255,255,255,.04)}
+    .chip{padding:.25rem .5rem;border-radius:999px;font-size:.75rem}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.6)}
+  </style>
+</head>
+<body>
+  <header class="glass sticky top-0 p-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div>
+        <h1 class="font-bold">Special Offers</h1>
+        <p class="text-sm text-slate-400">Create coupons, flash sales, BOGO & free-shipping rules</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="newOfferBtn" class="btn btn-primary">+ New Offer</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-4">
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div class="glass p-4 rounded-xl">
+        <div class="text-slate-400 text-sm">Active Offers</div>
+        <div id="countActive" class="text-2xl font-bold mt-2">0</div>
+      </div>
+      <div class="glass p-4 rounded-xl">
+        <div class="text-slate-400 text-sm">Upcoming</div>
+        <div id="countUpcoming" class="text-2xl font-bold mt-2">0</div>
+      </div>
+      <div class="glass p-4 rounded-xl">
+        <div class="text-slate-400 text-sm">Expired</div>
+        <div id="countExpired" class="text-2xl font-bold mt-2">0</div>
+      </div>
+    </section>
+
+    <section class="glass p-4 rounded-xl">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-bold">Offers List</h2>
+        <input id="search" placeholder="Search code or title" class="bg-white/5 px-3 py-2 rounded-xl" />
+      </div>
+      <div class="overflow-auto" style="max-height:420px">
+        <table class="w-full text-sm">
+          <thead class="text-slate-400 text-xs"><tr><th>Code/Title</th><th>Type</th><th>Rules</th><th>Validity</th><th>Usage</th><th class="text-right">Actions</th></tr></thead>
+          <tbody id="offersBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Add/Edit Offer -->
+  <div id="offerModal" class="modal">
+    <div class="bg-[#0f162e] p-4 rounded-xl max-w-3xl w-full">
+      <div class="flex items-center justify-between mb-3"><h3 id="modalTitle" class="font-bold">New Offer</h3><button id="closeModal">✕</button></div>
+      <form id="offerForm" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input type="hidden" id="offerId" />
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Offer Title</span><input id="offerTitle" class="bg-white/5 px-3 py-2 rounded-xl" required></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Coupon Code (optional)</span><input id="offerCode" class="bg-white/5 px-3 py-2 rounded-xl"></label>
+
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Type</span>
+          <select id="offerType" class="bg-white/5 px-3 py-2 rounded-xl">
+            <option value="percent">% Discount</option>
+            <option value="flat">Flat Discount</option>
+            <option value="bogo">Buy X Get Y</option>
+            <option value="free_shipping">Free Shipping</option>
+          </select>
+        </label>
+
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Value</span><input id="offerValue" class="bg-white/5 px-3 py-2 rounded-xl" placeholder="10 for 10% or 500 for ₹500"></label>
+
+        <label class="grid gap-1 md:col-span-2"><span class="text-xs text-slate-400">Applies To (categories or product IDs comma-separated)</span><input id="appliesTo" class="bg-white/5 px-3 py-2 rounded-xl"></label>
+
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Min Order Value (optional)</span><input id="minOrder" type="number" min="0" class="bg-white/5 px-3 py-2 rounded-xl"></label>
+
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Usage Limit (total)</span><input id="usageLimit" type="number" min="0" class="bg-white/5 px-3 py-2 rounded-xl" value="0"></label>
+
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Per-user Limit</span><input id="perUserLimit" type="number" min="0" class="bg-white/5 px-3 py-2 rounded-xl" value="1"></label>
+
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Start Date & Time</span><input id="startAt" type="datetime-local" class="bg-white/5 px-3 py-2 rounded-xl"></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">End Date & Time</span><input id="endAt" type="datetime-local" class="bg-white/5 px-3 py-2 rounded-xl"></label>
+
+        <label class="flex items-center gap-2"><input id="offerActive" type="checkbox" class="accent-indigo-500"><span class="text-xs text-slate-400">Active</span></label>
+
+        <label class="grid gap-1 md:col-span-2"><span class="text-xs text-slate-400">Notes / Description</span><textarea id="notes" rows="2" class="bg-white/5 px-3 py-2 rounded-xl"></textarea></label>
+
+        <div class="md:col-span-2 flex justify-end gap-2 pt-2">
+          <button type="button" id="cancelBtn" class="btn btn-ghost">Cancel</button>
+          <button class="btn btn-primary" type="submit">Save Offer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Demo offers store (frontend) — replace with API calls
+    let offers = [];
+    const API_URL = 'http://localhost:3006/api/offers';
+
+    const qs=(s,el=document)=>el.querySelector(s), qsa=(s,el=document)=>Array.from(el.querySelectorAll(s));
+
+    async function renderOffers(){
+      const res = await fetch(API_URL);
+      offers = await res.json();
+
+      const now = new Date();
+      const active = offers.filter(o=> o.active && new Date(o.startAt) <= now && new Date(o.endAt) >= now);
+      const upcoming = offers.filter(o=> new Date(o.startAt) > now);
+      const expired = offers.filter(o=> new Date(o.endAt) < now);
+      qs('#countActive').textContent = active.length; qs('#countUpcoming').textContent = upcoming.length; qs('#countExpired').textContent = expired.length;
+
+      qs('#offersBody').innerHTML = offers.map(o=>{
+        const typeLabel = o.type === 'percent' ? `${o.value}% off` : o.type === 'flat' ? `₹${o.value} off` : o.type === 'bogo' ? 'BOGO' : 'Free Shipping';
+        const validity = `${new Date(o.startAt || Date.now()).toLocaleString()} — ${new Date(o.endAt || Date.now()).toLocaleString()}`;
+        return `<tr data-id="${o._id}"><td><div class="font-semibold">${o.code||'—'} <div class="text-xs text-slate-400">${o.title}</div></div></td><td>${typeLabel}</td><td>${o.appliesTo || 'All'}</td><td>${validity}</td><td>${o.usageCount||0}/${o.usageLimit||'∞'}</td><td class="text-right"><div class="inline-flex gap-2"><button class="btn btn-ghost editOffer" data-id="${o._id}">Edit</button><button class="btn btn-ghost toggleOffer" data-id="${o._id}">${o.active? 'Deactivate':'Activate'}</button><button class="btn btn-danger delOffer" data-id="${o._id}">Delete</button></div></td></tr>`;
+      }).join('');
+
+      qsa('.editOffer').forEach(b => b.addEventListener('click', e => openModalFor(e.target.dataset.id)));
+      
+      qsa('.toggleOffer').forEach(b => b.addEventListener('click', async e => {
+        const id = e.target.dataset.id;
+        const offer = offers.find(o => o._id === id);
+        if (!offer) return;
+        const newStatus = !offer.active;
+        await fetch(`${API_URL}/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ active: newStatus }) });
+        renderOffers();
+      }));
+
+      qsa('.delOffer').forEach(b => b.addEventListener('click', async e => {
+        const id = e.target.dataset.id;
+        if (confirm('Delete offer?')) { await fetch(`${API_URL}/${id}`, { method: 'DELETE' }); renderOffers(); }
+      }));
+    }
+
+    function openModalFor(id){ const o = offers.find(x=>x._id===id); qs('#offerForm').reset(); qs('#offerId').value = o?._id||''; qs('#modalTitle').textContent = o? 'Edit Offer':'New Offer'; if(o){ qs('#offerTitle').value=o.title; qs('#offerCode').value=o.code||''; qs('#offerType').value=o.type; qs('#offerValue').value=o.value; qs('#appliesTo').value=o.appliesTo||''; qs('#minOrder').value=o.minOrder||''; qs('#usageLimit').value=o.usageLimit||0; qs('#perUserLimit').value=o.perUserLimit||1; qs('#startAt').value = new Date(o.startAt).toISOString().slice(0,16); qs('#endAt').value = new Date(o.endAt).toISOString().slice(0,16); qs('#notes').value=o.notes||''; qs('#offerActive').checked = o.active; } else { qs('#offerActive').checked = true; }
+      qs('#offerModal').style.display='flex'; }
+
+    function closeModal(){ qs('#offerModal').style.display='none'; }
+
+    qs('#newOfferBtn').addEventListener('click', ()=> openModalFor());
+    qs('#closeModal').addEventListener('click', closeModal); qs('#cancelBtn').addEventListener('click', closeModal);
+
+    qs('#offerForm').addEventListener('submit', async e=>{ e.preventDefault(); const id = qs('#offerId').value || null; const payload = {
+      title: qs('#offerTitle').value.trim(),
+      code: qs('#offerCode').value.trim()||null,
+      type: qs('#offerType').value,
+      value: Number(qs('#offerValue').value)||0,
+      appliesTo: qs('#appliesTo').value.trim(),
+      minOrder: Number(qs('#minOrder').value)||0,
+      usageLimit: Number(qs('#usageLimit').value)||0,
+      perUserLimit: Number(qs('#perUserLimit').value)||1,
+      startAt: qs('#startAt').value ? new Date(qs('#startAt').value).toISOString() : new Date().toISOString(),
+      endAt: qs('#endAt').value ? new Date(qs('#endAt').value).toISOString() : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      notes: qs('#notes').value.trim(),
+      active: qs('#offerActive').checked,
+      usageCount: id ? (offers.find(o=>o._id===id)?.usageCount || 0) : 0
+    };
+      const url = id ? `${API_URL}/${id}` : API_URL;
+      const method = id ? 'PUT' : 'POST';
+      
+      await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+      });
+
+      closeModal(); renderOffers();
+    });
+
+    // Live search
+    qs('#search').addEventListener('input', e=>{ const q = e.target.value.toLowerCase(); qsa('#offersBody tr').forEach(tr=>{ const txt = tr.textContent.toLowerCase(); tr.style.display = txt.includes(q)?'table-row':'none'; }); });
+
+    window.addEventListener('DOMContentLoaded', ()=> renderOffers());
+  </script>
+</body>
+</html>

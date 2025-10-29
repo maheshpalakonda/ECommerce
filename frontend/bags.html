@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickCart - Bags</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        :root {
+            --primary: #4a6cfa;
+            --secondary: #ff6b6b;
+            --accent: #42b883;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border: #e1e5eb;
+        }
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+        header {
+            background: linear-gradient(to right, var(--primary), #6c8fff);
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        .logo i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            margin-left: 20px;
+            position: relative;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: none;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .search-bar .search-buttons {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            display: flex;
+            gap: 5px;
+        }
+        .search-bar button {
+            background: var(--secondary);
+            border: none;
+            color: white;
+            border-radius: 50px;
+            padding: 7px 15px;
+            cursor: pointer;
+        }
+        .search-bar button.mic-btn {
+            background: var(--accent);
+        }
+        .search-bar button.mic-btn.active {
+            background: #e74c3c;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+        .header-actions a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .header-actions .language-selector {
+            margin-left: 20px;
+        }
+        .header-actions .language-selector select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--dark);
+        }
+        .header-actions i {
+            font-size: 20px;
+            margin-right: 5px;
+        }
+        .cart-count {
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .wishlist-count {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        nav {
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .nav-links li {
+            margin: 0 15px;
+            position: relative;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        .nav-links i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        .section {
+            padding: 60px 0;
+            scroll-margin-top: 100px;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .section-title h2 {
+            font-size: 32px;
+            color: var(--dark);
+            display: inline-block;
+        }
+        .section-title h2:after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: var(--secondary);
+            margin: 10px auto;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 35px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            cursor: move;
+        }
+        .product-card.hidden {
+            display: none;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 15px;
+        }
+        .product-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .product-vendor {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .product-vendor i {
+            margin-right: 5px;
+            color: var(--primary);
+        }
+        .product-price {
+            font-weight: 600;
+            font-size: 20px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 16px;
+        }
+        .discounted-price {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .discount-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .like-btn {
+            background: transparent;
+            border: none;
+            color: var(--gray);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+
+        .go-to-cart {
+            background: var(--primary);
+        }
+        .go-to-cart:hover {
+            background: #3a5ce5; /* A darker blue for hover */
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 20px;
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--secondary);
+        }
+        .footer-column ul {
+            list-style: none;
+        }
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        .footer-column a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-column a:hover {
+            color: white;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: #ccc;
+        }
+        @media (max-width: 992px) {
+            .header-content {
+                flex-direction: column;
+            }
+            .header-left {
+                flex-direction: column;
+                width: 100%;
+            }
+            .search-bar {
+                width: 100%;
+                max-width: none;
+                margin: 15px 0 0 0;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+        @media (max-width: 768px) {
+            .nav-links li {
+                margin: 5px 10px;
+            }
+            .section-title h2 {
+                font-size: 28px;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 15px;
+            }
+        }
+        @media (max-width: 576px) {
+            .header-actions a span {
+                display: none;
+            }
+            .nav-links {
+                overflow-x: auto;
+                white-space: nowrap;
+                justify-content: flex-start;
+                padding-bottom: 10px;
+            }
+            .product-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+        .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+    color:white;
+}
+
+.logo-img {
+    width: 40px;
+    height: 40px;
+}
+
+.logo-text {
+    letter-spacing: 1px;
+}
+/* Hero Section */
+.hero {
+    position: relative;
+    height: 600px;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Background Images Slider */
+.bg-slider-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.bg-slide {
+    min-width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.bg-slide::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* background: linear-gradient(135deg, rgba(74, 108, 250, 0.7), rgba(255, 107, 107, 0.5)); */
+    z-index: 1;
+}
+
+/* Static Content Overlay */
+.static-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slide-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color:white;
+    max-width: 600px;
+    padding: 0 20px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease-in-out;
+}
+
+.slide-content.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.slide-content h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.slide-content p {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.hero-btn {
+    background: var(--secondary);
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    color: white;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+.hero-btn:hover {
+    background: #ff5252;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+}
+
+/* Slider Controls */
+.slider-controls {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 15px;
+    z-index: 3;
+    transform: translateY(-50%);
+}
+
+.slider-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--primary);
+    font-size: 1.1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.slider-btn:hover {
+    background: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Slider Indicators */
+.slider-indicators {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 3;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    background: white;
+    transform: scale(1.2);
+}
+
+/* Hero Search Bar */
+.hero-search-container {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 700px;
+    z-index: 3;
+}
+
+.hero-search-bar {
+    background: white;
+    border-radius: 50px;
+    padding: 4px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    display: flex;
+    overflow: hidden;
+}
+
+.hero-search-bar input {
+    flex: 1;
+    border: none;
+    padding: 15px 20px;
+    font-size: 1rem;
+    outline: none;
+    background: transparent;
+}
+
+.hero-search-bar .search-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.hero-search-bar .search-btn:hover {
+    background: #3a5ce5;
+    transform: scale(1.05);
+}
+
+.quick-categories {
+    text-align: center;
+    margin-top: 12px;
+    color: white;
+    font-size: 0.85rem;
+}
+
+.quick-cat {
+    color: white;
+    text-decoration: none;
+    margin: 0 8px;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.quick-cat:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero {
+        height: 400px !important;
+    }
+    
+    .slide-content h2 {
+        font-size: 2rem;
+    }
+    
+    .slide-content p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero {
+        height: 350px !important;
+    }
+    
+    .slide-content h2 {
+        font-size: 1.8rem;
+    }
+    
+    .slide-content p {
+        font-size: 0.9rem;
+    }
+}
+
+#bags .section-title {
+  background: none;
+  text-align: center;
+  margin-top: 0;
+  padding: 25px 0;
+  margin-bottom: 40px;
+}
+
+/* Bold glossy red gradient text with stronger shadow */
+#bags .section-title h2 {
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-family: 'Georgia', serif;
+  background: linear-gradient(180deg, #a00000 0%, #b22222 40%, #ff4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #b22222; /* keeps the text visibly thick */
+  color: #b22222; /* fallback for other browsers */
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.8),   /* soft outer glow */
+    2px 2px 8px rgba(0, 0, 0, 0.6),      /* dark shadow for depth */
+    -2px -2px 4px rgba(255, 80, 80, 0.4); /* subtle highlight */
+}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="header-left">
+                <div class="logo" onclick="redirectToHome()">
+    <img src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" alt="ShopNest Logo" class="logo-img">
+    <span class="logo-text">ShopNest</span>
+</div>
+                <!-- <div class="logo"onclick="redirectToHome()">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span data-translate="logo_text">QuickCart</span>
+                </div> -->
+                <div class="search-bar">
+                    <input type="text" placeholder="Search for products, services..." data-translate-placeholder="">
+                    <div class="search-buttons">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
+                        <button class="mic-btn"><i class="fas fa-microphone"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="add1.html#wishlist?lang=en" data-page="wishlist"><i class="fas fa-heart"></i> <span data-translate="wishlist">Wishlist</span> <span class="wishlist-count">0</span></a>
+                <a href="add1.html#cart?lang=en" data-page="cart"><i class="fas fa-shopping-cart"></i> <span data-translate="cart">Cart</span> <span class="cart-count">0</span></a>
+                <div class="language-selector">
+                    <select id="language-select">
+                        <option value="en">English</option>
+                        <option value="hi">हिंदी</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="te">తెలుగు</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+    <nav>
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="add1.html#home?lang=en" data-page="home"><i class="fas fa-home"></i> <span data-translate="nav_home">Home</span></a></li>
+                <li><a href="add1.html#products?lang=en" data-page="home"><i class="fas fa-shopping-bag"></i> <span data-translate="nav_products">Products</span></a></li>
+                <li><a href="add1.html#services?lang=en" data-page="home"><i class="fas fa-tools"></i> <span data-translate="nav_services">Services</span></a></li>
+                <li><a href="add1.html#businesses?lang=en" data-page="home"><i class="fas fa-store"></i> <span data-translate="nav_businesses">Businesses</span></a></li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+<section class="hero" id="hero">
+    <div class="slider-container">
+        <!-- Background Images Slider -->
+        <div class="bg-slider-track">
+            <div class="bg-slide active" style="background-image: url('../IMAGES/bags-hero-1.jpg')"></div>
+            <div class="bg-slide" style="background-image: url('../IMAGES/bags-hero-2.png')"></div>
+            <div class="bg-slide" style="background-image: url('../IMAGES/bags-hero-3.jpg')"></div>
+        </div>
+        
+        <!-- Static Content Overlay -->
+        <div class="static-content">
+            <div class="slide-content active">
+                <!-- <h2 data-translate="slide1_title">Fresh Groceries Delivered</h2>
+                <p data-translate="slide1_desc">Get fresh produce and daily essentials delivered to your doorstep</p>
+                <a href="#categories" class="btn hero-btn" data-translate="shop_groceries">Shop Groceries</a> -->
+            </div>
+            <div class="slide-content">
+                <!-- <h2 data-translate="slide2_title">Local Businesses Near You</h2>
+                <p data-translate="slide2_desc">Support local vendors and discover unique products in your area</p>
+                <a href="#businesses" class="btn hero-btn" data-translate="explore_businesses">Explore Businesses</a> -->
+            </div>
+            <div class="slide-content">
+                <!-- <h2 data-translate="slide3_title">Fast & Reliable Delivery</h2>
+                <p data-translate="slide3_desc">Quick delivery services with real-time tracking</p>
+                <a href="#services" class="btn hero-btn" data-translate="learn_more">Learn More</a> -->
+            </div>
+        </div>
+        
+        <!-- Slider Controls -->
+        <div class="slider-controls">
+            <button class="slider-btn prev-btn" onclick="prevSlide()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="slider-btn next-btn" onclick="nextSlide()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <!-- Slider Indicators -->
+        <div class="slider-indicators">
+            <span class="indicator active" onclick="goToSlide(0)"></span>
+            <span class="indicator" onclick="goToSlide(1)"></span>
+            <span class="indicator" onclick="goToSlide(2)"></span>
+        </div>
+        
+        <!-- Search Bar
+        <div class="hero-search-container">
+            <div class="hero-search-bar">
+                <input type="text" placeholder="Search for products, businesses..." data-translate="search_placeholder">
+                <button class="search-btn" data-translate="search">
+                    <i class="fas fa-search"></i>
+                    Search
+                </button>
+            </div> -->
+            <div class="quick-categories">
+                <span data-translate="popular_categories">Popular: </span>
+                <a href="#categories" class="quick-cat">Food</a>
+                <a href="#categories" class="quick-cat">Electronics</a>
+                <a href="#categories" class="quick-cat">Fashion</a>
+                <a href="#categories" class="quick-cat">Home & Garden</a>
+            </div>
+        </div>
+    </div>
+</section>
+    <section id ="bags" class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2 data-translate="category_bags">Bags</h2>
+            </div>
+            <div class="product-grid">
+                <!-- Product 1 -->
+                 <div class="product-card" draggable="true" data-product='{"id":201,"name":"name_1","price":2999,"vendor":"vendor_1","image":"Leather Handbag.jpg","distance":"distance_1", "lat": 17.4486, "lon": 78.3908}'>
+                    <img src="IMAGES/Leather Handbag.jpg" alt="Leather Handbag" class="product-img" data-translate-product="name_1" onerror="this.src='https://via.placeholder.com/200x200?text=Leather+Handbag';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_1">Leather Handbag</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_1">Style Trends</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_1">Within 3 km</span></div>
+                        <div class="product-price">₹2999</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 2 -->
+                <div class="product-card" draggable="true" data-product='{"id":202,"name":"name_2","price":1999,"vendor":"vendor_2","image":"Backpack.jpg","distance":"distance_2", "lat": 17.4512, "lon": 78.3855}'>
+                    <img src="IMAGES/Backpack.jpg" alt="Backpack" class="product-img" data-translate-product="name_2" onerror="this.src='https://via.placeholder.com/200x200?text=Backpack';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_2">Backpack</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_2">Travel Gear</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_2">Within 4 km</span></div>
+                        <div class="product-price">₹1999</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 3 -->
+                <div class="product-card" draggable="true" data-product='{"id":203,"name":"name_3","price":3499,"vendor":"vendor_3","image":"Travel Duffel Bag.jpg","distance":"distance_3", "lat": 17.4421, "lon": 78.3882}'>
+                    <img src="IMAGES/Travel Duffel Bag.jpg" alt="Travel Duffel Bag" class="product-img" data-translate-product="name_3" onerror="this.src='https://via.placeholder.com/200x200?text=Travel+Duffel+Bag';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_3">Travel Duffel Bag</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_3">Adventure Outfitters</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_3">Within 2 km</span></div>
+                        <div class="product-price">₹3499</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 4 -->
+                <div class="product-card" draggable="true" data-product='{"id":204,"name":"name_4","price":1499,"vendor":"vendor_1","image":"Tote Bag.jpg","distance":"distance_4", "lat": 17.4550, "lon": 78.3920}'>
+                    <img src="IMAGES/Tote Bag.jpg" alt="Tote Bag" class="product-img" data-translate-product="name_4" onerror="this.src='https://via.placeholder.com/200x200?text=Tote+Bag';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_4">Tote Bag</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_1">Style Trends</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_4">Within 5 km</span></div>
+                        <div class="product-price">₹1499</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 5 -->
+                <div class="product-card" draggable="true" data-product='{"id":205,"name":"name_5","price":2499,"vendor":"vendor_4","image":"Laptop Bag.jpg","distance":"distance_5", "lat": 17.4399, "lon": 78.4421}'>
+                    <img src="IMAGES/Laptop Bag.jpg" alt="Laptop Bag" class="product-img" data-translate-product="name_5" onerror="this.src='https://via.placeholder.com/200x200?text=Laptop+Bag';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_5">Laptop Bag</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_4">Tech Carry</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_5">Within 6 km</span></div>
+                        <div class="product-price">₹2499</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 6 -->
+                <div class="product-card" draggable="true" data-product='{"id":206,"name":"name_6","price":999,"vendor":"vendor_5","image":"Clutch Purse.jpg","distance":"distance_1", "lat": 17.4455, "lon": 78.3800}'>
+                    <img src="IMAGES/Clutch Purse.jpg" alt="Clutch Purse" class="product-img" data-translate-product="name_6" onerror="this.src='https://via.placeholder.com/200x200?text=Clutch+Purse';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_6">Clutch Purse</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_5">Fashion Hub</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_1">Within 3 km</span></div>
+                        <div class="product-price">₹999</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 7 -->
+                <div class="product-card" draggable="true" data-product='{"id":207,"name":"name_7","price":1799,"vendor":"vendor_3","image":"Gym Bag.jpg","distance":"distance_2", "lat": 17.4480, "lon": 78.3890}'>
+                    <img src="IMAGES/Gym Bag.jpg" alt="Gym Bag" class="product-img" data-translate-product="name_7" onerror="this.src='https://via.placeholder.com/200x200?text=Gym+Bag';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_7">Gym Bag</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_3">Adventure Outfitters</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_2">Within 4 km</span></div>
+                        <div class="product-price">₹1799</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 8 -->
+                <div class="product-card" draggable="true" data-product='{"id":208,"name":"name_8","price":1299,"vendor":"vendor_1","image":"Crossbody Bag.jpg","distance":"distance_1", "lat": 17.4520, "lon": 78.3870}'>
+                    <img src="IMAGES/Crossbody Bag.jpg" alt="Crossbody Bag" class="product-img" data-translate-product="name_8" onerror="this.src='https://via.placeholder.com/200x200?text=Crossbody+Bag';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_8">Crossbody Bag</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_1">Style Trends</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_1">Within 3 km</span></div>
+                        <div class="product-price">₹1299</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 9 -->
+                <div class="product-card" draggable="true" data-product='{"id":209,"name":"name_9","price":3999,"vendor":"vendor_2","image":"Travel Backpack.jpg","distance":"distance_4", "lat": 17.4400, "lon": 78.3850}'>
+                    <img src="IMAGES/Travel Backpack.jpg" alt="Travel Backpack" class="product-img" data-translate-product="name_9" onerror="this.src='https://via.placeholder.com/200x200?text=Travel+Backpack';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_9">Travel Backpack</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_2">Travel Gear</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_4">Within 5 km</span></div>
+                        <div class="product-price">₹3999</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 10 -->
+                <div class="product-card" draggable="true" data-product='{"id":210,"name":"name_10","price":4999,"vendor":"vendor_5","image":"Designer Handbag.jpg","distance":"distance_2", "lat": 17.4490, "lon": 78.3950}'>
+                    <img src="IMAGES/Designer Handbag.jpg" alt="Designer Handbag" class="product-img" data-translate-product="name_10" onerror="this.src='https://via.placeholder.com/200x200?text=Designer+Handbag';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_10">Designer Handbag</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_5">Fashion Hub</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_2">Within 4 km</span></div>
+                        <div class="product-price">₹4999</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 11 -->
+                <div class="product-card" draggable="true" data-product='{"id":211,"name":"name_11","price":1599,"vendor":"vendor_1","image":"Sling Bag.jpg","distance":"distance_1", "lat": 17.4550, "lon": 78.3920}'>
+                    <img src="IMAGES/Sling Bag.jpg" alt="Sling Bag" class="product-img" data-translate-product="name_11" onerror="this.src='https://via.placeholder.com/200x200?text=Sling+Bag';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_11">Sling Bag</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_1">Style Trends</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_1">Within 3 km</span></div>
+                        <div class="product-price">₹1599</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 12 -->
+                <div class="product-card" draggable="true" data-product='{"id":212,"name":"name_12","price":7999,"vendor":"vendor_3","image":"Luggage Set.jpg","distance":"distance_3", "lat": 17.4430, "lon": 78.3860}'>
+                    <img src="IMAGES/Luggage Set.jpg" alt="Luggage Set" class="product-img" data-translate-product="name_12" onerror="this.src='https://via.placeholder.com/200x200?text=Luggage+Set';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_12">Luggage Set</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_3">Adventure Outfitters</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_3">Within 2 km</span></div>
+                        <div class="product-price">₹7999</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 13 -->
+                <div class="product-card" draggable="true" data-product='{"id":213,"name":"name_13","price":799,"vendor":"vendor_5","image":"Wallet.jpg","distance":"distance_4", "lat": 17.4500, "lon": 78.3840}'>
+                    <img src="IMAGES/Wallet.jpg" alt="Wallet" class="product-img" data-translate-product="name_13" onerror="this.src='https://via.placeholder.com/200x200?text=Wallet';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_13">Wallet</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_5">Fashion Hub</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_4">Within 5 km</span></div>
+                        <div class="product-price">₹799</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 14 -->
+                <div class="product-card" draggable="true" data-product='{"id":214,"name":"name_14","price":2199,"vendor":"vendor_4","image":"Messenger Bag.jpg","distance":"distance_2", "lat": 17.4470, "lon": 78.3910}'>
+                    <img src="IMAGES/Messenger Bag.jpg" alt="Messenger Bag" class="product-img" data-translate-product="name_14" onerror="this.src='https://via.placeholder.com/200x200?text=Messenger+Bag';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_14">Messenger Bag</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_4">Tech Carry</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_2">Within 4 km</span></div>
+                        <div class="product-price">₹2199</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product 15 -->
+                <div class="product-card" draggable="true" data-product='{"id":215,"name":"name_15","price":5999,"vendor":"vendor_2","image":"Trolley Bag.jpg","distance":"distance_3", "lat": 17.4400, "lon": 78.3850}'>
+                    <img src="IMAGES/Trolley Bag.jpg" alt="Trolley Bag" class="product-img" data-translate-product="name_15" onerror="this.src='https://via.placeholder.com/200x200?text=Trolley+Bag';">
+                    <div class="product-info">
+                        <h3 class="product-title" data-translate-product="name_15">Trolley Bag</h3>
+                        <div class="product-vendor"><i class="fas fa-store"></i> <span data-translate-vendor="vendor_2">Travel Gear</span></div>
+                        <div class="product-distance"><i class="fas fa-map-marker-alt"></i> <span data-translate-distance="distance_3">Within 2 km</span></div>
+                        <div class="product-price">₹5999</div>
+                        <div class="product-actions">
+                            <button class="like-btn"><i class="far fa-heart"></i></button>
+                            <button class="btn add-to-cart" data-translate="add_to_cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3 data-translate="footer_quickcart">ShopNest</h3>
+                    <p data-translate="footer_description">Your one-stop multi-vendor e-commerce solution. Shop from local businesses with delivery or pickup options.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_quick_links">Quick Links</h3>
+                    <ul>
+                        <li><a href="bags.html#home?lang=en" data-page="home" data-translate="footer_home">Home</a></li>
+                        <li><a href="bags.html#products?lang=en" data-page="home" data-translate="footer_products">Products</a></li>
+                        <li><a href="bags.html#services?lang=en" data-page="home" data-translate="footer_services">Services</a></li>
+                        <li><a href="bags.html#businesses?lang=en" data-page="home" data-translate="footer_businesses">Businesses</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_customer_support">Customer Support</h3>
+                    <ul>
+                        <li><a href="#" data-translate="footer_help_center">Help Center</a></li>
+                        <li><a href="#" data-translate="footer_faqs">FAQs</a></li>
+                        <li><a href="#" data-translate="footer_contact_us">Contact Us</a></li>
+                        <li><a href="#" data-translate="footer_return_policy">Return Policy</a></li>
+                        <li><a href="#" data-translate="footer_privacy_policy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3 data-translate="footer_contact_info">Contact Info</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Market St, City, Country</li>
+                        <li><i class="fas fa-phone"></i> <span data-translate="footer_phone">+1 234 567 8900</span></li>
+                        <li><i class="fas fa-envelope"></i> <span data-translate="footer_email">support@shopnest.com</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p data-translate="copyright">&copy; 2025 QuickCart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        let offers = [];
+        function saveCart() {
+            try {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            } catch (error) {
+                console.error('Error saving cart to localStorage:', error);
+            }
+        }
+
+        function saveWishlist() {
+            try {
+                localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            } catch (error) {
+                console.error('Error saving wishlist to localStorage:', error);
+            }
+        }
+        async function fetchOffers() {
+            try {
+                const res = await fetch('/api/offers');
+                offers = await res.json();
+                offers = offers.filter(o => o.active && new Date(o.startAt) <= new Date() && new Date(o.endAt) >= new Date());
+            } catch (error) {
+                console.error('Error fetching offers:', error);
+            }
+        }
+
+        const pageTranslations = {
+            en: {
+                logo_text: "ShopNest",
+                search_placeholder: "Search for products, services or businesses...",
+                nav_home: "Home",
+                nav_products: "Products",
+                nav_services: "Services",
+                nav_businesses: "Businesses",
+                login: "Login",
+                admin: "Admin",
+                sell: "Sell",
+                cart: "Cart",
+                wishlist: "Wishlist",
+                category_bags: "Bags",
+                add_to_cart: "Add to Cart",
+                footer_quickcart: "ShopNest",
+                footer_description: "Your one-stop multi-vendor e-commerce solution. Shop from local businesses with delivery or pickup options.",
+                footer_quick_links: "Quick Links",
+                footer_home: "Home",
+                footer_products: "Products",
+                footer_services: "Services",
+                footer_businesses: "Businesses",
+                footer_customer_support: "Customer Support",
+                footer_help_center: "Help Center",
+                footer_faqs: "FAQs",
+                footer_contact_us: "Contact Us",
+                footer_return_policy: "Return Policy",
+                footer_privacy_policy: "Privacy Policy",
+                footer_contact_info: "Contact Info",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. All rights reserved.",
+                name_1: "Leather Handbag",
+                vendor_1: "Style Trends",
+                name_2: "Backpack",
+                vendor_2: "Travel Gear", 
+                name_3: "Travel Duffel Bag",
+                vendor_3: "Adventure Outfitters",
+                name_4: "Tote Bag",
+                vendor_4: "Tech Carry", 
+                name_5: "Laptop Bag",
+                vendor_5: "Fashion Hub", 
+                name_6: "Clutch Purse",
+                vendor_6: "Fashion Hub", 
+                name_7: "Gym Bag",
+                vendor_7: "Adventure Outfitters", 
+                name_8: "Crossbody Bag",
+                vendor_8: "Style Trends", 
+                name_9: "Travel Backpack",
+                vendor_9: "Travel Gear", 
+                name_10: "Designer Handbag",
+                vendor_10: "Fashion Hub",
+                name_11: "Sling Bag",
+                vendor_11: "Style Trends",
+                name_12: "Luggage Set",
+                vendor_12: "Adventure Outfitters",
+                name_13: "Wallet",
+                vendor_13: "Fashion Hub",
+                name_14: "Messenger Bag",
+                vendor_14: "Tech Carry",
+                name_15: "Trolley Bag",
+                vendor_15: "Travel Gear",
+                distance_1: "Within 3 km",
+                distance_2: "Within 4 km",
+                distance_3: "Within 2 km",
+                distance_4: "Within 5 km",
+                distance_5: "Within 6 km"
+            },
+            hi: {
+                logo_text: "शॉपनेस्ट",
+                search_placeholder: "उत्पादों, सेवाओं या व्यवसायों की खोज करें...",
+                nav_home: "होम",
+                nav_products: "उत्पाद",
+                nav_services: "सेवाएँ",
+                nav_businesses: "व्यवसाय",
+                login: "लॉगिन",
+                admin: "एडमिन",
+                sell: "बेचें",
+                cart: "कार्ट",
+                wishlist: "इच्छा-सूची",
+                category_bags: "बैग",
+                add_to_cart: "कार्ट में जोड़ें",
+                footer_quickcart: "शॉपनेस्ट",
+                footer_description: "आपका एक-स्टॉप मल्टी-वेंडर ई-कॉमर्स समाधान। स्थानीय व्यवसायों से डिलीवरी या पिकअप विकल्प के साथ शॉपिंग करें।",
+                footer_quick_links: "त्वरित लिंक",
+                footer_home: "होम",
+                footer_products: "उत्पाद",
+                footer_services: "सेवाएँ",
+                footer_businesses: "व्यवसाय",
+                footer_customer_support: "ग्राहक समर्थन",
+                footer_help_center: "सहायता केंद्र",
+                footer_faqs: "FAQs",
+                footer_contact_us: "हमसे संपर्क करें",
+                footer_return_policy: "रिटर्न नीति",
+                footer_privacy_policy: "गोपनीयता नीति",
+                footer_contact_info: "संपर्क जानकारी",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025  ShopNest. सर्वाधिकार सुरक्षित।",
+                name_1: "लेदर हैंडबैग",
+                vendor_1: "स्टाइल ट्रेंड्स",
+                name_2: "बैकपैक",
+                vendor_2: "ट्रैवल गियर",
+                name_3: "ट्रैवल डफल बैग",
+                vendor_3: "एडवेंचर आउटफिटर्स",
+                name_4: "टोट बैग",
+                vendor_4: "टेक कैरी",
+                name_5: "लैपटॉप बैग",
+                vendor_5: "फैशन हब",
+                name_6: "क्लच पर्स",
+                vendor_6: "फैशन हब",
+                name_7: "जिम बैग",
+                vendor_7: "एडवेंचर आउटफिटर्स",
+                name_8: "क्रॉसबॉडी बैग",
+                vendor_8: "स्टाइल ट्रेंड्स",
+                name_9: "ट्रैवल बैकपैक",
+                vendor_9: "ट्रैवल गियर",
+                name_10: "डिज़ाइनर हैंडबैग",
+                vendor_10: "फैशन हब",
+                name_11: "स्लिंग बैग",
+                vendor_11: "स्टाइल ट्रेंड्स",
+                name_12: "लगेज सेट",
+                vendor_12: "एडवेंचर आउटफिटर्स",
+                name_13: "वॉलेट",
+                vendor_13: "फैशन हब",
+                name_14: "मैसेंजर बैग",
+                vendor_14: "टेक कैरी",
+                name_15: "ट्रॉली बैग",
+                vendor_15: "ट्रैवल गियर",
+                distance_1: "3 किमी के भीतर",
+                distance_2: "4 किमी के भीतर",
+                distance_3: "2 किमी के भीतर",
+                distance_4: "5 किमी के भीतर",
+                distance_5: "6 किमी के भीतर"
+            },
+            es: {
+                logo_text: "ShopNest",
+                search_placeholder: "Buscar productos, servicios o negocios...",
+                nav_home: "Inicio",
+                nav_products: "Productos",
+                nav_services: "Servicios",
+                nav_businesses: "Negocios",
+                login: "Iniciar Sesión",
+                admin: "Admin",
+                sell: "Vender",
+                cart: "Carrito",
+                wishlist: "Lista de deseos",
+                category_bags: "Bolsos",
+                add_to_cart: "Añadir al Carrito",
+                footer_quickcart: "ShopNest",
+                footer_description: "Tu solución de comercio electrónico multi-vendedor todo en uno. Compra de negocios locales con opciones de entrega o recogida.",
+                footer_quick_links: "Enlaces Rápidos",
+                footer_home: "Inicio",
+                footer_products: "Productos",
+                footer_services: "Servicios",
+                footer_businesses: "Negocios",
+                footer_customer_support: "Soporte al Cliente",
+                footer_help_center: "Centro de Ayuda",
+                footer_faqs: "Preguntas Frecuentes",
+                footer_contact_us: "Contáctanos",
+                footer_return_policy: "Política de Devoluciones",
+                footer_privacy_policy: "Política de Privacidad",
+                footer_contact_info: "Información de Contacto",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. Todos los derechos reservados.",
+                name_1: "Bolso de Cuero",
+                vendor_1: "Tendencias de Estilo",
+                name_2: "Mochila",
+                vendor_2: "Equipo de Viaje",
+                name_3: "Bolso de Viaje",
+                vendor_3: "Aventureros Equipados",
+                name_4: "Bolso Tote",
+                vendor_4: "Transporte Tecnológico",
+                name_5: "Bolso para Portátil",
+                vendor_5: "Centro de Moda",
+                name_6: "Cartera de Mano",
+                vendor_6: "Centro de Moda",
+                name_7: "Bolso de Gimnasio",
+                vendor_7: "Aventureros Equipados",
+                name_8: "Bolso Bandolera",
+                vendor_8: "Tendencias de Estilo",
+                name_9: "Mochila de Viaje",
+                vendor_9: "Equipo de Viaje",
+                name_10: "Bolso de Diseño",
+                vendor_10: "Centro de Moda",
+                name_11: "Bolso Sling",
+                vendor_11: "Tendencias de Estilo",
+                name_12: "Juego de Maletas",
+                vendor_12: "Aventureros Equipados",
+                name_13: "Billetera",
+                vendor_13: "Centro de Moda",
+                name_14: "Bolso Mensajero",
+                vendor_14: "Transporte Tecnológico",
+                name_15: "Bolso con Ruedas",
+                vendor_15: "Equipo de Viaje",
+                distance_1: "Dentro de 3 km",
+                distance_2: "Dentro de 4 km",
+                distance_3: "Dentro de 2 km",
+                distance_4: "Dentro de 5 km",
+                distance_5: "Dentro de 6 km"
+            },
+            fr: {
+                logo_text: "ShopNest",
+                search_placeholder: "Rechercher des produits, services ou entreprises...",
+                nav_home: "Accueil",
+                nav_products: "Produits",
+                nav_services: "Services",
+                nav_businesses: "Entreprises",
+                login: "Connexion",
+                admin: "Admin",
+                sell: "Vendre",
+                cart: "Panier",
+                wishlist: "Liste de souhaits",
+                category_bags: "Sacs",
+                add_to_cart: "Ajouter au Panier",
+                footer_quickcart: "ShopNest",
+                footer_description: "Votre solution e-commerce multi-vendeurs tout-en-un. Achetez auprès d'entreprises locales avec options de livraison ou ramassage.",
+                footer_quick_links: "Liens Rapides",
+                footer_home: "Accueil",
+                footer_products: "Produits",
+                footer_services: "Services",
+                footer_businesses: "Entreprises",
+                footer_customer_support: "Support Client",
+                footer_help_center: "Centre d'Aide",
+                footer_faqs: "FAQ",
+                footer_contact_us: "Contactez-Nous",
+                footer_return_policy: "Politique de Retour",
+                footer_privacy_policy: "Politique de Confidentialité",
+                footer_contact_info: "Informations de Contact",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. Tous droits réservés.",
+                name_1: "Sac à Main en Cuir",
+                vendor_1: "Tendances de Style",
+                name_2: "Sac à Dos",
+                vendor_2: "Équipement de Voyage",
+                name_3: "Sac de Voyage",
+                vendor_3: "Équipeurs d'Aventure",
+                name_4: "Sac Tote",
+                vendor_4: "Transport Technologique",
+                name_5: "Sac pour Ordinateur Portable",
+                vendor_5: "Centre de Mode",
+                name_6: "Pochette",
+                vendor_6: "Centre de Mode",
+                name_7: "Sac de Sport",
+                vendor_7: "Équipeurs d'Aventure",
+                name_8: "Sac Bandoulière",
+                vendor_8: "Tendances de Style",
+                name_9: "Sac à Dos de Voyage",
+                vendor_9: "Équipement de Voyage",
+                name_10: "Sac à Main de Créateur",
+                vendor_10: "Centre de Mode",
+                name_11: "Sac Sling",
+                vendor_11: "Tendances de Style",
+                name_12: "Ensemble de Valises",
+                vendor_12: "Équipeurs d'Aventure",
+                name_13: "Portefeuille",
+                vendor_13: "Centre de Mode",
+                name_14: "Sac Messager",
+                vendor_14: "Transport Technologique",
+                name_15: "Sac à Roulettes",
+                vendor_15: "Équipement de Voyage",
+                distance_1: "Dans un rayon de 3 km",
+                distance_2: "Dans un rayon de 4 km",
+                distance_3: "Dans un rayon de 2 km",
+                distance_4: "Dans un rayon de 5 km",
+                distance_5: "Dans un rayon de 6 km"
+            },
+            te: {
+                logo_text: "శాప్‌నెస్ట్",
+                search_placeholder: "ఉత్పత్తులు, సేవలు లేదా వ్యాపారాల కోసం శోధించండి...",
+                nav_home: "హోమ్",
+                nav_products: "ఉత్పత్తులు",
+                nav_services: "సేవలు",
+                nav_businesses: "వ్యాపారాలు",
+                login: "లాగిన్",
+                admin: "అడ్మిన్",
+                sell: "విక్రయించండి",
+                cart: "కార్ట్",
+                wishlist: "కోరికల జాబితా",
+                category_bags: "బ్యాగ్‌లు",
+                add_to_cart: "కార్ట్‌లో జోడించండి",
+                footer_quickcart: "శాప్‌నెస్ట్",
+                footer_description: "మీ మల్టీ-వెండర్ ఈ-కామర్స్ సొల్యూషన్ ఒక్కోస్తపు స్థలం. డెలివరీ లేదా పికప్ ఆప్షన్లతో స్థానిక వ్యాపారాల నుండి షాపింగ్ చేయండి.",
+                footer_quick_links: "క్విక్ లింక్స్",
+                footer_home: "హోమ్",
+                footer_products: "ఉత్పత్తులు",
+                footer_services: "సేవలు",
+                footer_businesses: "వ్యాపారాలు",
+                footer_customer_support: "కస్టమర్ సపోర్ట్",
+                footer_help_center: "హెల్ప్ సెంటర్",
+                footer_faqs: "FAQs",
+                footer_contact_us: "మమ్మల్ని సంప్రదించండి",
+                footer_return_policy: "రిటర్న్ పాలసీ",
+                footer_privacy_policy: "ప్రైవసీ పాలసీ",
+                footer_contact_info: "కాంటాక్ట్ ఇన్ఫో",
+                footer_phone: "+1 234 567 8900",
+                footer_email: "support@shopnest.com",
+                copyright: "© 2025 ShopNest. అన్ని హక్కులు రిజర్వ్ చేయబడ్డాయి.",
+                name_1: "లెదర్ హ్యాండ్‌బ్యాగ్",
+                vendor_1: "స్టైల్ ట్రెండ్స్",
+                name_2: "బ్యాక్‌ప్యాక్",
+                vendor_2: "ట్రావెల్ గేర్",
+                name_3: "ట్రావెల్ డఫెల్ బ్యాగ్",
+                vendor_3: "అడ్వెంచర్ ఔట్‌ఫిటర్స్",
+                name_4: "టోట్ బ్యాగ్",
+                vendor_4: "టెక్ క్యారీ",
+                name_5: "ల్యాప్‌టాప్ బ్యాగ్",
+                vendor_5: "ఫ్యాషన్ హబ్",
+                name_6: "క్లచ్ పర్స్",
+                vendor_6: "ఫ్యాషన్ హబ్",
+                name_7: "జిమ్ బ్యాగ్",
+                vendor_7: "అడ్వెంచర్ ఔట్‌ఫిటర్స్",
+                name_8: "క్రాస్‌బాడీ బ్యాగ్",
+                vendor_8: "స్టైల్ ట్రెండ్స్",
+                name_9: "ట్రావెల్ బ్యాక్‌ప్యాక్",
+                vendor_9: "ట్రావెల్ గేర్",
+                name_10: "డిజైనర్ హ్యాండ్‌బ్యాగ్",
+                vendor_10: "ఫ్యాషన్ హబ్",
+                name_11: "స్లింగ్ బ్యాగ్",
+                vendor_11: "స్టైల్ ట్రెండ్స్",
+                name_12: "లగేజ్ సెట్",
+                vendor_12: "అడ్వెంచర్ ఔట్‌ఫిటర్స్",
+                name_13: "వాలెట్",
+                vendor_13: "ఫ్యాషన్ హబ్",
+                name_14: "మెసెంజర్ బ్యాగ్",
+                vendor_14: "టెక్ క్యారీ",
+                name_15: "ట్రాలీ బ్యాగ్",
+                vendor_15: "ట్రావెల్ గేర్",
+                distance_1: "3 కి.మీ. లోపల",
+                distance_2: "4 కి.మీ. లోపల",
+                distance_3: "2 కి.మీ. లోపల",
+                distance_4: "5 కి.మీ. లోపల",
+                distance_5: "6 కి.మీ. లోపల"
+            }
+        };
+        document.addEventListener('DOMContentLoaded', async function() {
+            await fetchOffers();
+            updatePrices();
+            updateDistances();
+            const urlParams = new URLSearchParams(window.location.search);
+            let currentLanguage = urlParams.get('lang') || localStorage.getItem('language') || 'en';
+            const languageSelect = document.getElementById('language-select');
+            if (languageSelect) {
+                languageSelect.value = currentLanguage;
+            }
+            function translatePage() {
+                const trans = pageTranslations[currentLanguage];
+                document.querySelectorAll('[data-translate]').forEach(el => {
+                    const key = el.getAttribute('data-translate');
+                    if (trans[key]) el.textContent = trans[key];
+                });
+                document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-translate-placeholder');
+                    if (trans[key]) el.placeholder = trans[key];
+                });
+                document.querySelectorAll('[data-translate-product]').forEach(el => {
+                    const key = el.getAttribute('data-translate-product');
+                    if (trans[key]) {
+                        el.textContent = trans[key];
+                        if (el.tagName === 'H3') {
+                            const productCard = el.closest('.product-card');
+                            if (productCard) {
+                                const img = productCard.querySelector('.product-img');
+                                if (img) img.alt = trans[key];
+                            }
+                        }
+                    }
+                });
+                document.querySelectorAll('[data-translate-vendor]').forEach(el => {
+                    const key = el.getAttribute('data-translate-vendor');
+                    if (trans[key]) el.textContent = trans[key];
+                });
+                document.querySelectorAll('[data-translate-distance]').forEach(el => {
+                    const key = el.getAttribute('data-translate-distance');
+                    if (trans[key]) el.textContent = trans[key];
+                });
+                updateLinks();
+            }
+            function updateLinks() {
+                document.querySelectorAll('a[data-page]').forEach(link => {
+                    const baseHref = link.getAttribute('href').split('?')[0];
+                    link.href = baseHref + '?lang=' + currentLanguage;
+                });
+            }
+            if (languageSelect) {
+                languageSelect.addEventListener('change', function() {
+                    currentLanguage = this.value;
+                    localStorage.setItem('language', currentLanguage);
+                    updateLinks();
+                    translatePage();
+                    resetProductGrid();
+                });
+            }
+            translatePage();
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                card.addEventListener('dragstart', function(e) {
+                    const product = JSON.parse(card.getAttribute('data-product'));
+                    product.name = pageTranslations[currentLanguage][product.name] || product.name;
+                    product.vendor = pageTranslations[currentLanguage][product.vendor] || product.vendor;
+                    product.distance = pageTranslations[currentLanguage][product.distance] || product.distance;
+                    e.dataTransfer.setData('text/plain', JSON.stringify(product));
+                });
+            });
+
+            productCards.forEach(card => {
+                const image = card.querySelector('.product-img');
+                if (image) {
+                    image.style.cursor = 'pointer';
+                    image.addEventListener('click', () => {
+                        const product = JSON.parse(card.getAttribute('data-product'));
+                        window.location.href = `bags_product_detail.html?id=${product.id}&lang=${currentLanguage}`;
+                    });
+                }
+            });
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productCard = this.closest('.product-card');
+                    if (productCard) {
+                        const product = JSON.parse(productCard.getAttribute('data-product'));
+                        product.name = pageTranslations[currentLanguage][`name_${product.id - 200}`] || product.name;
+                        product.image = productCard.querySelector('.product-img').src;
+                        product.vendor = pageTranslations[currentLanguage][product.vendor] || product.vendor;
+                        product.distance = pageTranslations[currentLanguage][product.distance] || product.distance;
+                        addToCart(product, 1, this);
+                    }
+                });
+            });
+            productCards.forEach(card => {
+                const product = JSON.parse(card.getAttribute('data-product'));
+                if (cart.some(item => item.id === product.id)) {
+                    const button = card.querySelector('.add-to-cart');
+                    if (button) {
+                        const newButton = button.cloneNode(true);
+                        newButton.textContent = 'Go to Cart';
+                        newButton.classList.remove('add-to-cart');
+                        newButton.classList.add('go-to-cart');
+                        button.parentNode.replaceChild(newButton, button);
+                        newButton.onclick = () => window.location.href = 'add1.html#cart';
+                    }
+                }
+            });
+            const likeButtons = document.querySelectorAll('.like-btn');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productCard = this.closest('.product-card');
+                    if (productCard) {
+                        const product = JSON.parse(productCard.getAttribute('data-product'));
+                        toggleWishlist(product, this);
+                    }
+                });
+                const product = JSON.parse(button.closest('.product-card').getAttribute('data-product'));
+                if (wishlist.some(item => item.id === product.id)) {
+                    button.innerHTML = '<i class="fas fa-heart"></i>';
+                    button.style.color = 'var(--secondary)';
+                }
+            });
+            const searchInput = document.querySelector('.search-bar input');
+            const searchButton = document.querySelector('.search-bar .search-btn');
+            const micButton = document.querySelector('.search-bar .mic-btn');
+            function resetProductGrid() {
+                productCards.forEach(card => {
+                    card.classList.remove('hidden');
+                });
+            }
+            function performSearch() {
+                const query = searchInput.value.trim().toLowerCase();
+                if (!query) {
+                    resetProductGrid();
+                    return;
+                }
+                const productCards = document.querySelectorAll('.product-card');
+                let found = false;
+                let firstMatch = null;
+                productCards.forEach(card => {
+                    const product = JSON.parse(card.getAttribute('data-product'));
+                    const translatedName = pageTranslations[currentLanguage][product.name] || product.name;
+                    const translatedVendor = pageTranslations[currentLanguage][product.vendor] || product.vendor;
+                    const translatedDistance = pageTranslations[currentLanguage][product.distance] || product.distance;
+                    if (translatedName.toLowerCase().includes(query) || translatedVendor.toLowerCase().includes(query) || translatedDistance.toLowerCase().includes(query)) {
+                        if (!found) {
+                            firstMatch = card;
+                            found = true;
+                        } else {
+                            card.classList.add('hidden');
+                        }
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+                if (found) {
+                    firstMatch.classList.remove('hidden');
+                    firstMatch.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert(`No products found for "${query}"`);
+                    resetProductGrid();
+                }
+                searchInput.value = '';
+            }
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performSearch();
+                    }
+                });
+            }
+            if (searchButton) {
+                searchButton.addEventListener('click', performSearch);
+            }
+            let recognition = null;
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    searchInput.value = transcript;
+                    performSearch();
+                };
+                recognition.onerror = function(event) {
+                    alert('Error with speech recognition: ' + event.error);
+                    micButton.classList.remove('active');
+                };
+                recognition.onend = function() {
+                    micButton.classList.remove('active');
+                };
+                if (micButton) {
+                    micButton.addEventListener('click', function() {
+                        if (micButton.classList.contains('active')) {
+                            recognition.stop();
+                            micButton.classList.remove('active');
+                        } else {
+                            let lang = 'en-US';
+                            if (currentLanguage === 'hi') lang = 'hi-IN';
+                            else if (currentLanguage === 'es') lang = 'es-ES';
+                            else if (currentLanguage === 'fr') lang = 'fr-FR';
+                            else if (currentLanguage === 'te') lang = 'te-IN';
+                            recognition.lang = lang;
+                            recognition.start();
+                            micButton.classList.add('active');
+                        }
+                    });
+                }
+                languageSelect.addEventListener('change', function() {
+                    if (recognition) {
+                        let lang = 'en-US';
+                        if (this.value === 'hi') lang = 'hi-IN';
+                        else if (this.value === 'es') lang = 'es-ES';
+                        else if (this.value === 'fr') lang = 'fr-FR';
+                        else if (this.value === 'te') lang = 'te-IN';
+                        recognition.lang = lang;
+                    }
+                });
+            } else {
+                if (micButton) {
+                    micButton.style.display = 'none';
+                }
+            }
+            updateCart();
+            updateWishlist();
+        });
+        function addToCart(product, quantity = 1, button) {
+            const existingItem = cart.find(item => item.id === product.id);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({ ...product, quantity });
+            }
+            updateCart();
+            saveCart();
+            if (button) { // To prevent the old listener from firing, we clone and replace the button 
+                const newButton = button.cloneNode(true);
+                newButton.textContent = 'Go to Cart';
+                newButton.classList.remove('add-to-cart');
+                newButton.classList.add('go-to-cart');
+                button.parentNode.replaceChild(newButton, button);
+                newButton.onclick = function() { window.location.href = 'add1.html#cart'; };
+            }
+        }
+        function toggleWishlist(product, button) {
+            const productCard = button.closest('.product-card');
+            product.name = productCard.querySelector('.product-title').textContent;
+            product.image = productCard.querySelector('.product-img').src;
+            product.vendor = productCard.querySelector('.product-vendor span').textContent;
+
+            const existingIndex = wishlist.findIndex(item => item.id === product.id);
+            if (existingIndex > -1) {
+                wishlist.splice(existingIndex, 1);
+                button.innerHTML = '<i class="far fa-heart"></i>';
+                button.style.color = 'var(--gray)';
+                alert(`${product.name} removed from wishlist!`);
+            } else {
+                wishlist.push(product);
+                button.innerHTML = '<i class="fas fa-heart"></i>';
+                button.style.color = 'var(--secondary)';
+                alert(`${product.name} added to wishlist!`);
+            }
+            updateWishlist();
+            saveWishlist();
+        }
+        function increaseQuantity(index) {
+            if (cart[index]) {
+                cart[index].quantity += 1;
+                updateCart();
+                saveCart();
+            }
+        }
+        function decreaseQuantity(index) {
+            if (cart[index]) {
+                if (cart[index].quantity > 1) {
+                    cart[index].quantity -= 1;
+                } else {
+                    cart.splice(index, 1);
+                }
+                updateCart();
+                saveCart();
+            }
+        }
+        function removeFromCart(index) {
+            if (cart[index]) {
+                cart.splice(index, 1);
+                updateCart();
+                saveCart();
+            }
+        }
+        function updateCart() {
+            const cartCount = document.querySelector('.cart-count');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+        }
+        function updateWishlist() {
+            const wishlistCount = document.querySelector('.wishlist-count');
+            if (wishlistCount)
+                wishlistCount.textContent = wishlist.length;
+        }
+
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const d = R * c; // Distance in km
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        function updateDistances() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+
+                    document.querySelectorAll('.product-card').forEach(card => {
+                        const productData = JSON.parse(card.getAttribute('data-product'));
+                        if (productData.lat && productData.lon) {
+                            const distance = getDistanceFromLatLonInKm(userLat, userLon, productData.lat, productData.lon);
+                            const distanceSpan = card.querySelector('.product-distance span');
+                            if (distanceSpan) {
+                                distanceSpan.textContent = `${distance.toFixed(1)} km away`;
+                            }
+                        }
+                    });
+                }, error => {
+                    console.warn(`Geolocation error: ${error.message}. Showing default distances.`);
+                });
+            } else {
+                console.warn("Geolocation is not supported by this browser. Showing default distances.");
+            }
+        }
+
+        function updatePrices() {
+            const category = 'bags';
+            document.querySelectorAll('.product-card').forEach(card => {
+                const productData = JSON.parse(card.getAttribute('data-product'));
+                const priceElement = card.querySelector('.product-price');
+                const originalPrice = productData.price;
+                let bestDiscountedPrice = originalPrice;
+                let discountText = '';
+                let applicableOffer = null;
+
+                offers.forEach(offer => {
+                    if (offer.appliesTo && (offer.appliesTo.toLowerCase().includes(category) || offer.appliesTo.toLowerCase().includes('all')) && originalPrice >= (offer.minOrder || 0)) {
+                        let currentDiscountedPrice = originalPrice;
+                        let currentDiscountText = '';
+                        if (offer.type === 'percent') {
+                            const discount = originalPrice * (offer.value / 100);
+                            if (discount > 0) {
+                                currentDiscountedPrice = originalPrice - discount;
+                                currentDiscountText = `off ${offer.value}%`;
+                            }
+                        } else if (offer.type === 'flat') {
+                            const discount = offer.value;
+                            if (discount > 0 && discount < originalPrice) {
+                                currentDiscountedPrice = originalPrice - discount;
+                                currentDiscountText = `₹${offer.value} off`;
+                            }
+                        }
+                        if (currentDiscountedPrice < bestDiscountedPrice) {
+                            bestDiscountedPrice = currentDiscountedPrice;
+                            discountText = currentDiscountText;
+                            applicableOffer = offer;
+                        }
+                    }
+                });
+                if (applicableOffer) {
+                    priceElement.innerHTML = `<span class="original-price">₹${originalPrice.toLocaleString()}</span> <span class="discounted-price">₹${Math.round(bestDiscountedPrice).toLocaleString()}</span> <span class="discount-badge">${discountText}</span>`;
+                }
+            });
+        }
+         function redirectToHome() {
+    window.location.href = "add1.html";
+  }
+  // Hero Slider Functionality
+let currentSlide = 0;
+const bgSlides = document.querySelectorAll('.bg-slide');
+const contentSlides = document.querySelectorAll('.slide-content');
+const indicators = document.querySelectorAll('.indicator');
+const totalSlides = bgSlides.length;
+const bgSliderTrack = document.querySelector('.bg-slider-track');
+let autoSlideInterval;
+
+// Initialize slider
+function initSlider() {
+    setHeroHeight();
+    updateSlider();
+    startAutoSlide();
+    
+    // Pause auto-slide on hover
+    const sliderContainer = document.querySelector('.slider-container');
+    sliderContainer.addEventListener('mouseenter', pauseAutoSlide);
+    sliderContainer.addEventListener('mouseleave', startAutoSlide);
+    
+    // Update height on resize
+    window.addEventListener('resize', setHeroHeight);
+}
+
+// Set hero height based on screen size
+function setHeroHeight() {
+    const hero = document.querySelector('.hero');
+    const screenWidth = window.innerWidth;
+    
+    if (screenWidth <= 576) {
+        hero.style.height = '350px';
+    } else if (screenWidth <= 768) {
+        hero.style.height = '400px';
+    } else {
+        hero.style.height = '600px';
+    }
+}
+
+// Update slider - only move background images
+function updateSlider() {
+    // Move background images
+    bgSliderTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+    
+    // Update content visibility
+    contentSlides.forEach((content, index) => {
+        content.classList.toggle('active', index === currentSlide);
+    });
+    
+    // Update indicators
+    indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === currentSlide);
+    });
+    
+    // Update background slides
+    bgSlides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === currentSlide);
+    });
+}
+
+// Next slide function
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateSlider();
+    resetAutoSlide();
+}
+
+// Previous slide function
+function prevSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    updateSlider();
+    resetAutoSlide();
+}
+
+// Go to specific slide
+function goToSlide(slideIndex) {
+    currentSlide = slideIndex;
+    updateSlider();
+    resetAutoSlide();
+}
+
+// Auto slide functionality
+function startAutoSlide() {
+    autoSlideInterval = setInterval(nextSlide, 5000);
+}
+
+function pauseAutoSlide() {
+    clearInterval(autoSlideInterval);
+}
+
+function resetAutoSlide() {
+    pauseAutoSlide();
+    startAutoSlide();
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initSlider();
+});
+
+// Export functions for global access
+window.nextSlide = nextSlide;
+window.prevSlide = prevSlide;
+window.goToSlide = goToSlide;
+
+    </script>
+</body>
+</html>

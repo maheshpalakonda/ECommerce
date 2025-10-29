@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        :root {
+            --primary: #4a6cfa;
+            --secondary: #ff6b6b;
+            --accent: #42b883;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border: #e1e5eb;
+        }
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+        }
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background: linear-gradient(to right, var(--primary), #6c8fff);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .header-actions a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+        .cart-count, .wishlist-count {
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .product-detail-container {
+            background-color: white;
+            padding: 40px;
+            margin-top: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 40px;
+        }
+        .product-images {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .main-image img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .thumbnail-track {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+        }
+        .thumbnail-track img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .thumbnail-track img.active, .thumbnail-track img:hover {
+            border-color: var(--primary);
+        }
+        .product-details h1 {
+            font-size: 16px;
+            color: var(--gray);
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .product-distance i {
+            margin-right: 8px;
+        }
+        .product-details h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .product-vendor {
+            font-size: 16px;
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        .product-price {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        .product-price {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 24px;
+        }
+        .discount-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .product-description h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 5px;
+        }
+        .product-description p {
+            line-height: 1.7;
+            color: #555;
+        }
+        .product-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            align-items: center;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        .go-to-cart {
+            background: var(--primary);
+        }
+        .go-to-cart:hover {
+            background: #3a5ce5;
+        }
+        .wishlist-heart-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: var(--gray);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .wishlist-heart-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .wishlist-heart-btn.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+            animation: pop 0.3s ease-out;
+        }
+
+        .timing-info {
+            margin-top: 30px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+        .timing-info h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .timing-info p {
+            font-size: 16px;
+            color: var(--gray);
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .product-detail-container {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            .product-details h1 {
+                font-size: 26px;
+            }
+            .main-image img {
+                height: 300px;
+            }
+        }
+
+        /* Related Products Section */
+        .related-products-section {
+            margin-top: 50px;
+        }
+        .related-products-section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .related-product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .related-product-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--dark);
+        }
+        .related-product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .related-product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .related-product-info {
+            padding: 15px;
+        }
+        .related-product-info h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <div class="logo" onclick="window.location.href='add1.html'">
+                <i class="fas fa-shopping-bag"></i> ShopNest
+            </div>
+            <div class="header-actions">
+                <a href="add1.html#wishlist"><i class="fas fa-heart"></i> Wishlist <span class="wishlist-count">0</span></a>
+                <a href="add1.html#cart"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span></a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <a href="service.html" id="back-to-services" class="back-link">&larr; Back to Services</a>
+        <div class="product-detail-container">
+            <div class="product-images">
+                <div class="main-image">
+                    <img id="main-product-image" src="https://via.placeholder.com/400x400?text=Loading..." alt="Service Image">
+                </div>
+                <div class="thumbnail-track" id="thumbnail-track">
+                    <!-- Thumbnails will be injected here -->
+                </div>
+            </div>
+            <div class="product-details">
+                <h1 id="product-name">Service Name</h1>
+                <p class="product-vendor" id="product-vendor">by Vendor</p>
+                <div class="product-price" id="product-price">₹0.00</div>
+                <div class="product-description">
+                    <h3>Description</h3>
+                    <p id="product-description">Service description goes here. This is a high-quality service provided by a trusted professional.</p>
+                </div>
+                <div class="product-distance">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="product-distance">Calculating distance...</span>
+                </div>
+                <div class="timing-info">
+                    <h3>Available Timings</h3>
+                    <p id="product-timing"></p>
+                </div>
+                <div class="product-actions">
+                    <button class="btn" id="add-to-cart-btn">Book Now</button>
+                    <button class="wishlist-heart-btn" id="add-to-wishlist-btn" title="Add to Wishlist"><i class="far fa-heart"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Products Section -->
+        <div class="related-products-section">
+            <h2>You might also like</h2>
+            <div class="related-product-grid" id="related-products-grid">
+                <!-- Related products will be injected here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const allProducts = {
+            "1801": { id: 1801, name: "Smartphone Screen Repair", price: 2999, vendor: "TechFix", image: "smartphonerepair.jpg", timing: "Mon-Sat, 10 AM - 7 PM", otherImages: ["smartphonerepair1.jpg", "smartphonerepair2.jpg", "smartphonerepair3.jpg"], lat: 17.4486, lon: 78.3908 },
+            "1802": { id: 1802, name: "Laptop Repair", price: 4999, vendor: "GadgetCare", image: "laptop repair.jpg", timing: "Mon-Fri, 9 AM - 6 PM", otherImages: ["laptop repair1.jpg", "laptop repair2.jpg", "laptop repair3.jpg"], lat: 17.4512, lon: 78.3855 },
+            "1803": { id: 1803, name: "Tablet Repair", price: 3999, vendor: "DeviceMasters", image: "tablet repair.jpg", timing: "Mon-Sat, 11 AM - 8 PM", otherImages: ["tablet repair1.jpg", "tablet repair2.jpg", "tablet repair3.jpg"], lat: 17.4421, lon: 78.3882 },
+            "1804": { id: 1804, name: "Smartwatch Repair", price: 2499, vendor: "RepairPro", image: "smartwatch repair.jpg", timing: "Tue-Sun, 10 AM - 6 PM", otherImages: ["smartwatch repair1.jpg", "smartwatch repair2.jpg", "smartwatch repair3.jpg"], lat: 17.4550, lon: 78.3920 },
+            "1805": { id: 1805, name: "AC Repair", price: 1999, vendor: "CoolFix", image: "ac repair.jpg", timing: "Mon-Sun, 9 AM - 9 PM", otherImages: ["ac repair1.jpg", "ac repair2.jpg", "ac repair3.jpg"], lat: 17.4399, lon: 78.4421 },
+            "1806": { id: 1806, name: "Washing Machine Repair", price: 3499, vendor: "WashTech", image: "washing machine repair.jpg", timing: "Mon-Sat, 9 AM - 7 PM", otherImages: ["washing machine repair1.jpg", "washing machine repair2.jpg", "washing machine repair3.jpg"], lat: 17.4455, lon: 78.3800 },
+            "1807": { id: 1807, name: "Refrigerator Repair", price: 2999, vendor: "FridgeMasters", image: "refrigerator repair.jpg", timing: "Mon-Sun, 8 AM - 8 PM", otherImages: ["refrigerator repair1.jpg", "refrigerator repair2.jpg", "refrigerator repair3.jpg"], lat: 17.4480, lon: 78.3890 },
+            "1808": { id: 1808, name: "Microwave Repair", price: 1499, vendor: "OvenFix", image: "microwave repair.jpg", timing: "Mon-Fri, 10 AM - 5 PM", otherImages: ["microwave repair1.jpg", "microwave repair2.jpg", "microwave repair3.jpg"], lat: 17.4520, lon: 78.3870 },
+            "1809": { id: 1809, name: "Home Cleaning", price: 1999, vendor: "CleanMasters", image: "home cleaning.jpg", timing: "Mon-Sun, 8 AM - 6 PM", otherImages: ["home cleaning1.jpg", "home cleaning2.jpg", "home cleaning3.jpg"], lat: 17.4400, lon: 78.3850 },
+            "1810": { id: 1810, name: "Office Cleaning", price: 3499, vendor: "OfficeShine", image: "office cleaning.jpg", timing: "Mon-Fri, 6 PM - 10 PM", otherImages: ["office cleaning1.jpg", "office cleaning2.jpg", "office cleaning3.jpg"], lat: 17.4490, lon: 78.3950 },
+            "1811": { id: 1811, name: "Carpet Cleaning", price: 2499, vendor: "CarpetPro", image: "carpet cleaning.jpg", timing: "Mon-Sat, 9 AM - 5 PM", otherImages: ["carpet cleaning1.jpg", "carpet cleaning2.jpg", "carpet cleaning3.jpg"], lat: 17.4550, lon: 78.3920 },
+            "1812": { id: 1812, name: "Window Cleaning", price: 1799, vendor: "WindowGlow", image: "window cleaning.jpg", timing: "Mon-Fri, 9 AM - 4 PM", otherImages: ["window cleaning1.jpg", "window cleaning2.jpg", "window cleaning3.jpeg"], lat: 17.4430, lon: 78.3860 },
+            "1813": { id: 1813, name: "Deep Cleaning", price: 2999, vendor: "DeepCleaners", image: "deep cleaning.jpg", timing: "Mon-Sun, 9 AM - 7 PM", otherImages: ["deep cleaning1.jpg", "deep cleaning2.jpg", "deep cleaning3.jpg"], lat: 17.4500, lon: 78.3840 },
+            "1814": { id: 1814, name: "Bathroom Cleaning", price: 1499, vendor: "BathSpark", image: "bathroom cleaning.jpg", timing: "Mon-Sat, 10 AM - 6 PM", otherImages: ["bathroom cleaning1.jpg", "bathroom cleaning2.jpg", "bathroom cleaning3.jpg"], lat: 17.4470, lon: 78.3910 },
+            "1815": { id: 1815, name: "Kitchen Cleaning", price: 1999, vendor: "KitchenBright", image: "kitchen cleaning.jpeg", timing: "Mon-Sat, 10 AM - 6 PM", otherImages: ["kitchen cleaning1.jpeg", "kitchen cleaning2.jpeg", "kitchen cleaning3.jpeg"], lat: 17.4400, lon: 78.3850 },
+            "1816": { id: 1816, name: "Sofa Cleaning", price: 2499, vendor: "SofaFresh", image: "sofa cleaning.jpeg", timing: "Mon-Sun, 9 AM - 5 PM", otherImages: ["sofa cleaning1.jpeg", "sofa cleaning2.jpeg", "sofa cleaning3.jpeg"], lat: 17.4486, lon: 78.3908 },
+            "1817": { id: 1817, name: "Salon at Home", price: 1999, vendor: "BeautyHome", image: "salon at home.jpeg", timing: "Mon-Sun, 10 AM - 8 PM", otherImages: ["salon at home2.jpeg", "salon at home.jpeg", "salon at home2.jpeg"], lat: 17.4512, lon: 78.3855 },
+            "1818": { id: 1818, name: "Spa at Home", price: 2999, vendor: "SpaRelax", image: "spa at home.jpeg", timing: "Mon-Sun, 11 AM - 9 PM", otherImages: ["spa at home1.jpeg", "spa at home2.jpeg", "spa at home3.jpeg"], lat: 17.4421, lon: 78.3882 },
+            "1819": { id: 1819, name: "Massage Therapy", price: 2499, vendor: "MassagePro", image: "massage therapy.jpeg", timing: "Mon-Sun, 10 AM - 10 PM", otherImages: ["massage therapy1.jpeg", "massage therapy2.jpeg", "massage therapy3.jpeg"], lat: 17.4550, lon: 78.3920 },
+            "1820": { id: 1820, name: "Haircut for Men", price: 999, vendor: "HairStyle", image: "haircut men.jpg", timing: "Tue-Sun, 10 AM - 9 PM", otherImages: ["haircut men1.jpeg", "haircut men2.jpeg", "haircut men3.jpeg"], lat: 17.4399, lon: 78.4421 },
+            "1821": { id: 1821, name: "Manicure", price: 1499, vendor: "NailArt", image: "manicure.jpeg", timing: "Mon-Sat, 11 AM - 7 PM", otherImages: ["manicure1.jpeg", "manicure2.jpeg", "manicure3.jpeg"], lat: 17.4455, lon: 78.3800 },
+            "1822": { id: 1822, name: "Pedicure", price: 1499, vendor: "FootCare", image: "pedicure.jpeg", timing: "Mon-Sat, 11 AM - 7 PM", otherImages: ["pedicure1.jpeg", "pedicure2.jpeg", "pedicure3.jpeg"], lat: 17.4480, lon: 78.3890 },
+            "1823": { id: 1823, name: "Facial", price: 1999, vendor: "FaceGlow", image: "facial.jpeg", timing: "Mon-Sun, 10 AM - 8 PM", otherImages: ["facial1.jpeg", "facial2.jpeg", "facial3.jpeg"], lat: 17.4520, lon: 78.3870 },
+            "1824": { id: 1824, name: "Waxing", price: 999, vendor: "WaxSmooth", image: "Waxing Service.jpg", timing: "Mon-Sat, 10 AM - 7 PM", otherImages: ["Waxing Service1.jpeg", "Waxing Service2.jpeg", "Waxing Service3.jpeg"], lat: 17.4400, lon: 78.3850 }
+        };
+
+        let offers = [];
+
+        async function fetchOffers() {
+            try {
+                const res = await fetch('/api/offers');
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                const data = await res.json();
+                offers = data.filter(o => o.active && new Date(o.startAt) <= new Date() && new Date(o.endAt) >= new Date());
+            } catch (error) {
+                console.error('Error fetching offers:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            const lang = urlParams.get('lang') || 'en';
+            const product = allProducts[productId];
+            
+            await fetchOffers();
+            let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            if (product) {
+                document.getElementById('back-to-services').href = `service.html?lang=${lang}`;
+
+                document.title = product.name;
+                document.getElementById('product-name').textContent = product.name;
+                document.getElementById('product-vendor').textContent = `by ${product.vendor}`;
+                
+                const priceElement = document.getElementById('product-price');
+                const originalPrice = product.price;
+                let bestDiscountedPrice = originalPrice;
+                let discountText = '';
+                let applicableOffer = null;
+                const category = 'service';
+
+                offers.forEach(offer => {
+                    if (offer.appliesTo && (offer.appliesTo.toLowerCase().includes(category) || offer.appliesTo.toLowerCase().includes('all')) && originalPrice >= (offer.minOrder || 0)) {
+                        let currentDiscountedPrice = originalPrice;
+                        let currentDiscountText = '';
+
+                        if (offer.type === 'percent') {
+                            currentDiscountedPrice = originalPrice - (originalPrice * (offer.value / 100));
+                            currentDiscountText = `${offer.value}% off`;
+                        } else if (offer.type === 'flat' && offer.value < originalPrice) {
+                            currentDiscountedPrice = originalPrice - offer.value;
+                            currentDiscountText = `₹${offer.value} off`;
+                        }
+
+                        if (currentDiscountedPrice < bestDiscountedPrice) {
+                            bestDiscountedPrice = currentDiscountedPrice;
+                            discountText = currentDiscountText;
+                            applicableOffer = offer;
+                        }
+                    }
+                });
+
+                priceElement.innerHTML = applicableOffer ? `<span class="original-price">₹${originalPrice.toLocaleString()}</span> <span class="discounted-price">₹${Math.round(bestDiscountedPrice).toLocaleString()}</span> <span class="discount-badge">${discountText}</span>` : `₹${originalPrice.toLocaleString()}`;
+
+                document.getElementById('main-product-image').src = `IMAGES/${product.image}`;
+                document.getElementById('main-product-image').alt = product.name;
+
+                document.getElementById('product-timing').textContent = product.timing || 'Timings not available';
+
+                const thumbTrack = document.getElementById('thumbnail-track');
+                let images = [`IMAGES/${product.image}`];
+                if (product.otherImages && product.otherImages.length > 0) {
+                    images = images.concat(product.otherImages.map(img => `IMAGES/${img}`));
+                } else {
+                    // Fallback to placeholders if no other images are specified
+                    images.push('https://via.placeholder.com/200x200?text=Angle+2', 'https://via.placeholder.com/200x200?text=Angle+3', 'https://via.placeholder.com/200x200?text=Angle+4');
+                }
+
+                images.forEach((imgSrc, index) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = imgSrc;
+                    thumb.classList.add('thumbnail');
+                    if (index === 0) thumb.classList.add('active');
+                    thumb.onclick = () => {
+                        document.getElementById('main-product-image').src = imgSrc;
+                        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                        thumb.classList.add('active');
+                    };
+                    thumbTrack.appendChild(thumb);
+                });
+
+                const addToCartBtn = document.getElementById('add-to-cart-btn');
+                const isInCart = cart.some(item => item.id === product.id);
+
+                function handleAddToCartClick() {
+                    addToCart(product);
+                    updateButtonToGoToCart(addToCartBtn);
+                    addToCartBtn.removeEventListener('click', handleAddToCartClick);
+                }
+
+                if (isInCart) {
+                    updateButtonToGoToCart(addToCartBtn);
+                } else {
+                    addToCartBtn.addEventListener('click', handleAddToCartClick);
+                }
+
+                const wishlistBtn = document.getElementById('add-to-wishlist-btn');
+                
+                function updateWishlistButtonState(isInWishlist) {
+                    isInWishlist = (typeof isInWishlist === 'boolean') ? isInWishlist : wishlist.some(item => item.id === product.id);
+
+                    if (isInWishlist) {
+                        wishlistBtn.innerHTML = '<i class="fas fa-heart"></i>';
+                        wishlistBtn.classList.add('active');
+                    } else {
+                        wishlistBtn.innerHTML = '<i class="far fa-heart"></i>';
+                        wishlistBtn.classList.remove('active');
+                    }
+                }
+                updateWishlistButtonState();
+
+                wishlistBtn.addEventListener('click', () => {
+                    toggleWishlist(product, updateWishlistButtonState);
+                });
+
+                // Render related products
+                const relatedProductsGrid = document.getElementById('related-products-grid');
+                const relatedProducts = Object.values(allProducts)
+                    .filter(p => p.id !== product.id) // Exclude the current product
+                    .sort(() => 0.5 - Math.random()) // Shuffle to show random products
+                    .slice(0, 4); // Take the first 4
+
+                relatedProducts.forEach(related => {
+                    const originalPrice = related.price;
+                    let bestDiscountedPrice = originalPrice;
+                    let discountText = '';
+                    let applicableOffer = null;
+                    const category = 'service';
+
+                    offers.forEach(offer => {
+                        if (offer.appliesTo && (offer.appliesTo.toLowerCase().includes(category) || offer.appliesTo.toLowerCase().includes('all')) && originalPrice >= (offer.minOrder || 0)) {
+                            let currentDiscountedPrice = originalPrice;
+                            let currentDiscountText = '';
+
+                            if (offer.type === 'percent') {
+                                currentDiscountedPrice = originalPrice - (originalPrice * (offer.value / 100));
+                                currentDiscountText = `${offer.value}% off`;
+                            } else if (offer.type === 'flat' && offer.value < originalPrice) {
+                                currentDiscountedPrice = originalPrice - offer.value;
+                                currentDiscountText = `₹${offer.value} off`;
+                            }
+
+                            if (currentDiscountedPrice < bestDiscountedPrice) {
+                                bestDiscountedPrice = currentDiscountedPrice;
+                                discountText = currentDiscountText;
+                                applicableOffer = offer;
+                            }
+                        }
+                    });
+
+                    const priceHTML = applicableOffer ? `<span class="original-price" style="font-size: 14px;">₹${originalPrice.toLocaleString()}</span> <span class="discounted-price">₹${Math.round(bestDiscountedPrice).toLocaleString()}</span> <span class="discount-badge" style="font-size: 10px;">${discountText}</span>` : `₹${originalPrice.toLocaleString()}`;
+
+                    const card = document.createElement('a');
+                    card.href = `service_product_detail.html?id=${related.id}&lang=${lang}`;
+                    card.className = 'related-product-card';
+                    card.innerHTML = `
+                        <img src="IMAGES/${related.image.replace(/ /g, '%20')}" alt="${related.name}">
+                        <div class="related-product-info">
+                            <div class="product-distance small" style="margin-bottom: 5px;"><i class="fas fa-map-marker-alt"></i> <span data-product-id="${related.id}">...</span></div>
+                            <h4>${related.name}</h4>
+                            <p class="small">${related.vendor}</p>
+                            <div class="product-price" style="font-size: 18px; margin-top: 10px;">${priceHTML}</div>
+                        </div>
+                    `;
+                    relatedProductsGrid.appendChild(card);
+                });
+
+                if (relatedProducts.length === 0) {
+                    document.querySelector('.related-products-section').style.display = 'none';
+                }
+
+                // Calculate and display distances
+                updateDistances();
+            } else {
+                const container = document.querySelector('.product-detail-container');
+                container.innerHTML = '<h1>Service not found</h1>';
+                container.style.display = 'block';
+            }
+
+            updateCartCount();
+            updateWishlistCount();
+        });
+
+        function addToCart(product) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existingItem = cart.find(item => item.id === product.id);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                const productForCart = { ...product, quantity: 1 };
+                if (productForCart.image && !productForCart.image.startsWith('IMAGES/')) {
+                    productForCart.image = `IMAGES/${productForCart.image}`;
+                }
+                cart.push(productForCart);
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert(`${product.name} has been added to your cart.`);
+            updateCartCount();
+        }
+
+        function toggleWishlist(product, callback) {
+            let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            const existingIndex = wishlist.findIndex(item => item.id === product.id);
+
+            if (existingIndex > -1) {
+                wishlist.splice(existingIndex, 1);
+                alert(`${product.name} removed from wishlist.`);
+                if (callback) callback(false);
+            } else {
+                const cleanProduct = { ...allProducts[product.id] };
+                if (cleanProduct.image && !cleanProduct.image.startsWith('IMAGES/')) {
+                    cleanProduct.image = `IMAGES/${cleanProduct.image}`;
+                }
+                wishlist.push(cleanProduct);
+                alert(`${product.name} added to wishlist.`);
+                if (callback) callback(true);
+            }
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            updateWishlistCount();
+        }
+
+        function updateButtonToGoToCart(button) {
+            button.textContent = 'Go to Cart';
+            button.classList.remove('add-to-cart');
+            button.classList.add('go-to-cart');
+            button.onclick = () => {
+                window.location.href = 'add1.html#cart';
+            };
+        }
+
+        function updateCartCount() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.querySelector('.cart-count').textContent = totalItems;
+        }
+
+        function updateWishlistCount() {
+            let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            document.querySelector('.wishlist-count').textContent = wishlist.length;
+        }
+
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const d = R * c; // Distance in km
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        function updateDistances() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const productId = urlParams.get('id');
+                    const mainProduct = allProducts[productId];
+
+                    // Update main product distance
+                    if (mainProduct && mainProduct.lat && mainProduct.lon) {
+                        const distance = getDistanceFromLatLonInKm(userLat, userLon, mainProduct.lat, mainProduct.lon);
+                        document.getElementById('product-distance').textContent = `${distance.toFixed(1)} km away`;
+                    }
+
+                    // Update related products distance
+                    document.querySelectorAll('.related-product-card [data-product-id]').forEach(span => {
+                        const relatedId = span.dataset.productId;
+                        const relatedProduct = allProducts[relatedId];
+                        if (relatedProduct && relatedProduct.lat && relatedProduct.lon) {
+                            const distance = getDistanceFromLatLonInKm(userLat, userLon, relatedProduct.lat, relatedProduct.lon);
+                            span.textContent = `${distance.toFixed(1)} km away`;
+                        }
+                    });
+                }, () => {
+                    document.getElementById('product-distance').textContent = 'Could not get location';
+                });
+            } else {
+                document.getElementById('product-distance').textContent = 'Geolocation not supported';
+            }
+        }
+    </script>
+
+</body>
+</html>

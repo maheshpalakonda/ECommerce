@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin · User Profiles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#0f162e; --muted:#98a2b3; --primary:#6366f1; --danger:#ef4444;
+    }
+    html,body{height:100%}
+    body{
+      font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:linear-gradient(180deg,#0b1020,#0d1226);
+      color:#e6eef8;
+    }
+    .glass{
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+      border:1px solid rgba(255,255,255,.06);
+      box-shadow:0 8px 24px rgba(2,6,23,.45);
+    }
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
+      border:1px solid rgba(255,255,255,.05);
+    }
+    .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:10px;padding:.5rem .8rem;font-weight:600}
+    .btn-primary{background:var(--primary);color:white}
+    .btn-danger{background:var(--danger);color:white}
+    .tab{padding:.5rem 1rem;border-radius:10px}
+    .avatar{height:64px;width:64px;border-radius:12px;display:grid;place-items:center;background:rgba(99,102,241,.12);font-weight:700;color:#c7d2fe}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.6)}
+    .scroll-slim{scrollbar-width:thin}
+    .scroll-slim::-webkit-scrollbar{height:8px;width:8px}
+    .scroll-slim::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px}
+    input,textarea,select{color:inherit}
+  </style>
+</head>
+<body>
+  <header class="glass sticky top-0 p-3 z-30">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div>
+        <h1 class="font-bold">User Profiles</h1>
+        <p class="text-sm text-slate-400">Search, view and manage user accounts and security</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="goToUsers" class="btn btn-ghost">Users</button>
+        <button id="goToOrders" class="btn btn-ghost">Orders</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-4 space-y-6">
+    <!-- Controls -->
+    <section class="glass rounded-2xl p-3">
+      <div class="flex gap-3 items-center">
+        <input id="searchInput" placeholder="Search by name, email, phone or id" class="bg-white/5 px-3 py-2 rounded-xl w-80" />
+        <select id="roleFilter" class="bg-white/5 px-3 py-2 rounded-xl">
+          <option value="">All Roles</option><option>Customer</option><option>Seller</option><option>Delivery</option><option>Admin</option>
+        </select>
+        <select id="statusFilter" class="bg-white/5 px-3 py-2 rounded-xl">
+          <option value="">All Status</option><option value="active">Active</option><option value="blocked">Blocked</option><option value="suspended">Suspended</option>
+        </select>
+        <div class="ml-auto flex gap-2">
+          <button id="addUserBtn" class="btn btn-primary">+ Add User</button>
+          <button id="exportBtn" class="btn btn-ghost">Export CSV</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Users list -->
+      <div class="card rounded-2xl p-3 overflow-auto">
+        <h3 class="font-bold mb-2">Users</h3>
+        <div class="overflow-auto scroll-slim" style="max-height:520px;">
+          <ul id="userList" class="space-y-2"></ul>
+        </div>
+      </div>
+
+      <!-- Profile panel -->
+      <div class="card rounded-2xl p-4 md:col-span-2">
+        <div class="flex items-center gap-4">
+          <div id="profileAvatar" class="avatar">AD</div>
+          <div>
+            <div class="text-xl font-bold" id="profileName">Select a user</div>
+            <div class="text-sm text-slate-400" id="profileEmail">—</div>
+            <div class="mt-2 flex gap-2">
+              <button id="impersonateBtn" class="btn btn-ghost">Impersonate</button>
+              <button id="blockBtn" class="btn btn-danger">Block</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="flex gap-2 border-b border-white/6">
+            <button class="tab" data-tab="profile">Profile</button>
+            <button class="tab" data-tab="addresses">Addresses</button>
+            <button class="tab" data-tab="orders">Orders</button>
+            <button class="tab" data-tab="security">Security</button>
+          </div>
+
+          <div id="tabContent" class="mt-4 text-sm">
+            <!-- Profile tab -->
+            <div id="profile" class="space-y-3">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label class="grid gap-1"><span class="text-xs text-slate-400">Full Name</span><input id="p_name" class="bg-white/5 px-3 py-2 rounded-xl" /></label>
+                <label class="grid gap-1"><span class="text-xs text-slate-400">Email</span><input id="p_email" class="bg-white/5 px-3 py-2 rounded-xl" /></label>
+                <label class="grid gap-1"><span class="text-xs text-slate-400">Phone</span><input id="p_phone" class="bg-white/5 px-3 py-2 rounded-xl" /></label>
+                <label class="grid gap-1"><span class="text-xs text-slate-400">Role</span>
+                  <select id="p_role" class="bg-white/5 px-3 py-2 rounded-xl">
+                    <option>Customer</option><option>Seller</option><option>Delivery</option><option>Admin</option>
+                  </select>
+                </label>
+              </div>
+              <div class="flex justify-end gap-2"><button id="saveProfile" class="btn btn-primary">Save Profile</button></div>
+            </div>
+
+            <!-- Addresses tab -->
+            <div id="addresses" class="hidden">
+              <div id="addressList" class="space-y-2"></div>
+              <div class="mt-2"><button id="addAddressBtn" class="btn btn-ghost">Add Address</button></div>
+            </div>
+
+            <!-- Orders tab -->
+            <div id="orders" class="hidden">
+              <div id="userOrders" class="space-y-2"></div>
+            </div>
+
+            <!-- Security tab -->
+            <div id="security" class="hidden space-y-3">
+              <div><strong>Last Login:</strong> <span id="lastLogin">—</span></div>
+              <div><strong>Account Status:</strong> <span id="accStatus">—</span></div>
+              <div class="flex gap-2 mt-2">
+                <button id="resetPwdBtn" class="btn btn-ghost">Reset Password</button>
+                <button id="forcePwdBtn" class="btn btn-ghost">Force Password Change</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modals -->
+  <div id="userModal" class="modal">
+    <div class="bg-[#0f162e] p-4 rounded-xl w-full max-w-md">
+      <div class="flex items-center justify-between mb-3">
+        <h3 id="userModalTitle" class="font-bold">Add User</h3><button onclick="closeUserModal()">✕</button>
+      </div>
+      <form id="userForm" class="grid gap-2">
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Full name</span><input id="u_name" class="bg-white/5 px-3 py-2 rounded-xl" required></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Email</span><input id="u_email" type="email" class="bg-white/5 px-3 py-2 rounded-xl" required></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Phone</span><input id="u_phone" class="bg-white/5 px-3 py-2 rounded-xl"></label>
+        <div class="flex justify-end gap-2">
+          <button type="button" class="btn btn-ghost" onclick="closeUserModal()">Cancel</button>
+          <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="addrModal" class="modal">
+    <div class="bg-[#0f162e] p-4 rounded-xl w-full max-w-md">
+      <div class="flex items-center justify-between mb-3">
+        <h3 id="addrModalTitle" class="font-bold">Add Address</h3><button onclick="closeAddrModal()">✕</button>
+      </div>
+      <form id="addrForm" class="grid gap-2">
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Label (Home/Work)</span><input id="a_label" class="bg-white/5 px-3 py-2 rounded-xl"></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Address</span><textarea id="a_line" rows="3" class="bg-white/5 px-3 py-2 rounded-xl"></textarea></label>
+        <div class="flex justify-end gap-2">
+          <button type="button" class="btn btn-ghost" onclick="closeAddrModal()">Cancel</button>
+          <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Demo data - replace with API responses
+    const users = [
+      { id:1,name:'Aarav Sharma',email:'aarav@example.com',phone:'+91 98765 10001',role:'Customer',status:'active',registered:'2025-01-10',lastLogin:'2025-09-08T09:12',addresses:[{id:1,label:'Home',line:'12 MG Road, Bengaluru'}],orders:[{id:'ORD1001',total:1140,date:'2025-09-08'}] },
+      { id:2,name:'Isha Patel',email:'isha.patel@sellify.in',phone:'+91 98765 10002',role:'Seller',status:'active',registered:'2024-11-02',lastLogin:'2025-09-08T07:55',addresses:[],orders:[] },
+      { id:3,name:'Priya Das',email:'priya.das@example.com',phone:'+91 98765 10004',role:'Customer',status:'blocked',registered:'2025-02-12',lastLogin:'2025-08-30T12:05',addresses:[{id:2,label:'Work',line:'Park Street, Kolkata'}],orders:[{id:'ORD0999',total:450,date:'2025-08-30'}] }
+    ];
+
+    let state = { selectedUserId: null };
+
+    const qs = (s,el=document)=>el.querySelector(s);
+    const qsa = (s,el=document)=>Array.from((el||document).querySelectorAll(s));
+
+    // Render user list
+    function renderUserList(){
+      const search = qs('#searchInput').value.toLowerCase();
+      const role = qs('#roleFilter').value;
+      const status = qs('#statusFilter').value;
+      const list = users.filter(u=>{
+        if(role && u.role!==role) return false;
+        if(status && u.status!==status) return false;
+        if(search){
+          const str = `${u.name} ${u.email} ${u.phone} ${u.id}`.toLowerCase();
+          return str.includes(search);
+        }
+        return true;
+      });
+      qs('#userList').innerHTML = list.map(u=>`
+        <li class="p-2 rounded-lg hover:bg-white/2" data-id="${u.id}">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="font-semibold">${u.name} <span class="text-xs text-slate-400">(${u.role})</span></div>
+              <div class="text-xs text-slate-400">${u.email}</div>
+            </div>
+            <div><button class="btn btn-ghost selectUser" data-id="${u.id}">Open</button></div>
+          </div>
+        </li>`).join('');
+      qsa('.selectUser').forEach(b=> b.addEventListener('click', e=> openProfile(Number(e.target.dataset.id))));
+    }
+
+    function openProfile(id){
+      const u = users.find(x=>x.id===id); if(!u) return;
+      state.selectedUserId=id;
+      qs('#profileAvatar').textContent = u.name.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase();
+      qs('#profileName').textContent = u.name;
+      qs('#profileEmail').textContent = u.email;
+      qs('#p_name').value = u.name; qs('#p_email').value = u.email; qs('#p_phone').value = u.phone; qs('#p_role').value = u.role;
+      qs('#accStatus').textContent = u.status;
+      qs('#lastLogin').textContent = new Date(u.lastLogin).toLocaleString();
+      renderAddresses(u); renderUserOrders(u);
+    }
+
+    function renderAddresses(u){
+      qs('#addressList').innerHTML = u.addresses.map(a=>`
+        <div class="p-2 rounded-lg hover:bg-white/2">
+          <div class="font-semibold">${a.label}</div>
+          <div class="text-xs text-slate-400">${a.line}</div>
+          <div class="mt-2">
+            <button class="btn btn-ghost editAddr" data-uid="${u.id}" data-aid="${a.id}">Edit</button>
+            <button class="btn btn-danger delAddr" data-uid="${u.id}" data-aid="${a.id}">Delete</button>
+          </div>
+        </div>`).join('') || '<div class="text-slate-400">No addresses</div>';
+
+      qsa('.delAddr').forEach(b=> b.addEventListener('click', e=>{
+        const uid=Number(e.target.dataset.uid); const aid=Number(e.target.dataset.aid);
+        const user=users.find(x=>x.id===uid); user.addresses = user.addresses.filter(x=>x.id!==aid);
+        if(state.selectedUserId===uid) renderAddresses(user);
+        toast('Address deleted');
+      }));
+
+      qsa('.editAddr').forEach(b=> b.addEventListener('click', e=>{
+        const uid=Number(e.target.dataset.uid); const aid=Number(e.target.dataset.aid);
+        const user=users.find(x=>x.id===uid); const addr=user.addresses.find(a=>a.id===aid);
+        qs('#a_label').value=addr.label; qs('#a_line').value=addr.line; qs('#addrModal').style.display='flex';
+        qs('#addrModal').dataset.edit = JSON.stringify({uid,aid});
+      }));
+    }
+
+    function renderUserOrders(u){
+      qs('#userOrders').innerHTML = u.orders.map(o=>`
+        <div class="p-2 rounded-lg hover:bg-white/2">
+          <div class="flex justify-between">
+            <div><div class="font-semibold">${o.id}</div><div class="text-xs text-slate-400">${o.date}</div></div>
+            <div>₹ ${o.total}</div>
+          </div>
+        </div>`).join('') || '<div class="text-slate-400">No orders</div>';
+    }
+
+    // Tabs
+    qsa('.tab').forEach(t=> t.addEventListener('click', e=>{
+      qsa('.tab').forEach(x=> x.classList.remove('bg-white/3'));
+      e.target.classList.add('bg-white/3');
+      const tab = e.target.dataset.tab;
+      qsa('#tabContent > div').forEach(d=> d.classList.add('hidden'));
+      qs('#'+tab).classList.remove('hidden');
+    }));
+
+    // default to profile
+    document.addEventListener('DOMContentLoaded', ()=>{
+      qsa('.tab')[0].click();
+      renderUserList();
+    });
+
+    // Add user modal
+    function openUserModal(){ qs('#userModal').style.display='flex'; qs('#userModalTitle').textContent='Add User'; qs('#userForm').dataset.edit=''; }
+    function closeUserModal(){ qs('#userModal').style.display='none'; }
+    qs('#addUserBtn').addEventListener('click', openUserModal);
+
+    qs('#userForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const name=qs('#u_name').value.trim();
+      const email=qs('#u_email').value.trim();
+      const phone=qs('#u_phone').value.trim();
+      const id = Math.max(0,...users.map(u=>u.id))+1;
+      users.push({ id, name, email, phone, role:'Customer', status:'active', registered:new Date().toISOString().slice(0,10), lastLogin:new Date().toISOString(), addresses:[], orders:[] });
+      closeUserModal(); renderUserList(); toast('User added');
+    });
+
+    // Edit profile save
+    qs('#saveProfile').addEventListener('click', ()=>{
+      const uid = state.selectedUserId; if(!uid) return toast('Select a user');
+      const u = users.find(x=>x.id===uid);
+      u.name = qs('#p_name').value.trim(); u.email = qs('#p_email').value.trim(); u.phone = qs('#p_phone').value.trim(); u.role = qs('#p_role').value;
+      renderUserList(); openProfile(uid); toast('Profile saved');
+    });
+
+    // Addresses modal
+    function openAddrModal(){ if(!state.selectedUserId) return toast('Select a user'); qs('#addrModal').style.display='flex'; qs('#addrModal').dataset.edit=''; }
+    function closeAddrModal(){ qs('#addrModal').style.display='none'; delete qs('#addrModal').dataset.edit; }
+    qs('#addAddressBtn').addEventListener('click', openAddrModal);
+
+    qs('#addrForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const lbl = qs('#a_label').value.trim() || 'Other';
+      const line = qs('#a_line').value.trim(); if(!line) return toast('Enter address');
+      const edit = qs('#addrModal').dataset.edit; const uid = state.selectedUserId; const user = users.find(x=>x.id===uid);
+      if(edit){
+        const d = JSON.parse(edit); const addr = user.addresses.find(a=>a.id===d.aid);
+        addr.label=lbl; addr.line=line; toast('Address updated');
+      } else {
+        const aid = Math.max(0,...users.flatMap(u=>u.addresses.map(a=>a.id)))+1;
+        user.addresses.push({ id:aid, label:lbl, line });
+        toast('Address added');
+      }
+      closeAddrModal(); renderAddresses(user);
+    });
+
+    // Impersonate, block, reset password
+    qs('#impersonateBtn').addEventListener('click', ()=>{ if(!state.selectedUserId) return toast('Select a user'); toast(`Impersonating user #${state.selectedUserId} (demo)`); });
+    qs('#blockBtn').addEventListener('click', ()=>{ if(!state.selectedUserId) return toast('Select a user'); const u = users.find(x=>x.id===state.selectedUserId); u.status = u.status === 'blocked' ? 'active' : 'blocked'; renderUserList(); openProfile(u.id); toast(u.status==='blocked' ? 'User blocked' : 'User unblocked'); });
+    qs('#resetPwdBtn').addEventListener('click', ()=>{ if(!state.selectedUserId) return toast('Select a user'); toast('Password reset link sent (demo)'); });
+    qs('#forcePwdBtn').addEventListener('click', ()=>{ if(!state.selectedUserId) return toast('User will be forced to change password on next login (demo)'); });
+
+    // Export CSV
+    qs('#exportBtn').addEventListener('click', ()=>{
+      const csv = ['id,name,email,phone,role,status'].concat(users.map(u=>`${u.id},"${u.name}","${u.email}","${u.phone}",${u.role},${u.status}`)).join('\n');
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='users.csv'; a.click(); URL.revokeObjectURL(a.href); toast('Exported users.csv');
+    });
+
+    // Utility: toast
+    function toast(msg){
+      const el = document.createElement('div'); el.className='fixed bottom-6 right-6 glass px-4 py-2 rounded-xl'; el.textContent=msg;
+      document.body.appendChild(el); setTimeout(()=> el.remove(),2500);
+    }
+
+    // Wire filters & search
+    qs('#searchInput').addEventListener('input', ()=> renderUserList());
+    qs('#roleFilter').addEventListener('change', ()=> renderUserList());
+    qs('#statusFilter').addEventListener('change', ()=> renderUserList());
+
+    // Placeholder navigation buttons (customize)
+    qs('#goToUsers').addEventListener('click', ()=> toast('Go to Users (link)'));
+    qs('#goToOrders').addEventListener('click', ()=> toast('Go to Orders (link)'));
+  </script>
+</body>
+</html>

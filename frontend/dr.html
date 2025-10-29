@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - QuickCart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        .header .logo::before {
+            content: "🛒";
+            margin-right: 10px;
+        }
+        .header .nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 18px;
+        }
+        .header .nav a:hover {
+            text-decoration: underline;
+        }
+        .dashboard {
+            max-width: 1200px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .dashboard h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .dashboard hr {
+            border: 1px solid #ff6b6b;
+            width: 50px;
+            margin: 0 auto 40px;
+        }
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 250px;
+            padding: 20px;
+            text-align: left;
+        }
+        .card h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .card p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .card button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .card button:hover {
+            background-color: #e65b5b;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">QuickCart</div>
+        <div class="nav">
+            <a href="add to cart.html">Home</a>
+        </div>
+    </div>
+    <div class="dashboard">
+        <h1>Admin Dashboard</h1>
+        <hr>
+        <div class="cards">
+            <div class="card">
+                <h2>User Management</h2>
+                <p>Manage user accounts, roles, and permissions.</p>
+                <a href="admin_user_management.html">
+                <button>Go to User Management</button>
+                </a>
+            </div>
+            <div class="card">
+                <h2>Manage User Profile</h2>
+                <p>Update user profiles and personal information.</p>
+                <a href="admin_profile_management.html">
+                <button>Go to Profile Management</button>
+            </a>
+            </div>
+            <div class="card">
+                <h2>Offers Management</h2>
+                <p>Create and manage promotional offers and discounts.</p>
+                <a href="admin_offers_management.html">
+                <button>Go to Offers Management</button>
+            </a>
+            </div>
+            <div class="card">
+                <h2>Payment Management</h2>
+                <p>Monitor and manage payment transactions.</p>
+                <a href="admin_payment_management.html">
+                <button>Go to Payment Management</button>
+            </a>
+            </div>
+            <div class="card">
+                <h2>Product Management</h2>
+                <p>Add, edit, or remove products from the marketplace.</p>
+                <a href="admin_product_management.html">
+                <button>Go to Product Management</button>
+            </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

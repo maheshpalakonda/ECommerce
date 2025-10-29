@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin · Categories & Products</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{ --bg:#0b1020; --card:#0f162e; --muted:#98a2b3; --primary:#6366f1; --success:#22c55e; --danger:#ef4444; --ring:#2a3370 }
+    html,body{height:100%}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0b1020,#0d1226); color:#e6eef8}
+    .glass{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02)); box-shadow:0 8px 24px rgba(2,6,23,.45); border:1px solid rgba(255,255,255,.06)}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015)); border:1px solid rgba(255,255,255,.06)}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:12px;padding:.6rem .9rem;font-weight:600}
+    .btn-primary{background:var(--primary); color:white}
+    .btn-ghost{background:rgba(255,255,255,.04)}
+    .chip{padding:.25rem .6rem;border-radius:999px;font-size:.75rem;font-weight:700}
+    .table th{font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8}
+    .scroll-slim{scrollbar-width:thin}
+    .scroll-slim::-webkit-scrollbar{height:8px;width:8px}
+    .scroll-slim::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px}
+    .drag-handle{cursor:grab}
+    input[type=file]{display:none}
+  </style>
+</head>
+<body>
+  <header class="glass sticky top-0 z-30">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center gap-3">
+      <div class="h-9 w-9 rounded-xl bg-indigo-500/20 grid place-items-center text-indigo-300 font-black">CM</div>
+      <div class="flex-1">
+        <h1 class="text-lg font-bold tracking-tight">Catalog — Categories & Products</h1>
+        <p class="text-xs text-slate-400 -mt-1">Manage categories, products, variants, stock and SEO</p>
+      </div>
+      <div class="hidden md:flex items-center gap-2">
+        <button id="goToUsers" class="btn btn-ghost">User Management</button>
+        <button id="importBtn" class="btn btn-ghost">Import CSV</button>
+        <button id="exportBtn" class="btn btn-ghost">Export CSV</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl p-4 md:p-6 space-y-6">
+    <!-- Top controls -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="card rounded-2xl p-4 md:col-span-2">
+        <div class="flex items-center gap-3">
+          <input id="search" class="flex-1 bg-white/5 border border-white/10 rounded-xl pl-10 pr-3 py-2.5 placeholder:text-slate-500" placeholder="Search products or categories" />
+          <select id="catFilter" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 ring-focus">
+            <option value="">All Categories</option>
+          </select>
+          <select id="statusFilter" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5">
+            <option value="">All</option><option value="published">Published</option><option value="draft">Draft</option>
+          </select>
+        </div>
+      </div>
+      <div class="card rounded-2xl p-4 flex items-center justify-end gap-2">
+        <button id="addCategory" class="btn btn-primary">+ Category</button>
+        <button id="addProduct" class="btn btn-primary">+ Product</button>
+      </div>
+    </section>
+
+    <!-- Content columns -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Categories -->
+      <div class="card rounded-2xl p-3 overflow-auto">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-bold">Categories</h3>
+          <span id="catCount" class="text-sm text-slate-400">0</span>
+        </div>
+        <ul id="categoryList" class="space-y-2"></ul>
+        <div class="mt-3 flex gap-2">
+          <button id="reorderBtn" class="btn btn-ghost">Enable Reorder</button>
+          <button id="bulkDelCat" class="btn btn-danger">Delete Selected</button>
+        </div>
+      </div>
+
+      <!-- Products list -->
+      <div class="card rounded-2xl p-3 md:col-span-2">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-bold">Products</h3>
+          <div class="text-sm text-slate-400">Showing <span id="prodCount">0</span></div>
+        </div>
+        <div class="overflow-auto scroll-slim" style="max-height:520px;">
+          <table class="w-full">
+            <thead><tr class="text-left text-slate-400 text-xs"><th></th><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
+            <tbody id="productBody" class="text-sm"></tbody>
+          </table>
+        </div>
+        <div class="mt-3 flex items-center justify-between">
+          <div class="flex gap-2">
+            <button id="bulkPublish" class="btn btn-ghost">Publish</button>
+            <button id="bulkUnpublish" class="btn btn-ghost">Unpublish</button>
+            <button id="bulkDelete" class="btn btn-danger">Delete</button>
+          </div>
+          <div class="text-slate-400 text-xs">Tip: Use search to quickly find products</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reports -->
+    <section class="card rounded-2xl p-4">
+      <h3 class="font-bold mb-2">Reports (Demo)</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="glass rounded-xl p-3"><div class="text-slate-400 text-xs">Top Category</div><div id="topCategory" class="font-semibold">-</div></div>
+        <div class="glass rounded-xl p-3"><div class="text-slate-400 text-xs">Low Stock</div><div id="lowStock" class="font-semibold">-</div></div>
+        <div class="glass rounded-xl p-3"><div class="text-slate-400 text-xs">Total Products</div><div id="totalProducts" class="font-semibold">0</div></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Category Modal -->
+  <div id="catModal" class="hidden fixed inset-0 z-40 modal-bg items-center justify-center p-4">
+    <div class="glass rounded-2xl w-full max-w-lg p-4">
+      <div class="flex items-center justify-between mb-3"><h3 id="catModalTitle" class="font-bold">Add Category</h3><button onclick="closeCatModal()">✕</button></div>
+      <form id="catForm" class="grid grid-cols-1 gap-3">
+        <input type="hidden" id="catId" />
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Name</span><input id="catName" required class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5"/></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Parent (optional)</span><select id="catParent" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5"><option value="">None</option></select></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">SEO Title</span><input id="catSEOTitle" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5"/></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Banner Image</span><input id="catImage" type="file" accept="image/*" /></label>
+        <div class="flex justify-end gap-2"><button type="button" class="btn btn-ghost" onclick="closeCatModal()">Cancel</button><button class="btn btn-primary" type="submit">Save Category</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Product Modal -->
+  <div id="prodModal" class="hidden fixed inset-0 z-40 modal-bg items-center justify-center p-4">
+    <div class="glass rounded-2xl w-full max-w-3xl p-4 overflow-auto" style="max-height:90vh;">
+      <div class="flex items-center justify-between mb-3"><h3 id="prodModalTitle" class="font-bold">Add Product</h3><button onclick="closeProdModal()">✕</button></div>
+      <form id="prodForm" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input type="hidden" id="prodId" />
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Title</span><input id="prodTitle" required class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5"/></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Category</span><select id="prodCategory" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5"></select></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Price (₹)</span><input id="prodPrice" type="number" min="0" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5"/></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Stock Qty</span><input id="prodStock" type="number" min="0" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5"/></label>
+        <label class="grid gap-1 md:col-span-2"><span class="text-xs text-slate-400">Short Description</span><textarea id="prodDesc" rows="3" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5"></textarea></label>
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Images</span><input id="prodImages" type="file" accept="image/*" multiple /></label>
+
+        <!-- Variants simple UI -->
+        <div class="md:col-span-2">
+          <div class="flex items-center justify-between"><div class="text-xs text-slate-400">Variants</div><button id="addVariantBtn" type="button" class="btn btn-ghost">Add Variant</button></div>
+          <div id="variants" class="space-y-2 mt-2"></div>
+        </div>
+
+        <label class="grid gap-1"><span class="text-xs text-slate-400">Status</span><select id="prodStatus" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5"><option value="published">Published</option><option value="draft">Draft</option></select></label>
+        <div class="md:col-span-2 flex justify-end gap-2 pt-2"><button type="button" class="btn btn-ghost" onclick="closeProdModal()">Cancel</button><button class="btn btn-primary" type="submit">Save Product</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Hidden CSV input -->
+  <input id="csvInput" type="file" accept=".csv" />
+
+  <script>
+    // Demo categories & products
+    const categories = [
+      {id:1,name:'Groceries',parent:null,order:1},
+      {id:2,name:"Men's Fashion",parent:null,order:2},
+      {id:3,name:"Women\'s Fashion",parent:null,order:3},
+      {id:4,name:'Electronics',parent:null,order:4},
+      {id:5,name:'Kids',parent:null,order:5}
+    ];
+
+    const products = [
+      {id:1,title:'Organic Milk 1L',category:1,price:60,stock:120,status:'published',images:[],desc:'Fresh organic milk',variants:[]},
+      {id:2,title:'Plain T-Shirt',category:2,price:399,stock:40,status:'published',images:[],desc:'Cotton tee',variants:[{name:'Size',value:'M'},{name:'Color',value:'Blue'}]},
+      {id:3,title:'Bluetooth Earbuds',category:4,price:1299,stock:8,status:'published',images:[],desc:'Noise cancelling',variants:[]},
+      {id:4,title:'Kids Sneakers',category:5,price:799,stock:0,status:'draft',images:[],desc:'Comfort fit',variants:[]}
+    ];
+
+    // State
+    let state = { search:'', catFilter:'', statusFilter:'', reorder:false, selectedCats: new Set(), selectedProds: new Set() };
+
+    // Utils
+    const qs=(s,el=document)=>el.querySelector(s); const qsa=(s,el=document)=>Array.from(el.querySelectorAll(s));
+    const idFor = (arr)=> Math.max(0,...arr.map(x=>x.id))+1;
+
+    // Render categories list
+    function renderCategories(){
+      const list = categories.slice().sort((a,b)=> a.order - b.order);
+      qs('#categoryList').innerHTML = list.map(c=>`
+        <li draggable="false" class="flex items-center justify-between p-2 rounded-lg hover:bg-white/2" data-id="${c.id}">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" class="catChk" data-id="${c.id}" ${state.selectedCats.has(c.id)?'checked':''} />
+            <div class="drag-handle">☰</div>
+            <div>
+              <div class="font-semibold">${c.name}</div>
+              <div class="text-xs text-slate-400">${c.parent ? (categories.find(x=>x.id===c.parent)?.name || '-') : 'Top level'}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-ghost editCat" data-id="${c.id}">Edit</button>
+            <button class="btn btn-danger delCat" data-id="${c.id}">Delete</button>
+          </div>
+        </li>
+      `).join('');
+      qs('#catCount').textContent = list.length; updateCategorySelectors(); wireCategoryHandlers();
+    }
+
+    function updateCategorySelectors(){
+      const sel = qs('#prodCategory'); sel.innerHTML = categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+      const psel = qs('#catParent'); psel.innerHTML = `<option value="">None</option>` + categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+      const cf = qs('#catFilter'); cf.innerHTML = `<option value="">All Categories</option>` + categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    }
+
+    // Render products
+    function renderProducts(){
+      const filtered = products.filter(p=>{
+        if(state.search && !(`${p.title} ${p.desc}`.toLowerCase().includes(state.search.toLowerCase()))) return false;
+        if(state.catFilter && String(p.category)!==String(state.catFilter)) return false;
+        if(state.statusFilter && p.status!==state.statusFilter) return false;
+        return true;
+      });
+      qs('#productBody').innerHTML = filtered.map(p=>{
+        const cat = categories.find(c=>c.id===p.category)?.name||'-';
+        return `
+          <tr data-id="${p.id}">
+            <td><input type="checkbox" class="prodChk" data-id="${p.id}" ${state.selectedProds.has(p.id)?'checked':''}></td>
+            <td class="py-2"> <div class="font-semibold">${p.title}</div><div class="text-xs text-slate-400">${p.desc}</div></td>
+            <td>${cat}</td>
+            <td>₹ ${p.price}</td>
+            <td>${p.stock}</td>
+            <td>${p.status}</td>
+            <td class="text-right"><div class="inline-flex gap-2"><button class="btn btn-ghost viewProd" data-id="${p.id}">View</button><button class="btn btn-ghost editProd" data-id="${p.id}">Edit</button><button class="btn btn-danger delProd" data-id="${p.id}">Delete</button></div></td>
+          </tr>
+        `;
+      }).join('');
+      qs('#prodCount').textContent = filtered.length; updateReports(); wireProductHandlers();
+    }
+
+    // Wire handlers
+    function wireCategoryHandlers(){
+      qsa('.editCat').forEach(b=> b.addEventListener('click', e=> openCatModal(Number(e.target.dataset.id))));
+      qsa('.delCat').forEach(b=> b.addEventListener('click', e=>{ const id=Number(e.target.dataset.id); if(confirm('Delete category? Products in this category will remain uncategorized.')){ const i=categories.findIndex(c=>c.id===id); if(i>-1) categories.splice(i,1); products.forEach(p=>{ if(p.category===id) p.category=null }); renderCategories(); renderProducts(); } }));
+      qsa('.catChk').forEach(ch=> ch.addEventListener('change', e=>{ const id=Number(e.target.dataset.id); e.target.checked? state.selectedCats.add(id): state.selectedCats.delete(id); }));
+    }
+    function wireProductHandlers(){
+      qsa('.editProd').forEach(b=> b.addEventListener('click', e=> openProdModal(products.find(p=>p.id===Number(e.target.dataset.id)))));
+      qsa('.delProd').forEach(b=> b.addEventListener('click', e=>{ const id=Number(e.target.dataset.id); if(confirm('Delete product?')){ const idx=products.findIndex(p=>p.id===id); if(idx>-1) products.splice(idx,1); renderProducts(); } }));
+      qsa('.prodChk').forEach(ch=> ch.addEventListener('change', e=>{ const id=Number(e.target.dataset.id); e.target.checked? state.selectedProds.add(id): state.selectedProds.delete(id); }));
+      qsa('.viewProd').forEach(b=> b.addEventListener('click', e=> viewProduct(Number(e.target.dataset.id))));
+    }
+
+    // Modals
+    function openCatModal(id){ const c = categories.find(x=>x.id===id); qs('#catForm').reset(); qs('#catId').value = c?.id||''; qs('#catModalTitle').textContent = c? 'Edit Category':'Add Category'; if(c){ qs('#catName').value=c.name; qs('#catParent').value=c.parent||''; qs('#catSEOTitle').value=c.seo||''; } qs('#catModal').classList.remove('hidden'); qs('#catModal').classList.add('flex'); }
+    function closeCatModal(){ qs('#catModal').classList.add('hidden'); qs('#catModal').classList.remove('flex'); }
+
+    function openProdModal(product){ qs('#prodForm').reset(); qs('#variants').innerHTML=''; qs('#prodId').value = product?.id||''; qs('#prodModalTitle').textContent = product? 'Edit Product':'Add Product'; if(product){ qs('#prodTitle').value=product.title; qs('#prodCategory').value=product.category; qs('#prodPrice').value=product.price; qs('#prodStock').value=product.stock; qs('#prodDesc').value=product.desc; qs('#prodStatus').value=product.status; product.variants.forEach(v=> addVariantRow(v.name,v.value)); } qs('#prodModal').classList.remove('hidden'); qs('#prodModal').classList.add('flex'); }
+    function closeProdModal(){ qs('#prodModal').classList.add('hidden'); qs('#prodModal').classList.remove('flex'); }
+
+    function addVariantRow(name='', value=''){ const id=Math.random().toString(36).slice(2); const el = document.createElement('div'); el.className='flex gap-2 items-center'; el.innerHTML = `<input placeholder="Variant name" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2" value="${name}"><input placeholder="Value" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2" value="${value}"><button class="btn btn-danger">Remove</button>`; qs('#variants').appendChild(el); el.querySelector('button').addEventListener('click', ()=> el.remove()); }
+
+    // Save handlers
+    qs('#catForm').addEventListener('submit', e=>{ e.preventDefault(); const id = qs('#catId').value? Number(qs('#catId').value): null; const payload = { name: qs('#catName').value.trim(), parent: qs('#catParent').value? Number(qs('#catParent').value): null, seo: qs('#catSEOTitle').value.trim() };
+      if(id){ const idx=categories.findIndex(c=>c.id===id); categories[idx] = {...categories[idx], ...payload}; toast('Category updated'); }
+      else { categories.push({ id: idFor(categories), ...payload, order: categories.length+1 }); toast('Category created'); }
+      closeCatModal(); renderCategories(); renderProducts(); });
+
+    qs('#prodForm').addEventListener('submit', e=>{ e.preventDefault(); const id = qs('#prodId').value? Number(qs('#prodId').value): null; const variantEls = Array.from(qs('#variants').children); const variants = variantEls.map(r=> ({ name: r.children[0].value, value: r.children[1].value })); const payload = { title: qs('#prodTitle').value.trim(), category: Number(qs('#prodCategory').value), price: Number(qs('#prodPrice').value), stock: Number(qs('#prodStock').value), desc: qs('#prodDesc').value.trim(), status: qs('#prodStatus').value, variants };
+      if(id){ const idx = products.findIndex(p=>p.id===id); products[idx] = {...products[idx], ...payload}; toast('Product updated'); }
+      else { products.push({ id: idFor(products), images: [], ...payload }); toast('Product added'); }
+      closeProdModal(); renderProducts(); });
+
+    qs('#addVariantBtn').addEventListener('click', ()=> addVariantRow());
+
+    // CSV import/export (simple)
+    function toCSV(){ const cols=['id','title','category','price','stock','status','desc']; const rows = products.map(p=> cols.map(k=>`"${String(p[k]??'').replace(/"/g,'\"')}"`).join(',')); return [cols.join(','), ...rows].join('\n'); }
+    function download(filename, text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'})); a.download=filename; a.click(); URL.revokeObjectURL(a.href); }
+    qs('#exportBtn').addEventListener('click', ()=> download('products.csv', toCSV()));
+    qs('#importBtn').addEventListener('click', ()=> qs('#csvInput').click());
+    qs('#csvInput').addEventListener('change', async e=>{ const f=e.target.files[0]; if(!f) return; const text=await f.text(); const lines=text.split(/\r?\n/).filter(Boolean); const cols=lines.shift().split(','); let added=0; lines.forEach(l=>{ const cells = l.match(/((?<!\\)\".*?(?<!\\)\"|[^,]+)/g)||[]; const obj={}; cols.forEach((c,i)=> obj[c]= (cells[i]||'').replace(/^"|"$/g,'') ); if(obj.title){ products.push({ id: idFor(products), title: obj.title, category: Number(obj.category)||null, price: Number(obj.price)||0, stock: Number(obj.stock)||0, status: obj.status||'draft', desc: obj.desc||'', variants:[] }); added++; } }); toast(`Imported ${added} products`); renderProducts(); e.target.value=''; });
+
+    // Bulk actions
+    qs('#bulkDelete').addEventListener('click', ()=>{ if(state.selectedProds.size===0) return toast('Select products to delete'); if(confirm('Delete selected products?')){ for(const id of Array.from(state.selectedProds)){ const i=products.findIndex(p=>p.id===id); if(i>-1) products.splice(i,1); state.selectedProds.delete(id);} renderProducts(); } });
+    qs('#bulkPublish').addEventListener('click', ()=>{ for(const id of Array.from(state.selectedProds)){ const p=products.find(x=>x.id===id); if(p) p.status='published'; } toast('Published selected'); renderProducts(); });
+    qs('#bulkUnpublish').addEventListener('click', ()=>{ for(const id of Array.from(state.selectedProds)){ const p=products.find(x=>x.id===id); if(p) p.status='draft'; } toast('Unpublished selected'); renderProducts(); });
+
+    // Reorder categories (drag & drop simple)
+    let dragSrc=null;
+    qs('#reorderBtn').addEventListener('click', ()=>{ state.reorder=!state.reorder; qs('#reorderBtn').textContent = state.reorder? 'Disable Reorder':'Enable Reorder'; const items = qsa('#categoryList li'); items.forEach(it=>{ it.draggable = state.reorder; it.addEventListener('dragstart', e=>{ dragSrc = it; it.style.opacity='0.5'; }); it.addEventListener('dragend', e=>{ dragSrc=null; it.style.opacity='1'; }); it.addEventListener('dragover', e=> e.preventDefault()); it.addEventListener('drop', e=>{ if(!dragSrc) return; const aId=Number(dragSrc.dataset.id); const bId=Number(it.dataset.id); const aIdx = categories.findIndex(c=>c.id===aId); const bIdx = categories.findIndex(c=>c.id===bId); const tmp = categories.splice(aIdx,1)[0]; categories.splice(bIdx,0,tmp); categories.forEach((c,i)=> c.order = i+1); renderCategories(); }); }); });
+
+    // Search & filters
+    qs('#search').addEventListener('input', e=>{ state.search=e.target.value; renderProducts(); });
+    qs('#catFilter').addEventListener('change', e=>{ state.catFilter=e.target.value; renderProducts(); });
+    qs('#statusFilter').addEventListener('change', e=>{ state.statusFilter=e.target.value; renderProducts(); });
+
+    // Quick UI links
+    qs('#addCategory').addEventListener('click', ()=> openCatModal());
+    qs('#addProduct').addEventListener('click', ()=> openProdModal());
+    qs('#bulkDelCat').addEventListener('click', ()=>{ if(state.selectedCats.size===0) return toast('Select categories'); if(confirm('Delete selected categories?')){ for(const id of Array.from(state.selectedCats)){ const i=categories.findIndex(c=>c.id===id); if(i>-1) categories.splice(i,1); state.selectedCats.delete(id);} renderCategories(); renderProducts(); } });
+
+    // Reports
+    function updateReports(){ qs('#totalProducts').textContent = products.length; const low = products.filter(p=>p.stock>0 && p.stock<10).length || '-'; qs('#lowStock').textContent = low; const topCatId = products.reduce((acc,p)=>{ acc[p.category] = (acc[p.category]||0)+1; return acc; },{}); const top = Object.entries(topCatId).sort((a,b)=>b[1]-a[1])[0]; qs('#topCategory').textContent = top ? (categories.find(c=>c.id===Number(top[0]))?.name || '-') : '-'; }
+
+    // View product quick
+    function viewProduct(id){ const p = products.find(x=>x.id===id); alert(JSON.stringify(p,null,2)); }
+
+    // Toast
+    function toast(msg){ const t=document.createElement('div'); t.className='glass rounded-xl px-4 py-2 fixed bottom-6 right-6'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=> t.remove(), 2800); }
+
+    // Initial render
+    window.addEventListener('DOMContentLoaded', ()=>{ renderCategories(); renderProducts(); updateReports(); });
+  </script>
+</body>
+</html>

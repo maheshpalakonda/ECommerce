@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin · User Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#0f162e; --muted:#98a2b3; --primary:#6366f1; --success:#22c55e; --danger:#ef4444; --warning:#f59e0b; --ring:#2a3370;
+    }
+    html,body{height:100%}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0b1020, #0d1226 25%, #0b1020 100%); color:#e5e7eb}
+    .glass{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); box-shadow:0 10px 30px rgba(2,6,23,.35), inset 0 1px 0 rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.08)}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:12px;padding:.6rem .9rem;font-weight:600}
+    .btn-primary{background:var(--primary); color:white}
+    .btn-ghost{background:rgba(255,255,255,.06)}
+    .btn-danger{background:var(--danger); color:white}
+    .chip{padding:.25rem .6rem;border-radius:999px;font-size:.75rem;font-weight:700;letter-spacing:.02em}
+    .chip-success{background:rgba(34,197,94,.18); color:#86efac}
+    .chip-danger{background:rgba(239,68,68,.18); color:#fca5a5}
+    .chip-warning{background:rgba(245,158,11,.18); color:#fcd34d}
+    .chip-neutral{background:rgba(148,163,184,.18); color:#cbd5e1}
+    .table th{font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8}
+    .table tr{border-bottom:1px solid rgba(255,255,255,.06)}
+    .table tr:hover{background:rgba(255,255,255,.03)}
+    .ring-focus:focus{outline:none; box-shadow:0 0 0 4px var(--ring)}
+    .scroll-slim{scrollbar-width:thin}
+    .scroll-slim::-webkit-scrollbar{height:8px;width:8px}
+    .scroll-slim::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:999px}
+    .modal-bg{background:rgba(2,6,23,.7);backdrop-filter: blur(10px)}
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Topbar -->
+  <header class="glass sticky top-0 z-30">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center gap-3">
+      <div class="h-9 w-9 rounded-xl bg-indigo-500/20 grid place-items-center text-indigo-300 font-black">UM</div>
+      <div class="flex-1">
+        <h1 class="text-lg font-bold tracking-tight">User Management</h1>
+        <p class="text-xs text-slate-400 -mt-1">Admin controls for customers, sellers, delivery partners, staff</p>
+      </div>
+      <div class="hidden md:flex items-center gap-2">
+        <button id="impersonateBtn" class="btn btn-ghost">Impersonate</button>
+        <button id="signOutBtn" class="btn btn-danger">Force Sign-out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl p-4 md:p-6 space-y-6">
+    <!-- KPI Cards -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="card rounded-2xl p-4">
+        <p class="text-slate-400 text-xs">Total Users</p>
+        <div class="flex items-end justify-between mt-2">
+          <h2 id="kpiTotal" class="text-2xl font-extrabold">0</h2>
+          <span class="chip chip-neutral">All</span>
+        </div>
+      </div>
+      <div class="card rounded-2xl p-4">
+        <p class="text-slate-400 text-xs">Active</p>
+        <div class="flex items-end justify-between mt-2">
+          <h2 id="kpiActive" class="text-2xl font-extrabold">0</h2>
+          <span class="chip chip-success">+ Live</span>
+        </div>
+      </div>
+      <div class="card rounded-2xl p-4">
+        <p class="text-slate-400 text-xs">Blocked</p>
+        <div class="flex items-end justify-between mt-2">
+          <h2 id="kpiBlocked" class="text-2xl font-extrabold">0</h2>
+          <span class="chip chip-danger">Risk</span>
+        </div>
+      </div>
+      <div class="card rounded-2xl p-4">
+        <p class="text-slate-400 text-xs">New Today</p>
+        <div class="flex items-end justify-between mt-2">
+          <h2 id="kpiNew" class="text-2xl font-extrabold">0</h2>
+          <span class="chip chip-warning">24h</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toolbar -->
+    <section class="glass rounded-2xl p-3 md:p-4">
+      <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+        <div class="flex flex-1 gap-2">
+          <div class="flex-1 relative">
+            <input id="searchInput" class="w-full ring-focus bg-white/5 border border-white/10 rounded-xl pl-10 pr-3 py-2.5 placeholder:text-slate-500" placeholder="Search by name, email, phone…" />
+            <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z"/></svg>
+          </div>
+          <select id="roleFilter" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 ring-focus">
+            <option value="">All Roles</option>
+            <option>Customer</option>
+            <option>Seller</option>
+            <option>Delivery</option>
+            <option>Staff</option>
+            <option>Admin</option>
+          </select>
+          <select id="statusFilter" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 ring-focus">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="blocked">Blocked</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+        <div class="flex gap-2">
+          <button id="addUserBtn" class="btn btn-primary">+ Add User</button>
+          <button id="importBtn" class="btn btn-ghost">Import CSV</button>
+          <button id="exportBtn" class="btn btn-ghost">Export CSV</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Users Table -->
+    <section class="card rounded-2xl overflow-hidden">
+      <div class="overflow-auto scroll-slim">
+        <table class="table w-full">
+          <thead>
+            <tr class="text-left">
+              <th class="px-4 py-3 w-10"><input id="selectAll" type="checkbox" class="accent-indigo-500"></th>
+              <th class="px-4 py-3">User</th>
+              <th class="px-4 py-3">Role</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3">Last Active</th>
+              <th class="px-4 py-3">Orders</th>
+              <th class="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="text-sm"></tbody>
+        </table>
+      </div>
+      <div class="p-3 md:p-4 flex flex-col sm:flex-row items-center gap-3 justify-between">
+        <div class="text-slate-400 text-xs"><span id="selectionCount">0</span> selected</div>
+        <div class="flex items-center gap-2">
+          <button id="bulkActivate" class="btn btn-ghost">Activate</button>
+          <button id="bulkBlock" class="btn btn-ghost">Block</button>
+          <button id="bulkDelete" class="btn btn-danger">Delete</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="prevPage" class="btn btn-ghost">Prev</button>
+          <span id="pageInfo" class="text-sm text-slate-300"></span>
+          <button id="nextPage" class="btn btn-ghost">Next</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Add/Edit Modal -->
+  <div id="userModal" class="hidden fixed inset-0 modal-bg z-40 items-center justify-center p-4">
+    <div class="glass rounded-2xl w-full max-w-xl">
+      <div class="p-4 border-b border-white/10 flex items-center justify-between">
+        <h3 id="modalTitle" class="font-bold">Add User</h3>
+        <button class="p-2" onclick="closeUserModal()">✕</button>
+      </div>
+      <form id="userForm" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input type="hidden" id="userId" />
+        <label class="grid gap-1">
+          <span class="text-xs text-slate-400">Full Name</span>
+          <input id="fullnameInput" required class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 ring-focus"/>
+        </label>
+        <label class="grid gap-1">
+          <span class="text-xs text-slate-400">Email</span>
+          <input id="emailInput" type="email" required class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 ring-focus"/>
+        </label>
+        <label class="grid gap-1">
+          <span class="text-xs text-slate-400">Phone</span>
+          <input id="phoneInput" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 ring-focus"/>
+        </label>
+        <label class="grid gap-1">
+          <span class="text-xs text-slate-400">Role</span>
+          <select id="roleInput" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 ring-focus">
+            <option>Customer</option>
+            <option>Seller</option>
+            <option>Delivery</option>
+            <option>Staff</option>
+            <option>Admin</option>
+          </select>
+        </label>
+        <label class="grid gap-1 md:col-span-2">
+          <span class="text-xs text-slate-400">Address</span>
+          <input id="addressInput" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 ring-focus"/>
+        </label>
+        <div class="md:col-span-2 flex justify-end gap-2 pt-2">
+          <button type="button" class="btn btn-ghost" onclick="closeUserModal()">Cancel</button>
+          <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirmModal" class="hidden fixed inset-0 modal-bg z-40 items-center justify-center p-4">
+    <div class="glass rounded-2xl w-full max-w-md">
+      <div class="p-4 border-b border-white/10 flex items-center justify-between">
+        <h3 class="font-bold">Please Confirm</h3>
+        <button class="p-2" onclick="closeConfirm()">✕</button>
+      </div>
+      <div class="p-4 space-y-4">
+        <p id="confirmText" class="text-slate-300">Are you sure?</p>
+        <div class="flex justify-end gap-2">
+          <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+          <button id="confirmYes" class="btn btn-danger">Yes, proceed</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer: User details -->
+  <aside id="drawer" class="fixed top-0 right-0 h-full w-[420px] max-w-[90vw] translate-x-full transition-transform duration-300 z-40">
+    <div class="h-full glass p-4 overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold">User Details</h3>
+        <button onclick="toggleDrawer(false)" class="p-2">✕</button>
+      </div>
+      <div id="drawerBody" class="mt-4 space-y-3 text-sm"></div>
+    </div>
+  </aside>
+
+  <!-- Toasts -->
+  <div id="toastArea" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
+
+  <!-- Hidden file input for CSV import -->
+  <input id="csvInput" type="file" accept=".csv" class="hidden" />
+
+  <script>
+    // --- Fetch Real User Data from API ---------------------------------------
+    let users = [];
+    async function fetchUsers() {
+      try {
+        const response = await fetch('/api/admin/users');
+        if (!response.ok) throw new Error('Failed to fetch users');
+        users = await response.json();
+        // Format lastActive date
+        users.forEach(user => {
+          if (user.lastActive) {
+            user.lastActive = new Date(user.lastActive).toISOString().slice(0, 16).replace('T', ' ');
+          } else {
+            user.lastActive = 'Never';
+          }
+        });
+        render();
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        toast('Failed to load users', 'err');
+      }
+    }
+
+    // --- State --------------------------------------------------------------
+    let state = { page:1, perPage:6, search:"", role:"", status:"", selected:new Set(), sortKey:"fullname", sortDir:"asc" };
+
+    // --- Utilities ----------------------------------------------------------
+    const qs = (s, el=document) => el.querySelector(s);
+    const qsa = (s, el=document) => Array.from(el.querySelectorAll(s));
+    const fmtDate = (s)=> new Date(s.replace(' ','T'));
+
+    function avatarSeed(fullname){
+      const initials = fullname.split(' ').map(p=>p[0]).slice(0,2).join('').toUpperCase();
+      return `<div class="h-9 w-9 rounded-full bg-indigo-500/20 text-indigo-300 grid place-items-center text-xs font-bold">${initials}</div>`;
+    }
+    function badge(status){
+      const map={active:'chip-success',blocked:'chip-danger',pending:'chip-warning'};
+      return `<span class="chip ${map[status]||'chip-neutral'}">${status}</span>`;
+    }
+
+    function toast(text, type='ok'){
+      const id = 't'+Math.random().toString(36).slice(2);
+      const el = document.createElement('div');
+      el.id = id;
+      el.className = `glass rounded-xl px-4 py-3 text-sm ${type==='err'?'border-red-400/40':'border-white/10'}`;
+      el.textContent = text;
+      qs('#toastArea').appendChild(el);
+      setTimeout(()=>{ el.remove(); }, 3200);
+    }
+
+    function updateKPIs(list){
+      qs('#kpiTotal').textContent = list.length;
+      qs('#kpiActive').textContent = list.filter(u=>u.status==='active').length;
+      qs('#kpiBlocked').textContent = list.filter(u=>u.status==='blocked').length;
+      const today = new Date().toISOString().slice(0,10);
+      qs('#kpiNew').textContent = list.filter(u=>fmtDate(u.lastActive).toISOString().slice(0,10)===today).length;
+    }
+
+    // --- Filtering, Sorting, Paging ----------------------------------------
+    function getFiltered(){
+      let list = users.slice();
+      if(state.search){
+        const s = state.search.toLowerCase();
+        list = list.filter(u=>`${u.fullname} ${u.email} ${u.phone}`.toLowerCase().includes(s));
+      }
+      if(state.role) list = list.filter(u=>u.role===state.role);
+      if(state.status) list = list.filter(u=>u.status===state.status);
+      // sort
+      list.sort((a,b)=>{
+        let av=a[state.sortKey], bv=b[state.sortKey];
+        if(state.sortKey==='lastActive'){ av=fmtDate(av); bv=fmtDate(bv); }
+        if(av<bv) return state.sortDir==='asc'? -1: 1;
+        if(av>bv) return state.sortDir==='asc'? 1: -1;
+        return 0;
+      });
+      return list;
+    }
+
+    function paginate(list){
+      const start = (state.page-1)*state.perPage;
+      return list.slice(start, start+state.perPage);
+    }
+
+    // --- Render -------------------------------------------------------------
+    function render(){
+      const list = getFiltered();
+      updateKPIs(list);
+      const pageList = paginate(list);
+      const tbody = qs('#tableBody');
+      tbody.innerHTML = pageList.map(u=>`
+        <tr>
+          <td class="px-4 py-3"><input type="checkbox" class="rowChk accent-indigo-500" data-id="${u.id}" ${state.selected.has(u.id)?'checked':''}></td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              ${avatarSeed(u.fullname)}
+              <div>
+                <div class="font-semibold">${u.fullname}</div>
+                <div class="text-slate-400 text-xs">${u.email}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3">
+            <select class="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-sm roleSelect" data-id="${u.id}">
+              ${['Customer','Seller','Delivery','Staff','Admin'].map(r=>`<option ${r===u.role?'selected':''}>${r}</option>`).join('')}
+            </select>
+          </td>
+          <td class="px-4 py-3">${badge(u.status)}</td>
+          <td class="px-4 py-3">${u.lastActive}</td>
+          <td class="px-4 py-3">${u.orders}</td>
+          <td class="px-4 py-3 text-right">
+            <div class="inline-flex gap-2">
+              <button class="btn btn-ghost viewBtn" data-id="${u.id}">View</button>
+              <button class="btn btn-ghost editBtn" data-id="${u.id}">Edit</button>
+              ${u.status==='blocked'
+                ? `<button class="btn btn-primary unblockBtn" data-id="${u.id}">Unblock</button>`
+                : `<button class="btn btn-danger blockBtn" data-id="${u.id}">Block</button>`}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      // Selection count & pagination
+      qs('#selectionCount').textContent = state.selected.size;
+      const totalPages = Math.max(1, Math.ceil(list.length/state.perPage));
+      qs('#pageInfo').textContent = `Page ${state.page} of ${totalPages}`;
+      qs('#prevPage').disabled = state.page<=1; qs('#nextPage').disabled = state.page>=totalPages;
+
+      // Wire per-row handlers
+      qsa('.rowChk').forEach(ch=> ch.addEventListener('change', e=>{
+        const id = Number(e.target.dataset.id); e.target.checked? state.selected.add(id) : state.selected.delete(id); qs('#selectAll').checked=false; qs('#selectionCount').textContent = state.selected.size; }));
+      qsa('.roleSelect').forEach(sel=> sel.addEventListener('change', async e=>{ const id=Number(e.target.dataset.id); const newRole=e.target.value; try { const response=await fetch(`/api/admin/users/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({role:newRole})}); if(!response.ok) throw new Error('Failed to update role'); const u=users.find(x=>x.id===id); u.role=newRole; toast(`Role updated to ${newRole}`); } catch(error){ console.error(error); toast('Failed to update role','err'); e.target.value=u.role; } }));
+      qsa('.viewBtn').forEach(b=> b.addEventListener('click', e=> openDrawer(Number(e.target.dataset.id))));
+      qsa('.editBtn').forEach(b=> b.addEventListener('click', e=> openUserModal(users.find(u=>u.id===Number(e.target.dataset.id)))));
+      qsa('.blockBtn').forEach(b=> b.addEventListener('click', e=> confirmAction('Block this user?', ()=>{ const id=Number(e.target.dataset.id); const u=users.find(x=>x.id===id); u.status='blocked'; render(); toast('User blocked'); }))); 
+      qsa('.unblockBtn').forEach(b=> b.addEventListener('click', e=> { const id=Number(e.target.dataset.id); const u=users.find(x=>x.id===id); u.status='active'; render(); toast('User unblocked'); })); 
+    }
+
+    // --- Drawer -------------------------------------------------------------
+    function openDrawer(id){
+      const u = users.find(x=>x.id===id);
+      const html = `
+        <div class="flex items-center gap-3">
+          ${avatarSeed(u.fullname)}
+          <div>
+            <div class="text-lg font-bold">${u.fullname}</div>
+            <div class="text-slate-400 text-xs">${u.email}</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mt-4">
+          <div class="glass rounded-xl p-3"><div class="text-slate-400 text-xs">Role</div><div class="font-semibold">${u.role}</div></div>
+          <div class="glass rounded-xl p-3"><div class="text-slate-400 text-xs">Status</div><div>${badge(u.status)}</div></div>
+          <div class="glass rounded-xl p-3"><div class="text-slate-400 text-xs">Phone</div><div class="font-semibold">${u.phone||'-'}</div></div>
+          <div class="glass rounded-xl p-3"><div class="text-slate-400 text-xs">Last Active</div><div class="font-semibold">${u.lastActive}</div></div>
+          <div class="glass rounded-xl p-3 col-span-2"><div class="text-slate-400 text-xs">Address</div><div class="font-semibold">${u.address||'-'}</div></div>
+        </div>
+        <div class="mt-4 flex gap-2">
+          <button class="btn btn-primary" onclick="impersonate(${u.id})">Impersonate</button>
+          <button class="btn btn-ghost" onclick="openUserModal(users.find(x=>x.id===${u.id}))">Edit</button>
+        </div>`;
+      qs('#drawerBody').innerHTML = html;
+      toggleDrawer(true);
+    }
+    function toggleDrawer(open){ qs('#drawer').style.transform = open? 'translateX(0)':'translateX(100%)'; }
+
+    // --- Modals -------------------------------------------------------------
+    function openUserModal(user){
+      qs('#userForm').reset();
+      qs('#userId').value = user?.id||'';
+      qs('#modalTitle').textContent = user? 'Edit User' : 'Add User';
+      if(user){
+        qs('#fullnameInput').value = user.fullname; qs('#emailInput').value = user.email; qs('#phoneInput').value = user.phone||''; qs('#roleInput').value = user.role; qs('#addressInput').value = user.address||'';
+      }
+      qs('#userModal').classList.remove('hidden'); qs('#userModal').classList.add('flex');
+    }
+    function closeUserModal(){ qs('#userModal').classList.add('hidden'); qs('#userModal').classList.remove('flex'); }
+
+    function confirmAction(text, onYes){
+      qs('#confirmText').textContent = text; qs('#confirmModal').classList.remove('hidden'); qs('#confirmModal').classList.add('flex');
+      const btn = qs('#confirmYes');
+      const clone = btn.cloneNode(true); btn.parentNode.replaceChild(clone, btn);
+      clone.addEventListener('click', ()=>{ closeConfirm(); onYes&&onYes(); });
+    }
+    function closeConfirm(){ qs('#confirmModal').classList.add('hidden'); qs('#confirmModal').classList.remove('flex'); }
+
+    // --- CSV Import/Export --------------------------------------------------
+    function toCSV(list){
+      const cols=['id','fullname','email','phone','role','status','lastActive','orders','address'];
+      const head = cols.join(',');
+      const rows = list.map(u=> cols.map(k=>`"${String(u[k]??'').replace(/"/g,'\"')}"`).join(','));
+      return [head, ...rows].join('\n');
+    }
+    function download(filename, text){
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'})); a.download=filename; a.click(); URL.revokeObjectURL(a.href);
+    }
+    function parseCSV(text){
+      const [head,...rows]=text.split(/\r?\n/).filter(Boolean); const cols=head.split(',').map(s=>s.replace(/^"|"$/g,''));
+      return rows.map(r=>{
+        const parts = r.match(/((?<!\\)\".*?(?<!\\)\"|[^,]+)/g)||[]; // crude CSV split, ok for demo
+        const obj={}; cols.forEach((c,i)=> obj[c.replace(/^"|"$/g,'')] = (parts[i]||'').replace(/^"|"$/g,'').replace(/\\\"/g,'"')); return obj;
+      });
+    }
+
+    // --- Actions ------------------------------------------------------------
+    function addOrUpdateUserFromForm(e){ e.preventDefault();
+      const id = qs('#userId').value? Number(qs('#userId').value) : null;
+      const payload = {
+        id: id || (Math.max(...users.map(u=>u.id))+1),
+        fullname: qs('#fullnameInput').value.trim(),
+        email: qs('#emailInput').value.trim(),
+        phone: qs('#phoneInput').value.trim(),
+        role: qs('#roleInput').value,
+        status: 'active',
+        lastActive: new Date().toISOString().slice(0,16).replace('T',' '),
+        orders: 0,
+        address: qs('#addressInput').value.trim()
+      };
+      if(id){ const idx = users.findIndex(u=>u.id===id); users[idx] = {...users[idx], ...payload}; toast('User updated'); }
+      else { users.unshift(payload); toast('User added'); state.page=1; }
+      closeUserModal(); render();
+    }
+
+    function impersonate(id){ toast(`Impersonating user #${id} (demo)`); }
+
+    // --- Event Listeners ----------------------------------------------------
+    window.addEventListener('DOMContentLoaded', ()=>{
+      // Search & filters
+      qs('#searchInput').addEventListener('input', e=>{ state.search = e.target.value; state.page=1; render(); });
+      qs('#roleFilter').addEventListener('change', e=>{ state.role = e.target.value; state.page=1; render(); });
+      qs('#statusFilter').addEventListener('change', e=>{ state.status = e.target.value; state.page=1; render(); });
+
+      // Pagination
+      qs('#prevPage').addEventListener('click', ()=>{ if(state.page>1){ state.page--; render(); }});
+      qs('#nextPage').addEventListener('click', ()=>{ state.page++; render(); });
+
+      // Select all
+      qs('#selectAll').addEventListener('change', e=>{
+        const list = paginate(getFiltered());
+        if(e.target.checked){ list.forEach(u=> state.selected.add(u.id)); }
+        else { list.forEach(u=> state.selected.delete(u.id)); }
+        render();
+      });
+
+      // Bulk actions
+      qs('#bulkActivate').addEventListener('click', ()=>{ users.forEach(u=>{ if(state.selected.has(u.id)) u.status='active'; }); toast('Selected users activated'); render(); });
+      qs('#bulkBlock').addEventListener('click', ()=>{ users.forEach(u=>{ if(state.selected.has(u.id)) u.status='blocked'; }); toast('Selected users blocked'); render(); });
+      qs('#bulkDelete').addEventListener('click', ()=> confirmAction('Delete selected users? This cannot be undone.', ()=>{ for(const id of Array.from(state.selected)) { const i=users.findIndex(u=>u.id===id); if(i>-1) users.splice(i,1); state.selected.delete(id);} toast('Deleted'); render(); }));
+
+      // Add/Edit Modals
+      qs('#addUserBtn').addEventListener('click', ()=> openUserModal());
+      qs('#userForm').addEventListener('submit', addOrUpdateUserFromForm);
+
+      // CSV
+      qs('#exportBtn').addEventListener('click', ()=> download('users.csv', toCSV(users)));
+      qs('#importBtn').addEventListener('click', ()=> qs('#csvInput').click());
+      qs('#csvInput').addEventListener('change', async e=>{ const file=e.target.files[0]; if(!file) return; const text=await file.text(); const rows=parseCSV(text); let added=0; rows.forEach(r=>{ if(!r.email) return; const exists = users.find(u=>u.email===r.email); if(exists){ Object.assign(exists,r,{id:exists.id}); } else { added++; users.push({ id: Math.max(...users.map(u=>u.id))+1, fullname:r.fullname||'Unnamed', email:r.email, phone:r.phone||'', role:r.role||'Customer', status:r.status||'active', lastActive:r.lastActive||new Date().toISOString().slice(0,16).replace('T',' '), orders:Number(r.orders||0), address:r.address||'' }); }}); toast(`Imported ${added} new, updated ${rows.length - added}`); render(); e.target.value=''; });
+
+      // Topbar quick actions (demo)
+      qs('#impersonateBtn').addEventListener('click', ()=>{ if(state.selected.size!==1) return toast('Select exactly one user to impersonate','err'); impersonate(Array.from(state.selected)[0]); });
+      qs('#signOutBtn').addEventListener('click', ()=>{ if(state.selected.size<1) return toast('Select users first','err'); toast('Forced sign-out for selected (demo)'); });
+
+      // Fetch users on load
+      fetchUsers();
+    });
+  </script>
+</body>
+</html>

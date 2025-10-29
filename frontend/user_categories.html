@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Shop by Category · E-Commerce</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {background:#f8fafc;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .card {background:white;border:1px solid #e5e7eb;border-radius:.75rem;padding:1rem}
+    .sidebar {background:#1e293b;color:white}
+    .sidebar a {display:block;padding:.5rem 1rem;border-radius:.5rem;margin:.25rem 0}
+    .sidebar a.active {background:#2563eb}
+  </style>
+</head>
+<body class="flex h-screen">
+  <!-- Sidebar Categories -->
+  <aside class="sidebar w-64 p-4 overflow-y-auto">
+    <h1 class="text-lg font-bold mb-4">Categories</h1>
+    <nav id="categoryList"></nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-6 overflow-auto">
+    <!-- Filters & Sorting -->
+    <div class="flex flex-wrap items-center justify-between mb-4">
+      <div class="flex gap-2">
+        <select id="filterPrice" class="border rounded p-2">
+          <option value="">Price</option>
+          <option value="0-500">Under ₹500</option>
+          <option value="500-1000">₹500–₹1000</option>
+          <option value="1000-2000">₹1000–₹2000</option>
+        </select>
+        <select id="filterRating" class="border rounded p-2">
+          <option value="">Rating</option>
+          <option value="4">4★ & above</option>
+          <option value="3">3★ & above</option>
+        </select>
+      </div>
+      <div>
+        <select id="sortBy" class="border rounded p-2">
+          <option value="new">Newest</option>
+          <option value="low">Price: Low to High</option>
+          <option value="high">Price: High to Low</option>
+          <option value="popular">Most Popular</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <h2 id="categoryTitle" class="text-xl font-bold mb-3">Select a category</h2>
+    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+  </main>
+
+  <script>
+    // Demo categories
+    const categories = [
+      {id:1,name:"Groceries",sub:["Vegetables","Fruits","Snacks"]},
+      {id:2,name:"Men Fashion",sub:["Shirts","Jeans","Shoes"]},
+      {id:3,name:"Women Fashion",sub:["Dresses","Handbags","Heels"]},
+      {id:4,name:"Kids Fashion",sub:["T-Shirts","Toys","Shoes"]},
+      {id:5,name:"Electronics",sub:["Mobiles","Laptops","Headphones"]}
+    ];
+
+    // Demo products
+    const products = [
+      {id:101,cat:"Vegetables",name:"Fresh Tomatoes",price:80,rating:4.2},
+      {id:102,cat:"Vegetables",name:"Potatoes 5kg",price:120,rating:4.5},
+      {id:103,cat:"Fruits",name:"Apples Pack",price:250,rating:4.6},
+      {id:201,cat:"Shirts",name:"Casual Cotton Shirt",price:799,rating:4.1},
+      {id:202,cat:"Jeans",name:"Blue Denim Jeans",price:1199,rating:4.4},
+      {id:301,cat:"Dresses",name:"Floral Summer Dress",price:999,rating:4.3},
+      {id:401,cat:"Toys",name:"Building Blocks Set",price:450,rating:4.8},
+      {id:501,cat:"Mobiles",name:"Smartphone X12",price:15999,rating:4.7},
+      {id:502,cat:"Headphones",name:"Wireless Earbuds",price:2499,rating:4.5}
+    ];
+
+    // Render categories
+    const catList = document.getElementById("categoryList");
+    categories.forEach(c=>{
+      const div=document.createElement("div");
+      div.innerHTML=`<a href="#" class="font-semibold">${c.name}</a>` +
+        c.sub.map(s=>`<a href="#" class="ml-4" data-sub="${s}">${s}</a>`).join("");
+      catList.appendChild(div);
+    });
+
+    // Show products
+    function showProducts(cat){
+      document.getElementById("categoryTitle").textContent=cat;
+      let filtered = products.filter(p=>p.cat===cat);
+
+      // Apply filters
+      const price=document.getElementById("filterPrice").value;
+      if(price){
+        const [min,max]=price.split("-").map(Number);
+        filtered=filtered.filter(p=>(!min||p.price>=min)&&(!max||p.price<=max));
+      }
+      const rating=document.getElementById("filterRating").value;
+      if(rating){
+        filtered=filtered.filter(p=>p.rating>=+rating);
+      }
+
+      // Sort
+      const sortBy=document.getElementById("sortBy").value;
+      if(sortBy==="low") filtered.sort((a,b)=>a.price-b.price);
+      if(sortBy==="high") filtered.sort((a,b)=>b.price-a.price);
+      if(sortBy==="popular") filtered.sort((a,b)=>b.rating-a.rating);
+
+      // Render grid
+      document.getElementById("productGrid").innerHTML = filtered.map(p=>
+        `<div class="card">
+          <div class="font-semibold">${p.name}</div>
+          <div class="text-sm text-gray-600">₹${p.price}</div>
+          <div class="text-yellow-500">★ ${p.rating}</div>
+          <button class="btn mt-2 bg-blue-600 text-white w-full rounded p-2">Add to Cart</button>
+        </div>`
+      ).join("") || `<p class="text-gray-500">No products found in this category.</p>`;
+    }
+
+    // Category click events
+    catList.addEventListener("click",e=>{
+      if(e.target.dataset.sub){
+        e.preventDefault();
+        showProducts(e.target.dataset.sub);
+      }
+    });
+
+    // Filter change
+    document.querySelectorAll("#filterPrice,#filterRating,#sortBy").forEach(el=>{
+      el.addEventListener("change",()=>{
+        const current=document.getElementById("categoryTitle").textContent;
+        if(current!=="Select a category") showProducts(current);
+      });
+    });
+  </script>
+</body>
+</html>
