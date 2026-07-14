@@ -1,4 +1,4 @@
-name: Build, Push and Deploy to Amazon EKS
+name: Build, Push and Deploy to EKS
 
 on:
   push:
@@ -7,9 +7,9 @@ on:
 
 env:
   AWS_REGION: ap-south-1
-  CLUSTER_NAME: Ecommerce
   ECR_REPOSITORY: ecommerce
-  ECR_REGISTRY: 360967147235.dkr.ecr.ap-south-1.amazonaws.com
+  CLUSTER_NAME: Ecommerce
+  NAMESPACE: ecommerce
 
 jobs:
   deploy:
@@ -37,15 +37,15 @@ jobs:
         run: |
           docker build -t $ECR_REPOSITORY:${{ github.sha }} .
 
-      - name: Tag Docker Images
+      - name: Tag Docker Image
         run: |
-          docker tag $ECR_REPOSITORY:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
-          docker tag $ECR_REPOSITORY:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker tag $ECR_REPOSITORY:${{ github.sha }} \
+          ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
 
-      - name: Push Docker Images
+      - name: Push Docker Image
         run: |
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push \
+          ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
 
       - name: Configure kubectl
         run: |
@@ -59,41 +59,22 @@ jobs:
           chmod +x kubectl-argo-rollouts-linux-amd64
           sudo mv kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
 
-      - name: Verify Argo Rollouts CLI
+      - name: Deploy New Version
         run: |
-          kubectl argo rollouts version
+          IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
-      - name: Update Rollout Image
+          kubectl argo rollouts set image ecommerce \
+          ecommerce=$IMAGE \
+          -n $NAMESPACE
+
+      - name: Wait for Preview Pods
         run: |
-          IMAGE=$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+          kubectl argo rollouts get rollout ecommerce \
+          -n $NAMESPACE
 
-          sed -i "s|image: .*|image: $IMAGE|g" k8s/backend/rollout.yaml
-
-      - name: Apply Rollout
+      - name: Deployment Finished
         run: |
-          kubectl apply -f k8s/backend/rollout.yaml
-
-      - name: Verify Rollout Exists
-        run: |
-          kubectl get rollout ecommerce -n ecommerce
-
-      - name: Show Rollout Status
-        run: |
-          kubectl argo rollouts get rollout ecommerce -n ecommerce
-
-      - name: Deployment Completed
-        run: |
-          echo "========================================"
-          echo "Deployment completed successfully."
-          echo ""
-          echo "Preview deployment has been created."
-          echo ""
-          echo "To monitor rollout:"
-          echo "kubectl argo rollouts get rollout ecommerce -n ecommerce --watch"
-          echo ""
-          echo "To promote:"
-          echo "kubectl argo rollouts promote ecommerce -n ecommerce"
-          echo ""
-          echo "To rollback:"
-          echo "kubectl argo rollouts undo ecommerce -n ecommerce"
-          echo "========================================"
+          echo "=================================="
+          echo "Preview deployment created."
+          echo "Waiting for manual approval."
+          echo "=================================="
