@@ -1,9 +1,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
+
 metadata:
   name: mongodb-pvc
   namespace: ecommerce
+
 spec:
+  storageClassName: gp2
+
   accessModes:
     - ReadWriteOnce
 
