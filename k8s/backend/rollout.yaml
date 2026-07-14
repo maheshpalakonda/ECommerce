@@ -6,6 +6,7 @@ metadata:
   namespace: ecommerce
 
 spec:
+
   replicas: 2
 
   revisionHistoryLimit: 5
@@ -21,50 +22,47 @@ spec:
 
     spec:
       containers:
-        - name: ecommerce
+      - name: ecommerce
 
-          image: 360967147235.dkr.ecr.ap-south-1.amazonaws.com/ecommerce:latest
+        image: 360967147235.dkr.ecr.ap-south-1.amazonaws.com/ecommerce:latest
 
-          imagePullPolicy: Always
+        imagePullPolicy: Always
 
-          ports:
-            - containerPort: 3006
+        ports:
+        - containerPort: 3006
 
-          envFrom:
-            - configMapRef:
-                name: ecommerce-config
+        envFrom:
 
-            - secretRef:
-                name: ecommerce-secret
+        - configMapRef:
+            name: ecommerce-config
 
-          resources:
-            requests:
-              cpu: "200m"
-              memory: "256Mi"
+        - secretRef:
+            name: ecommerce-secret
 
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3006
 
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 3006
+          initialDelaySeconds: 10
+          periodSeconds: 5
 
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            timeoutSeconds: 2
-            failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3006
 
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 3006
+          initialDelaySeconds: 30
+          periodSeconds: 10
 
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 2
-            failureThreshold: 3
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
 
   strategy:
 

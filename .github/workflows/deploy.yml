@@ -1,4 +1,4 @@
-name: Build, Push and Deploy to EKS (Blue-Green)
+name: Build, Push and Deploy to EKS
 
 on:
   push:
@@ -7,10 +7,8 @@ on:
 
 env:
   AWS_REGION: ap-south-1
-  ECR_REPOSITORY: ecommerce
   CLUSTER_NAME: Ecommerce
-  NAMESPACE: ecommerce
-  ROLLOUT_NAME: ecommerce
+  ECR_REPOSITORY: ecommerce
 
 jobs:
   deploy:
@@ -38,6 +36,9 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t $ECR_REPOSITORY:${{ github.sha }} .
+
+      - name: Tag Docker Images
+        run: |
           docker tag $ECR_REPOSITORY:${{ github.sha }} \
           ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
 
@@ -58,28 +59,22 @@ jobs:
           --region $AWS_REGION \
           --name $CLUSTER_NAME
 
-      - name: Install Argo Rollouts CLI
+      - name: Update Rollout Image
         run: |
-          curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
-          chmod +x kubectl-argo-rollouts-linux-amd64
-          sudo mv kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+          IMAGE=${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
 
-      - name: Deploy Green Version
+          sed -i "s|image: .*|image: $IMAGE|g" k8s/backend/rollout.yaml
+
+      - name: Deploy Rollout
         run: |
-          kubectl argo rollouts set image rollout/$ROLLOUT_NAME \
-          ecommerce=${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }} \
-          -n $NAMESPACE
+          kubectl apply -f k8s/backend/rollout.yaml
 
       - name: Wait for Rollout
         run: |
-          kubectl argo rollouts get rollout $ROLLOUT_NAME \
-          -n $NAMESPACE \
-          --watch
+          kubectl rollout status rollout/ecommerce \
+          -n ecommerce \
+          --timeout=300s
 
-      - name: Deployment Summary
+      - name: Show Rollout
         run: |
-          echo "Deployment completed."
-          echo ""
-          echo "Preview deployment created."
-          echo "Manual Promotion Command:"
-          echo "kubectl argo rollouts promote ecommerce -n ecommerce"
+          kubectl get rollout -n ecommerce
