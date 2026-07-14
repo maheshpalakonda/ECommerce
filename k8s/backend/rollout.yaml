@@ -3,13 +3,12 @@ kind: Rollout
 
 metadata:
   name: ecommerce
-
   namespace: ecommerce
 
 spec:
   replicas: 2
 
-  revisionHistoryLimit: 3
+  revisionHistoryLimit: 5
 
   selector:
     matchLabels:
@@ -22,38 +21,54 @@ spec:
 
     spec:
       containers:
+        - name: ecommerce
+          image: 360967147235.dkr.ecr.ap-south-1.amazonaws.com/ecommerce:latest
+          imagePullPolicy: Always
 
-      - name: ecommerce
+          ports:
+            - containerPort: 3006
 
-        image: 360967147235.dkr.ecr.ap-south-1.amazonaws.com/ecommerce:latest
+          envFrom:
+            - configMapRef:
+                name: ecommerce-config
+            - secretRef:
+                name: ecommerce-secret
 
-        imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
 
-        ports:
-        - containerPort: 3006
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3006
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
 
-        envFrom:
-        - configMapRef:
-            name: ecommerce-config
-
-        - secretRef:
-            name: ecommerce-secret
-
-        resources:
-          requests:
-            cpu: "200m"
-            memory: "256Mi"
-
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3006
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
 
   strategy:
-
     blueGreen:
-
       activeService: ecommerce-active
-
       previewService: ecommerce-preview
 
-      autoPromotionEnabled: true
+      autoPromotionEnabled: false
+
+      autoPromotionSeconds: 60
+
+      scaleDownDelaySeconds: 30
+
+      previewReplicaCount: 2
