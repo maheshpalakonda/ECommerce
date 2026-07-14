@@ -1,4 +1,4 @@
-name: Build and Push Docker Image to Amazon ECR
+name: Build, Push and Deploy to EKS (Blue-Green)
 
 on:
   push:
@@ -8,16 +8,19 @@ on:
 env:
   AWS_REGION: ap-south-1
   ECR_REPOSITORY: ecommerce
+  CLUSTER_NAME: Ecommerce
+  NAMESPACE: ecommerce
+  ROLLOUT_NAME: ecommerce
 
 jobs:
-  build-and-push:
-    name: Build and Push Docker Image
+  deploy:
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
 
     steps:
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -34,19 +37,49 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t $ECR_REPOSITORY:latest .
-          docker tag $ECR_REPOSITORY:latest ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:latest
-          docker tag $ECR_REPOSITORY:latest ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
+          docker build -t $ECR_REPOSITORY:${{ github.sha }} .
+          docker tag $ECR_REPOSITORY:${{ github.sha }} \
+          ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
+
+          docker tag $ECR_REPOSITORY:${{ github.sha }} \
+          ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:latest
 
       - name: Push Docker Images
         run: |
-          docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:latest
-          docker push ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
+          docker push \
+          ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}
 
-      - name: Image Information
+          docker push \
+          ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:latest
+
+      - name: Configure kubectl
         run: |
-          echo "Latest Image:"
-          echo "${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:latest"
+          aws eks update-kubeconfig \
+          --region $AWS_REGION \
+          --name $CLUSTER_NAME
+
+      - name: Install Argo Rollouts CLI
+        run: |
+          curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
+          chmod +x kubectl-argo-rollouts-linux-amd64
+          sudo mv kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+
+      - name: Deploy Green Version
+        run: |
+          kubectl argo rollouts set image rollout/$ROLLOUT_NAME \
+          ecommerce=${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }} \
+          -n $NAMESPACE
+
+      - name: Wait for Rollout
+        run: |
+          kubectl argo rollouts get rollout $ROLLOUT_NAME \
+          -n $NAMESPACE \
+          --watch
+
+      - name: Deployment Summary
+        run: |
+          echo "Deployment completed."
           echo ""
-          echo "Commit Image:"
-          echo "${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ github.sha }}"
+          echo "Preview deployment created."
+          echo "Manual Promotion Command:"
+          echo "kubectl argo rollouts promote ecommerce -n ecommerce"
