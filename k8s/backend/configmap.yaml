@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: ecommerce-config
+  namespace: ecommerce
+
+data:
+  PORT: "3006"
+  GOOGLE_CLIENT_ID: "458280472299-vmd1t5nekhckkk2b2pna6erhhni0vr6u.apps.googleusercontent.com"

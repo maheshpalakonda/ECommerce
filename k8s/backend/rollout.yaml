@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+
+metadata:
+  name: ecommerce
+
+  namespace: ecommerce
+
+spec:
+  replicas: 2
+
+  revisionHistoryLimit: 3
+
+  selector:
+    matchLabels:
+      app: ecommerce
+
+  template:
+    metadata:
+      labels:
+        app: ecommerce
+
+    spec:
+      containers:
+
+      - name: ecommerce
+
+        image: 360967147235.dkr.ecr.ap-south-1.amazonaws.com/ecommerce:latest
+
+        imagePullPolicy: Always
+
+        ports:
+        - containerPort: 3006
+
+        envFrom:
+        - configMapRef:
+            name: ecommerce-config
+
+        - secretRef:
+            name: ecommerce-secret
+
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
+  strategy:
+
+    blueGreen:
+
+      activeService: ecommerce-active
+
+      previewService: ecommerce-preview
+
+      autoPromotionEnabled: true
