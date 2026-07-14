@@ -1,0 +1,8 @@
+node_modules
+.git
+.github
+.env
+Dockerfile
+k8s
+*.log
+npm-debug.log
